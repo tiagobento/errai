@@ -16,25 +16,7 @@
 
 package org.jboss.errai.samples.restdemo.client.local;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.enterprise.client.jaxrs.MarshallingWrapper;
-import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
-import org.jboss.errai.ioc.client.api.EntryPoint;
-import org.jboss.errai.samples.restdemo.client.shared.Customer;
-import org.jboss.errai.samples.restdemo.client.shared.CustomerNotFoundException;
-import org.jboss.errai.samples.restdemo.client.shared.CustomerService;
-
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
@@ -44,6 +26,20 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.enterprise.client.jaxrs.MarshallingWrapper;
+import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
+import org.jboss.errai.ioc.client.api.EntryPoint;
+import org.jboss.errai.samples.restdemo.client.shared.Customer;
+import org.jboss.errai.samples.restdemo.client.shared.CustomerNotFoundException;
+import org.jboss.errai.samples.restdemo.client.shared.CustomerService;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Example code showing how to use Errai-JAXRS.
@@ -61,86 +57,71 @@ public class App {
   final private TextBox custLastName = new TextBox();
   final private TextBox custPostalCode = new TextBox();
 
-  final Map<Long, Integer> rows = new HashMap<Long, Integer>();
+  private final Map<Long, Integer> rows = new HashMap<>();
 
-  final RemoteCallback<Response> creationCallback = new RemoteCallback<Response>() {
-    @Override
-    public void callback(final Response response) {
-      if (response.getStatusCode() == 200) {
-        final long id = MarshallingWrapper.fromJSON(response.getText(), Long.class);
-        customerService.call(new RemoteCallback<Customer>() {
-          @Override
-          public void callback(final Customer customer) {
-            addCustomerToTable(customer, customersTable.getRowCount() + 1);
-          }
-        }).retrieveCustomerById(id);
-      }
+  private final RemoteCallback<Response> creationCallback = response -> {
+    if (response.getStatusCode() == 200) {
+      final long id = MarshallingWrapper.fromJSON(response.getText(), Long.class);
+      customerService.call((RemoteCallback<Customer>) this::addNewCustomerToTable).retrieveCustomerById(id);
     }
   };
 
-  final RemoteCallback<Customer> modificationCallback = new RemoteCallback<Customer>() {
-    @Override
-    public void callback(final Customer customer) {
-      addCustomerToTable(customer, rows.get(customer.getId()));
-    }
+  private final RemoteCallback<Customer> modificationCallback = customer -> {
+    addCustomerToTable(customer, rows.get(customer.getId()));
   };
 
-  final RemoteCallback<Response> deletionCallback = new RemoteCallback<Response>() {
-    @Override
-    public void callback(final Response response) {
-      customersTable.removeAllRows();
-      populateCustomersTable();
-    }
+  private final RemoteCallback<Response> deletionCallback = response -> {
+    customersTable.removeAllRows();
+    populateCustomersTable();
   };
 
   @PostConstruct
   public void init() {
-    final Button create = new Button("Create", new ClickHandler() {
-      @Override
-      public void onClick(final ClickEvent clickEvent) {
-        final Customer customer = new Customer(custFirstName.getText(), custLastName.getText(), custPostalCode.getText());
-        customerService.call(creationCallback).createCustomer(customer);
-      }
+
+    final Button createButton = new Button("Create", (ClickHandler) clickEvent -> {
+      final Customer customer = new Customer(custFirstName.getText(), custLastName.getText(), custPostalCode.getText());
+      customerService.call(creationCallback).createCustomer(customer);
     });
 
-    final Button get = new Button("Get (Simulate Error)", new ClickHandler() {
-      @Override
-      public void onClick(final ClickEvent clickEvent) {
-        customerService.call(new RemoteCallback<Customer>() {
-          @Override
-          public void callback(final Customer response) {
-            Window.alert("A customer was returned?  What the what?!");
-          }
-        }, new RestErrorCallback() {
-          @Override
-          public boolean error(final Request message, final Throwable throwable) {
-            final CustomerNotFoundException cnfe = (CustomerNotFoundException) throwable;
-            Window.alert("As expected, an error of type '"
-                    + cnfe.getClass().getName() + "' was received for ID '"
-                    + cnfe.getCustomerId() + "'.");
-            return true;
-          }
-        }).retrieveCustomerById(17);
-      }
+    final Button getSimulatingErrorButton = new Button("Get (Simulate Error)", (ClickHandler) clickEvent -> {
+      final RestErrorCallback errorCallback = (message, throwable) -> {
+        final CustomerNotFoundException e = (CustomerNotFoundException) throwable;
+
+        final String className = e.getClass().getName();
+        final Long customerId = e.getCustomerId();
+
+        Window.alert("As expected, an error of type '" + className + "' was received for ID '" + customerId + "'.");
+        return true;
+      };
+
+      final RemoteCallback<Customer> successCallback = response -> {
+        Window.alert("A customer was returned?  What the what?!");
+      };
+
+      customerService.call(successCallback, errorCallback).retrieveCustomerById(nonexistentCustomerId());
     });
 
     final FlexTable newCustomerTable = new FlexTable();
     newCustomerTable.setWidget(0, 1, custFirstName);
     newCustomerTable.setWidget(0, 2, custLastName);
     newCustomerTable.setWidget(0, 3, custPostalCode);
-    newCustomerTable.setWidget(0, 4, create);
+    newCustomerTable.setWidget(0, 4, createButton);
     newCustomerTable.setStyleName("new-customer-table");
 
     final VerticalPanel vPanel = new VerticalPanel();
     vPanel.add(customersTable);
-    vPanel.add(new HTML("<hr>"));
+    vPanel.add(new HTML("<hr />"));
     vPanel.add(newCustomerTable);
-    vPanel.add(new HTML("<hr>"));
-    vPanel.add(get);
+    vPanel.add(new HTML("<hr />"));
+    vPanel.add(getSimulatingErrorButton);
     vPanel.addStyleName("whole-customer-table");
     RootPanel.get().add(vPanel);
 
     populateCustomersTable();
+  }
+
+  private long nonexistentCustomerId() {
+    return 17L;
   }
 
   private void populateCustomersTable() {
@@ -150,15 +131,15 @@ public class App {
     customersTable.setText(0, 3, "Postal Code");
     customersTable.setText(0, 4, "Date Changed");
 
-    final RemoteCallback<List<Customer>> listCallback = new RemoteCallback<List<Customer>>() {
-      @Override
-      public void callback(final List<Customer> customers) {
-        for (final Customer customer : customers) {
-          addCustomerToTable(customer, customersTable.getRowCount() + 1);
-        }
-      }
+    final RemoteCallback<List<Customer>> listCallback = customers -> {
+      customers.forEach(this::addNewCustomerToTable);
     };
+
     customerService.call(listCallback).listAllCustomers();
+  }
+
+  private void addNewCustomerToTable(Customer customer) {
+    addCustomerToTable(customer, customersTable.getRowCount() + 1);
   }
 
   private void addCustomerToTable(final Customer customer, final int row) {
@@ -171,30 +152,25 @@ public class App {
     final TextBox postalCode = new TextBox();
     postalCode.setText(customer.getPostalCode());
 
-    final Button update = new Button("Update", new ClickHandler() {
-      @Override
-      public void onClick(final ClickEvent clickEvent) {
-        customer.setFirstName(firstName.getText());
-        customer.setLastName(lastName.getText());
-        customer.setPostalCode(postalCode.getText());
-        customerService.call(modificationCallback).updateCustomer(customer.getId(), customer);
-      }
+    final Button updateButton = new Button("Update", (ClickHandler) clickEvent -> {
+      customer.setFirstName(firstName.getText());
+      customer.setLastName(lastName.getText());
+      customer.setPostalCode(postalCode.getText());
+      customerService.call(modificationCallback).updateCustomer(customer.getId(), customer);
     });
 
-    final Button delete = new Button("Delete", new ClickHandler() {
-      @Override
-      public void onClick(final ClickEvent clickEvent) {
-        customerService.call(deletionCallback).deleteCustomer(customer.getId());
-      }
+    final Button deleteButton = new Button("Delete", (ClickHandler) clickEvent -> {
+      customerService.call(deletionCallback).deleteCustomer(customer.getId());
     });
 
-    customersTable.setText(row, 0, new Long(customer.getId()).toString());
+    customersTable.setText(row, 0, Long.toString(customer.getId()));
     customersTable.setWidget(row, 1, firstName);
     customersTable.setWidget(row, 2, lastName);
     customersTable.setWidget(row, 3, postalCode);
-    customersTable.setText(row, 4,DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss").format(customer.getLastChanged()));
-    customersTable.setWidget(row, 5, update);
-    customersTable.setWidget(row, 6, delete);
+    customersTable.setText(row, 4, DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss").format(customer.getLastChanged()));
+    customersTable.setWidget(row, 5, updateButton);
+    customersTable.setWidget(row, 6, deleteButton);
+
     rows.put(customer.getId(), row);
   }
 }

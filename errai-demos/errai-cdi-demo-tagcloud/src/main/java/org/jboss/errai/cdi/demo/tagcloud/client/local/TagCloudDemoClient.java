@@ -16,15 +16,9 @@
 
 package org.jboss.errai.cdi.demo.tagcloud.client.local;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import org.jboss.errai.cdi.demo.tagcloud.client.shared.Deleted;
 import org.jboss.errai.cdi.demo.tagcloud.client.shared.New;
 import org.jboss.errai.cdi.demo.tagcloud.client.shared.Tag;
@@ -33,13 +27,17 @@ import org.jboss.errai.cdi.demo.tagcloud.client.shared.TagCloudSubscription;
 import org.jboss.errai.cdi.demo.tagcloud.client.shared.Updated;
 import org.jboss.errai.ioc.client.api.EntryPoint;
 
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.RootPanel;
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * EntryPoint to the Errai CDI tag cloud demo.
- * 
+ *
  * @author Christian Sadilek <csadilek@redhat.com>
  */
 @EntryPoint
@@ -48,8 +46,8 @@ public class TagCloudDemoClient {
   private static final int MIN_FONT_SIZE = 10;
   private static final int MAX_FONT_SIZE = 35;
 
-  private static final long TAG_ADULT_AGE = 15000l;
-  private static final long TAG_SENIOR_AGE = 45000l;
+  private static final long TAG_ADULT_AGE = 15000L;
+  private static final long TAG_SENIOR_AGE = 45000L;
   private static final String TAG_ADULT_AGE_STYLE = "tag-adult";
   private static final String TAG_SENIOR_AGE_STYLE = "tag-senior";
   private static final String TAG_WINNER_STYLE = "tag-winner";
@@ -72,9 +70,8 @@ public class TagCloudDemoClient {
 
   public void onTagCloudReceived(@Observes TagCloud tagCloud) {
     if (tags == null) {
-      tags = new HashMap<String, Anchor>();
-    }
-    else {
+      tags = new HashMap<>();
+    } else {
       tags.clear();
       tagCloudPanel.clear();
     }
@@ -88,53 +85,59 @@ public class TagCloudDemoClient {
   }
 
   public void onTagUpdated(@Observes @Updated Tag tag) {
-    if (tags != null) {
-      Anchor link = tags.get(tag.getName());
-      if (link == null)
-        return;
-
-      if (tag.getFrequency() > cloud.getTag(tag.getName()).getFrequency()) {
-        link.setStyleName(TAG_DEFAULT_STYLE);
-      }
-      else if (tag.getFrequency() < cloud.getTag(tag.getName()).getFrequency()) {
-        if (link.getStyleName().contains(TAG_ADULT_AGE_STYLE)) {
-          link.setStyleName(TAG_SENIOR_AGE_STYLE, true);
-        }
-        else {
-          link.setStyleName(TAG_ADULT_AGE_STYLE, true);
-        }
-      }
-
-      boolean needsRefresh = cloud.updateTag(tag);
-      bounceResize("#" + link.getElement().getId(), calculateFontSize(tag), MAX_FONT_SIZE + "px");
-      checkAndMarkAsWinner(tag);
-
-      if (needsRefresh)
-        refreshTagCloud();
-
-      ageTags();
+    if (tags == null) {
+      return;
     }
+
+    Anchor link = tags.get(tag.getName());
+    if (link == null) {
+      return;
+    }
+
+    if (tag.getFrequency() > cloud.getTag(tag.getName()).getFrequency()) {
+      link.setStyleName(TAG_DEFAULT_STYLE);
+    } else if (tag.getFrequency() < cloud.getTag(tag.getName()).getFrequency()) {
+      if (link.getStyleName().contains(TAG_ADULT_AGE_STYLE)) {
+        link.setStyleName(TAG_SENIOR_AGE_STYLE, true);
+      } else {
+        link.setStyleName(TAG_ADULT_AGE_STYLE, true);
+      }
+    }
+
+    boolean needsRefresh = cloud.updateTag(tag);
+    bounceResize("#" + link.getElement().getId(), calculateFontSize(tag), MAX_FONT_SIZE + "px");
+    checkAndMarkAsWinner(tag);
+
+    if (needsRefresh) {
+      refreshTagCloud();
+    }
+
+    ageTags();
   }
 
   public void onTagCreated(@Observes @New Tag tag) {
-    if (tags == null)
+    if (tags == null) {
       return;
+    }
 
     boolean needsRefresh = cloud.addTag(tag);
     addTag(tag);
     fadeIn("#" + tag.getName());
-    if (needsRefresh)
+    if (needsRefresh) {
       refreshTagCloud();
+    }
   }
 
   public void onTagDeleted(@Observes @Deleted Tag tag) {
-    if (tags == null)
+    if (tags == null) {
       return;
+    }
 
     fadeOut("#" + tag.getName());
     tags.remove(tag.getName());
-    if (cloud.removeTag(tag))
+    if (cloud.removeTag(tag)) {
       refreshTagCloud();
+    }
   }
 
   private void refreshTagCloud() {
@@ -170,8 +173,9 @@ public class TagCloudDemoClient {
     Date now = new Date();
     for (Tag tag : cloud.getAllTags()) {
       Anchor link = tags.get(tag.getName());
-      if (link == null || link.getStyleName().contains(TAG_WINNER_STYLE))
+      if (link == null || link.getStyleName().contains(TAG_WINNER_STYLE)) {
         continue;
+      }
 
       if (tag.getCreated().getTime() < now.getTime() - TAG_ADULT_AGE) {
         link.setStyleName(TAG_ADULT_AGE_STYLE, true);
@@ -183,13 +187,15 @@ public class TagCloudDemoClient {
   }
 
   private void checkAndMarkAsWinner(Tag tag) {
-    if (tags == null)
+    if (tags == null) {
       return;
+    }
 
     Anchor link = tags.get(tag.getName());
     if (link != null) {
-      if (link.getStyleName().contains(TAG_WINNER_STYLE))
+      if (link.getStyleName().contains(TAG_WINNER_STYLE)) {
         link.removeStyleName(TAG_WINNER_STYLE);
+      }
 
       if (tag.getFrequency().equals(cloud.getMaxFrequency())) {
         link.setStyleName(TAG_WINNER_STYLE, true);
@@ -198,35 +204,35 @@ public class TagCloudDemoClient {
   }
 
   private native void resize(String tag, String size) /*-{
-    $wnd.$(tag).animate({
-        fontSize : size
-    }, 200, function() {
-    });
+      $wnd.$(tag).animate({
+          fontSize: size
+      }, 200, function () {
+      });
   }-*/;
 
   private native void bounceResize(String tag, String size, String maxSize) /*-{
-    $wnd.$(tag).animate({
-        fontSize : maxSize
-    }, 300, function() {
-        $wnd.$(tag).animate({
-            fontSize : size
-        }, 500, function() {
-        })
-    });
+      $wnd.$(tag).animate({
+          fontSize: maxSize
+      }, 300, function () {
+          $wnd.$(tag).animate({
+              fontSize: size
+          }, 500, function () {
+          })
+      });
   }-*/;
 
   private native void fadeIn(String tag) /*-{
-    $wnd.$(tag).hide().fadeIn(800, function() {
-    });
+      $wnd.$(tag).hide().fadeIn(800, function () {
+      });
   }-*/;
 
   private native void fadeOut(String tag) /*-{
-    $wnd.$(tag).fadeOut(800, function() {
-        $wnd.$(tag).remove()
-    });
+      $wnd.$(tag).fadeOut(800, function () {
+          $wnd.$(tag).remove()
+      });
   }-*/;
 
   private native void remove(String tag) /*-{
-    $wnd.$(tag).remove();
+      $wnd.$(tag).remove();
   }-*/;
 }

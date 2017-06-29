@@ -16,6 +16,19 @@
 
 package org.jboss.errai.cdi.demo.tagcloud.server;
 
+import org.jboss.errai.cdi.demo.tagcloud.client.shared.Deleted;
+import org.jboss.errai.cdi.demo.tagcloud.client.shared.New;
+import org.jboss.errai.cdi.demo.tagcloud.client.shared.Tag;
+import org.jboss.errai.cdi.demo.tagcloud.client.shared.TagCloud;
+import org.jboss.errai.cdi.demo.tagcloud.client.shared.TagCloudSubscription;
+import org.jboss.errai.cdi.demo.tagcloud.client.shared.Updated;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,19 +38,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
-import org.jboss.errai.cdi.demo.tagcloud.client.shared.New;
-import org.jboss.errai.cdi.demo.tagcloud.client.shared.Tag;
-import org.jboss.errai.cdi.demo.tagcloud.client.shared.TagCloud;
-import org.jboss.errai.cdi.demo.tagcloud.client.shared.TagCloudSubscription;
-import org.jboss.errai.cdi.demo.tagcloud.client.shared.Updated;
 
 /**
  * A CDI-based tag cloud service using random mock data.
@@ -68,6 +68,7 @@ public class TagCloudService {
   };
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
   private ScheduledFuture<?> updater = null;
 
   @Inject
@@ -81,20 +82,20 @@ public class TagCloudService {
   @New
   private Event<Tag> newTagEvent;
 
+  @Inject
+  @Deleted
+  private Event<Tag> deletedTagEvent;
+
   @PostConstruct
   public void start() {
-    updater = scheduler.scheduleAtFixedRate(new Runnable() {
-      @Override
-      public void run() {
-        createRandomChange();
-      }
-    }, 0, 2, TimeUnit.SECONDS);
+    updater = scheduler.scheduleAtFixedRate(this::createRandomChange, 0, 2, TimeUnit.SECONDS);
   }
 
   @PreDestroy
   public void stop() {
-    if (updater != null)
+    if (updater != null) {
       updater.cancel(true);
+    }
   }
 
   public void handleNewSubscription(@Observes TagCloudSubscription subscription) {
@@ -102,22 +103,34 @@ public class TagCloudService {
   }
 
   private void createRandomChange() {
-    if (Math.random() > 0.9) {
-      // add a random tag
-      List<Tag> tags = new ArrayList<Tag>(initialTags);
-      Tag randomTag = new Tag(randomString(tags.get(new Random().nextInt(initialTags.size())).getName()),
-                (int) Math.ceil(Math.random() * 100));
-      initialTags.add(randomTag);
-      newTagEvent.fire(randomTag);
+
+    //50% chance to add a tag
+    if (Math.random() > 0.5) {
+      List<Tag> tags = new ArrayList<>(initialTags);
+      Tag randomTag = tags.get(new Random().nextInt(initialTags.size()));
+      Tag newTag = new Tag(randomString(randomTag.getName()), (int) Math.ceil(Math.random() * 100));
+
+      initialTags.add(newTag);
+      newTagEvent.fire(newTag);
     }
-    else {
-      // modify a tag
+
+    //25% chance to update tags
+    else if (Math.random() > 0.5) {
       for (Tag tag : initialTags) {
         if (Math.random() > 0.8) {
           tag.setFrequency((int) Math.ceil(Math.random() * 100));
           updatedTagEvent.fire(tag);
         }
       }
+    }
+
+    //25% chance to remove a tag
+    else {
+      List<Tag> tags = new ArrayList<>(initialTags);
+      Tag randomTag = tags.get(new Random().nextInt(initialTags.size()));
+
+      initialTags.remove(randomTag);
+      deletedTagEvent.fire(randomTag);
     }
   }
 

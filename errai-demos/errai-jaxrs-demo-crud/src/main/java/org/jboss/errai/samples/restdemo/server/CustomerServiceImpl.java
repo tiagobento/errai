@@ -47,9 +47,9 @@ public class CustomerServiceImpl implements CustomerService {
 
   private static Map<Long, Customer> customers = new ConcurrentHashMap<Long, Customer>() {
     {
-      put(1l, new Customer(1, "Christian", "Sadilek", "A1B2C3"));
-      put(2l, new Customer(2, "Mike", "Brock", "A1B2C3"));
-      put(3l, new Customer(3, "Jonathan", "Fuerth", "A1B2C3"));
+      put(1L, new Customer(1, "Christian", "Sadilek", "A1B2C3"));
+      put(2L, new Customer(2, "Mike", "Brock", "A1B2C3"));
+      put(3L, new Customer(3, "Jonathan", "Fuerth", "A1B2C3"));
     }
   };
 
@@ -82,7 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
 
   @Override
   public List<Customer> listAllCustomers() {
-    List<Customer> customers = new ArrayList<Customer>(CustomerServiceImpl.customers.values());
+    List<Customer> customers = new ArrayList<>(CustomerServiceImpl.customers.values());
     Collections.sort(customers);
     return customers;
   }

@@ -38,29 +38,24 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class StockService {
-    private Map<String, Stock> stocks = new HashMap<String, Stock>();
-    private List<String> tickerList = new CopyOnWriteArrayList<String>();
+
+    private Map<String, Stock> stocks = new HashMap<>();
+    private List<String> tickerList = new CopyOnWriteArrayList<>();
     private volatile AsyncTask task;
 
     @Inject
     public StockService(final RequestDispatcher dispatcher, final MessageBus bus) {
         loadDefault();
 
-        bus.addSubscribeListener(new SubscribeListener() {
-            public void onSubscribe(SubscriptionEvent event) {
-                if (event.getSubject().equals("StockClient")) {
-                    if (task == null || task.isCancelled()) {
-                        task = MessageBuilder.createMessage()
-                            .toSubject("StockClient")
-                            .command("PriceChange")
-                            .withProvided("Data", new ResourceProvider<String>() {
-                                public String get() {
-                                    return simulateRandomChange();
-                                }
-                            })
-                            .noErrorHandling()
-                            .sendRepeatingWith(dispatcher, TimeUnit.MILLISECONDS, 50);
-                    }
+        bus.addSubscribeListener(event -> {
+            if (event.getSubject().equals("StockClient")) {
+                if (task == null || task.isCancelled()) {
+                    task = MessageBuilder.createMessage()
+                        .toSubject("StockClient")
+                        .command("PriceChange")
+                        .withProvided("Data", this::simulateRandomChange)
+                        .noErrorHandling()
+                        .sendRepeatingWith(dispatcher, TimeUnit.MILLISECONDS, 50);
                 }
             }
         });
@@ -73,7 +68,8 @@ public class StockService {
                 .toSubject("StockClient")
                 .command("UpdateStockInfo")
                 .with("Stock", stock)
-                .noErrorHandling().reply();
+                .noErrorHandling()
+                .reply();
         }
     }
 
@@ -85,11 +81,12 @@ public class StockService {
             .toSubject("StockClient")
             .command("UpdateStockInfo")
             .with("Stock", stock)
-            .noErrorHandling().reply();
+            .noErrorHandling()
+            .reply();
     }
 
     public String simulateRandomChange() {
-        /**
+        /*
          * Randomly choose a stock to update.
          */
         final String ticker = tickerList.get((int) (Math.random() * 1000) % tickerList.size());

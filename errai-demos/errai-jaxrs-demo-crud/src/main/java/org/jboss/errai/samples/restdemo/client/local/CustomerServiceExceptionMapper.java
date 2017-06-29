@@ -42,7 +42,7 @@ public class CustomerServiceExceptionMapper implements ClientExceptionMapper {
    */
   @Override
   public Throwable fromResponse(Response response) {
-    return new CustomerNotFoundException(17l);
+    return new CustomerNotFoundException(17L);
   }
 
 }

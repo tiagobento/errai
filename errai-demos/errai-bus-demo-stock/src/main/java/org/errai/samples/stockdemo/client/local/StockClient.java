@@ -20,11 +20,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-
 import org.errai.samples.stockdemo.client.shared.Stock;
 import org.jboss.errai.bus.client.ErraiBus;
-import org.jboss.errai.bus.client.api.messaging.Message;
-import org.jboss.errai.bus.client.api.messaging.MessageCallback;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 
 import java.util.HashMap;
@@ -34,45 +31,43 @@ import static org.errai.samples.stockdemo.client.local.EquityRenderer.newEquity;
 
 public class StockClient implements EntryPoint {
 
-    private Map<String, EquityRenderer> equities = new HashMap<String, EquityRenderer>();
+    private Map<String, EquityRenderer> equities = new HashMap<>();
     private FlexTable table = new FlexTable();
     private int rows = 0;
 
+    @Override
     public void onModuleLoad() {
         setupTable();
         loadDefault();
 
-        ErraiBus.get().subscribe("StockClient",
-            new MessageCallback() {
-                public void callback(Message message) {
-                    if ("PriceChange".equals(message.getCommandType())) {
-                        String[] data = message.get(String.class, "Data").split(":");
-                        EquityRenderer renderer = equities.get(data[0]);
+        ErraiBus.get().subscribe("StockClient", message -> {
+            if ("PriceChange".equals(message.getCommandType())) {
+                String[] data = message.get(String.class, "Data").split(":");
+                EquityRenderer renderer = equities.get(data[0]);
 
-                        if (renderer != null) {
-                            renderer.setLastTrade(Double.parseDouble(data[1]));
-                            renderer.setVolume(Double.parseDouble(data[2]));
-                        }
-                    }
-                    else if ("UpdateStockInfo".equals(message.getCommandType())) {
-                        Stock stock = message.get(Stock.class, "Stock");
-
-                        if (stock != null) {
-                            EquityRenderer renderer = equities.get(stock.getTicker());
-
-                            renderer.setCompanyName(stock.getCompanyName());
-                            renderer.setOpeningPrice(stock.getOpeningPrice());
-                            renderer.setLastTrade(stock.getLastTrade());
-                            renderer.setVolume(stock.getVolume());
-                        }
-                    }
+                if (renderer != null) {
+                    renderer.setLastTrade(Double.parseDouble(data[1]));
+                    renderer.setVolume(Double.parseDouble(data[2]));
                 }
-            });
+            } else if ("UpdateStockInfo".equals(message.getCommandType())) {
+                Stock stock = message.get(Stock.class, "Stock");
+
+                if (stock != null) {
+                    EquityRenderer renderer = equities.get(stock.getTicker());
+
+                    renderer.setCompanyName(stock.getCompanyName());
+                    renderer.setOpeningPrice(stock.getOpeningPrice());
+                    renderer.setLastTrade(stock.getLastTrade());
+                    renderer.setVolume(stock.getVolume());
+                }
+            }
+        });
 
         MessageBuilder.createMessage()
             .toSubject("StockService")
             .command("Start")
-            .noErrorHandling().sendNowWith(ErraiBus.getDispatcher());
+            .noErrorHandling()
+            .sendNowWith(ErraiBus.getDispatcher());
 
         RootPanel.get().add(table);
     }
@@ -84,8 +79,9 @@ public class StockClient implements EntryPoint {
     private void addTableRow() {
         table.insertRow(rows);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++) {
             table.addCell(rows);
+        }
 
         rows++;
     }
