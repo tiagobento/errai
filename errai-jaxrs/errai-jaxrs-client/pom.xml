@@ -41,16 +41,13 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>**/javax/ws/rs/core/*.java</exclude>
+            <exclude>**/compat/**</exclude>
           </excludes>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <configuration>
-          <excludes>**/core/**,**/ext/**</excludes>
-        </configuration>
         <executions>
           <execution>
             <id>unpack</id>
@@ -59,11 +56,20 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
+              <includes>
+                **/POST**,
+                **/GET**,
+                **/PUT**,
+                **/DELETE**,
+                **/PathSegment**,
+                **/Path**,
+                **/MultivaluedMap**,
+                **/Produces**
+              </includes>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.jboss.spec.javax.ws.rs</groupId>
-                  <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
-                  <version>1.0.1.Final</version>
+                  <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
                   <classifier>sources</classifier>
                   <overWrite>false</overWrite>
                   <outputDirectory>target/generated-sources/javax/ws/rs/super</outputDirectory>
