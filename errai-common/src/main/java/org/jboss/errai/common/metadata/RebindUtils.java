@@ -326,7 +326,7 @@ public class RebindUtils {
       return new File("").getAbsolutePath() + "/";
     }
     try {
-      final List<URL> configUrls = MetaDataScanner.getConfigUrls();
+      final List<URL> configUrls = ErraiAppProperties.getConfigUrls();
       final Set<String> candidateRoots = new HashSet<String>();
       final String workingDir = new File("").getAbsolutePath();
 

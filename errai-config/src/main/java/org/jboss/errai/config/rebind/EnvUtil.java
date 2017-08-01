@@ -21,9 +21,7 @@ import static java.util.stream.Collectors.toCollection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,6 +37,7 @@ import org.jboss.errai.common.client.api.annotations.LocalEvent;
 import org.jboss.errai.common.client.api.annotations.NonPortable;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.client.types.TypeHandlerFactory;
+import org.jboss.errai.common.metadata.ErraiAppProperties;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.common.rebind.CacheStore;
 import org.jboss.errai.common.rebind.CacheUtil;
@@ -338,21 +337,10 @@ public abstract class EnvUtil {
   }
 
   public static Collection<URL> getErraiAppProperties() {
-    try {
-      final Set<URL> urlList = new HashSet<>();
-      for (final ClassLoader classLoader : Arrays.asList(Thread.currentThread().getContextClassLoader(),
-              EnvUtil.class.getClassLoader())) {
+    final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    final ClassLoader envUtilClassLoader = EnvUtil.class.getClassLoader();
 
-        final Enumeration<URL> resources = classLoader.getResources("ErraiApp.properties");
-        while (resources.hasMoreElements()) {
-          urlList.add(resources.nextElement());
-        }
-      }
-      return urlList;
-    }
-    catch (final IOException e) {
-      throw new RuntimeException("failed to load ErraiApp.properties from classloader", e);
-    }
+    return ErraiAppProperties.getUrlsFrom(contextClassLoader, envUtilClassLoader);
   }
 
   private static void fillInInterfacesAndSuperTypes(final Set<MetaClass> set, final MetaClass type) {

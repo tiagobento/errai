@@ -16,7 +16,9 @@
 
 package org.jboss.errai.common.metadata;
 
-import java.util.concurrent.Callable;
+import org.jboss.errai.reflections.ReflectionsException;
+
+import java.io.File;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -26,21 +28,24 @@ import java.util.concurrent.FutureTask;
  * @author Mike Brock
  */
 public class ScannerSingleton {
+
   private static volatile MetaDataScanner scanner;
 
-  private static final FutureTask<MetaDataScanner> future = new FutureTask<MetaDataScanner>(
-      new Callable<MetaDataScanner>() {
-        @Override
-        public MetaDataScanner call() throws Exception {
-          if (Boolean.getBoolean("errai.reflections.cache")
-              && RebindUtils.cacheFileExists(RebindUtils.getClasspathHash() + ".cache.xml")) {
-              return MetaDataScanner.createInstanceFromCache();
-          }
+  private static final FutureTask<MetaDataScanner> future = new FutureTask<>(() -> {
 
-          return MetaDataScanner.createInstance();
-        }
+    String cacheFileName = RebindUtils.getClasspathHash() + ".cache.xml";
+    Boolean cacheFileExists = RebindUtils.cacheFileExists(cacheFileName);
+
+    if (Boolean.getBoolean("errai.reflections.cache") && cacheFileExists) {
+      try {
+        return MetaDataScanner.createInstance(RebindUtils.getCacheFile(cacheFileName));
+      } catch (final ReflectionsException e) {
+        e.printStackTrace();
       }
-  );
+    }
+
+    return MetaDataScanner.createInstance();
+  });
 
   static {
     new Thread(future).start();

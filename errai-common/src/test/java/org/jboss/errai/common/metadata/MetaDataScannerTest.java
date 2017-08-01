@@ -74,7 +74,7 @@ public class MetaDataScannerTest {
      * Errai Common now has an ErraiApp.properties file.
      * Thus the temporary properties file made in this test will be the second url returned.
      */
-    List<URL> urls = MetaDataScanner.getConfigUrls(loader);
+    List<URL> urls = ErraiAppProperties.getConfigUrls(loader);
     assertFalse("No URLs returned", urls.isEmpty());
     String[] segments = urls.get(1).getPath().split("/");
 

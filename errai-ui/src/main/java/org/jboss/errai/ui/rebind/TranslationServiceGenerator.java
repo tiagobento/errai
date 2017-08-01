@@ -59,6 +59,7 @@ import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.codegen.util.Implementations;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.Assert;
+import org.jboss.errai.common.metadata.ErraiAppProperties;
 import org.jboss.errai.common.metadata.MetaDataScanner;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
@@ -260,7 +261,7 @@ public class TranslationServiceGenerator extends AbstractAsyncGenerator {
   }
 
   private void addUrlsFromErraiAppProperties(final Collection<URL> urls) {
-    urls.addAll(MetaDataScanner.getConfigUrls());
+    urls.addAll(ErraiAppProperties.getConfigUrls());
   }
 
   private void addUrlsFromBundleAnnotations(final Collection<MetaClass> bundleAnnotatedClasses, final Collection<URL> urls) {

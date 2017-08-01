@@ -16,6 +16,20 @@
 
 package org.jboss.errai.common.metadata;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import org.jboss.errai.common.rebind.CacheStore;
+import org.jboss.errai.common.rebind.CacheUtil;
+import org.jboss.errai.reflections.Configuration;
+import org.jboss.errai.reflections.Reflections;
+import org.jboss.errai.reflections.scanners.FieldAnnotationsScanner;
+import org.jboss.errai.reflections.scanners.MethodAnnotationsScanner;
+import org.jboss.errai.reflections.util.ConfigurationBuilder;
+import org.jboss.errai.reflections.vfs.Vfs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -26,28 +40,19 @@ import java.lang.annotation.Inherited;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-
-import org.jboss.errai.common.rebind.CacheStore;
-import org.jboss.errai.common.rebind.CacheUtil;
-import org.jboss.errai.reflections.Configuration;
-import org.jboss.errai.reflections.Reflections;
-import org.jboss.errai.reflections.ReflectionsException;
-import org.jboss.errai.reflections.scanners.FieldAnnotationsScanner;
-import org.jboss.errai.reflections.scanners.MethodAnnotationsScanner;
-import org.jboss.errai.reflections.util.ConfigurationBuilder;
-import org.jboss.errai.reflections.vfs.Vfs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 
 /**
  * Scans component meta data. The scanner creates a {@link DeploymentContext} that identifies nested
@@ -75,8 +80,6 @@ public class MetaDataScanner extends Reflections {
     }
   }
 
-  public static final String ERRAI_CONFIG_STUB_NAME = "ErraiApp.properties";
-
   private static final ErraiPropertyScanner propScanner = new ErraiPropertyScanner(new Predicate<String>() {
     @Override
     public boolean apply(final String file) {
@@ -101,8 +104,7 @@ public class MetaDataScanner extends Reflections {
     }
     if (cacheFile != null) {
       collect(cacheFile);
-    }
-    else {
+    } else {
       scan();
     }
   }
@@ -118,23 +120,22 @@ public class MetaDataScanner extends Reflections {
         inputStream = url.openStream();
 
         final ResourceBundle props = new PropertyResourceBundle(inputStream);
-        if (props != null) {
 
-          for (final Object o : props.keySet()) {
-            final String key = (String) o;
+        for (final Object o : props.keySet()) {
+          final String key = (String) o;
 
-            if (key.equals(EXTENSION_KEY)) {
-              final String clsName = props.getString(key);
-              try {
+          if (key.equals(EXTENSION_KEY)) {
+            final String clsName = props.getString(key);
 
-                final Class<?> aClass = Thread.currentThread().getContextClassLoader().loadClass(clsName);
-                extensions.add(aClass.asSubclass(Vfs.UrlType.class));
-              } catch (final Throwable t) {
-                throw new RuntimeException("could not load class scanning extension: " + clsName, t);
-              }
+            try {
+              final Class<?> aClass = Thread.currentThread().getContextClassLoader().loadClass(clsName);
+              extensions.add(aClass.asSubclass(Vfs.UrlType.class));
+            } catch (final Throwable t) {
+              throw new RuntimeException("could not load class scanning extension: " + clsName, t);
             }
           }
         }
+
       } catch (final IOException e) {
         throw new RuntimeException("error reading ErraiApp.properties", e);
       } finally {
@@ -150,49 +151,30 @@ public class MetaDataScanner extends Reflections {
     return extensions;
   }
 
+
+  ///
+
   private static Collection<URL> getErraiAppProperties() {
-    try {
-      final Set<URL> urlList = new HashSet<>();
-      Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("ErraiApp.properties");
+    final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    final ClassLoader metaDataScannerClassLoader = MetaDataScanner.class.getClassLoader();
 
-      while (resources.hasMoreElements()) {
-        urlList.add(resources.nextElement());
-      }
-
-      resources = MetaDataScanner.class.getClassLoader().getResources("ErraiApp.properties");
-      while (resources.hasMoreElements()) {
-        urlList.add(resources.nextElement());
-      }
-
-      return urlList;
-    } catch (final IOException e) {
-      throw new RuntimeException("failed to load ErraiApp.properties from classloader", e);
-    }
+    return ErraiAppProperties.getUrlsFrom(contextClassLoader, metaDataScannerClassLoader);
   }
 
+  ///
+
   private static Configuration getConfiguration(final List<URL> urls) {
-    return new ConfigurationBuilder()
-            .setUrls(urls)
-            .setExecutorService(Executors.newFixedThreadPool(2))
+    return new ConfigurationBuilder().setUrls(urls).setExecutorService(Executors.newFixedThreadPool(2))
             .setScanners(new FieldAnnotationsScanner(), new MethodAnnotationsScanner(),
                     new ExtendedTypeAnnotationScanner(), propScanner);
   }
 
-  static MetaDataScanner createInstanceFromCache() {
-    try {
-      return createInstance(getConfigUrls(), RebindUtils.getCacheFile(RebindUtils.getClasspathHash() + ".cache.xml"));
-    } catch (final ReflectionsException e) {
-      e.printStackTrace();
-      return createInstance();
-    }
-  }
-
   static MetaDataScanner createInstance() {
-    return createInstance(getConfigUrls(), null);
+    return createInstance(ErraiAppProperties.getConfigUrls(), null);
   }
 
-  public static MetaDataScanner createInstance(final List<URL> urls) {
-    return createInstance(urls, null);
+  static MetaDataScanner createInstance(final File cacheFile) {
+    return createInstance(ErraiAppProperties.getConfigUrls(), cacheFile);
   }
 
   public static MetaDataScanner createInstance(final List<URL> urls, final File cacheFile) {
@@ -228,8 +210,9 @@ public class MetaDataScanner extends Reflections {
     final Set<String> result = new HashSet<>();
     final Set<String> types = getStore().getTypesAnnotatedWith(annotation.getName());
     for (final String className : types) {
-      if (!p.matcher(className).matches())
+      if (!p.matcher(className).matches()) {
         result.add(className);
+      }
     }
 
     return ImmutableSet.copyOf(forNames(result));
@@ -303,8 +286,7 @@ public class MetaDataScanner extends Reflections {
   public String getHashForTypesAnnotatedWith(final String seed, final Class<? extends Annotation> annotation) {
     if (!CacheUtil.getCache(CacheHolder.class).ANNOTATIONS_TO_CLASS.containsKey(annotation.getName())) {
       return "0";
-    }
-    else {
+    } else {
       try {
         final MessageDigest md = MessageDigest.getInstance("SHA-256");
 
@@ -313,8 +295,8 @@ public class MetaDataScanner extends Reflections {
         }
 
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        for (final SortableClassFileWrapper classFileWrapper : CacheUtil.getCache(CacheHolder.class).ANNOTATIONS_TO_CLASS
-                .get(annotation.getName())) {
+        for (final SortableClassFileWrapper classFileWrapper : CacheUtil
+                .getCache(CacheHolder.class).ANNOTATIONS_TO_CLASS.get(annotation.getName())) {
           byteArrayOutputStream.reset();
           final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
           classFileWrapper.getClassFile().write(dataOutputStream);
@@ -328,46 +310,6 @@ public class MetaDataScanner extends Reflections {
         throw new RuntimeException("could not generate hash", e);
       }
     }
-  }
-
-  public static List<URL> getConfigUrls(final ClassLoader loader) {
-    try {
-      final Enumeration<URL> configTargets = loader.getResources(ERRAI_CONFIG_STUB_NAME);
-      final List<URL> urls = new ArrayList<>();
-
-      while (configTargets.hasMoreElements()) {
-        final URL url = configTargets.nextElement();
-
-        try {
-          final Properties properties = new Properties();
-          final InputStream stream = url.openStream();
-          try {
-            properties.load(stream);
-          } finally {
-            stream.close();
-          }
-        } catch (final IOException e) {
-          System.err.println("could not read properties file");
-          e.printStackTrace();
-        }
-
-        String urlString = url.toExternalForm();
-        urlString = urlString.substring(0, urlString.indexOf(ERRAI_CONFIG_STUB_NAME));
-        // URLs returned by the classloader are UTF-8 encoded. The URLDecoder assumes
-        // a HTML form encoded String, which is why we escape the plus symbols here.
-        // Otherwise, they would be decoded into space characters.
-        // The pound character still must not appear anywhere in the path!
-        urls.add(new URL(URLDecoder.decode(urlString.replaceAll("\\+", "%2b"), "UTF-8")));
-      }
-      return urls;
-    } catch (final IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException("Failed to scan configuration Url's", e);
-    }
-  }
-
-  public static List<URL> getConfigUrls() {
-    return getConfigUrls(MetaDataScanner.class.getClassLoader());
   }
 
   public Multimap<String, String> getErraiProperties() {
