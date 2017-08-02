@@ -19,7 +19,7 @@ public class ErraiAppPropertiesFiles {
 
   private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesFiles.class);
 
-  public static final String FILE_NAME = "ErraiApp.properties";
+  static final String FILE_NAME = "ErraiApp.properties";
 
   private static final String META_INF_FILE_NAME = "META-INF/" + FILE_NAME;
 

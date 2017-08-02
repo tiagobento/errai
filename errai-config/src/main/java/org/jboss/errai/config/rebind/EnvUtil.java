@@ -138,7 +138,7 @@ public abstract class EnvUtil {
     addExposedInnerClasses(exposedClasses, exposedFromScanner);
     exposedClasses.addAll(exposedFromScanner);
 
-    processErraiAppPropertiesUrls(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, explicitTypes);
+    processErraiAppPropertiesFiles(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, explicitTypes);
     processEnvironmentConfigExtensions(exposedClasses);
 
     // must do this before filling in interfaces and supertypes!
@@ -171,7 +171,7 @@ public abstract class EnvUtil {
     }
   }
 
-  private static void processErraiAppPropertiesUrls(final Map<String, String> frameworkProps, final Map<String, String> mappingAliases,
+  private static void processErraiAppPropertiesFiles(final Map<String, String> frameworkProps, final Map<String, String> mappingAliases,
           final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final Set<String> explicitTypes) {
     for (final URL url : getErraiAppPropertiesFilesUrls()) {
       InputStream inputStream = null;
@@ -201,6 +201,7 @@ public abstract class EnvUtil {
   private static void processErraiAppPropertiesBundle(final Map<String, String> frameworkProps, final Map<String, String> mappingAliases,
           final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final Set<String> explicitTypes,
           final ResourceBundle props) {
+
     for (final String key : props.keySet()) {
       final String value = props.getString(key);
       updateFrameworkProperties(frameworkProps, key, value);
