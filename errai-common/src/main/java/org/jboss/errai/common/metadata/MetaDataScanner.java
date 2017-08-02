@@ -16,7 +16,6 @@
 
 package org.jboss.errai.common.metadata;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.jboss.errai.common.rebind.CacheStore;
@@ -60,7 +59,7 @@ import java.util.regex.Pattern;
  * href="http://code.google.com/p/reflections/">Reflections</a> library.
  * <p/>
  * <p/>
- * The initial set of config URLs (entry points) is discovered through ErraiApp.properties.
+ * The initial set of config URLs (entry points) is discovered through ErraiApp.properties and META-INF/ErraiApp.properties.
  *
  * @author Heiko Braun <hbraun@redhat.com>
  * @author Mike Brock <cbrock@redhat.com>
@@ -75,8 +74,10 @@ public class MetaDataScanner extends Reflections {
 
   private static final ErraiPropertyScanner propScanner = new ErraiPropertyScanner(file -> file.endsWith(".properties"));
 
+  private final Map<Class<? extends Annotation>, Set<Class<?>>> _annotationCache = new HashMap<>();
+
   static MetaDataScanner createInstance() {
-    return createInstance(ErraiAppPropertiesFiles.getDirUrls());
+    return createInstance(ErraiAppPropertiesFiles.getModulesUrls());
   }
 
   //tests only
@@ -85,7 +86,7 @@ public class MetaDataScanner extends Reflections {
   }
 
   static MetaDataScanner createInstance(final File cacheFile) {
-    return createInstance(ErraiAppPropertiesFiles.getDirUrls(), cacheFile);
+    return createInstance(ErraiAppPropertiesFiles.getModulesUrls(), cacheFile);
   }
 
   private static MetaDataScanner createInstance(final List<URL> urls, final File cacheFile) {
@@ -166,7 +167,7 @@ public class MetaDataScanner extends Reflections {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     final ClassLoader metaDataScannerClassLoader = MetaDataScanner.class.getClassLoader();
 
-    return ErraiAppPropertiesFiles.getUrlsFrom(contextClassLoader, metaDataScannerClassLoader);
+    return ErraiAppPropertiesFiles.getUrls(contextClassLoader, metaDataScannerClassLoader);
   }
 
   private static Configuration getConfiguration(final List<URL> urls) {
@@ -249,8 +250,6 @@ public class MetaDataScanner extends Reflections {
     }
     return results;
   }
-
-  private final Map<Class<? extends Annotation>, Set<Class<?>>> _annotationCache = new HashMap<>();
 
   @Override
   public Set<Class<?>> getTypesAnnotatedWith(final Class<? extends Annotation> annotation) {

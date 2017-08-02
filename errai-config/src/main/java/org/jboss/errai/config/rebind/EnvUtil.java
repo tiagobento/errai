@@ -16,21 +16,6 @@
 
 package org.jboss.errai.config.rebind;
 
-import static java.util.stream.Collectors.toCollection;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.common.client.api.annotations.LocalEvent;
@@ -45,6 +30,21 @@ import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * @author Mike Brock
@@ -337,7 +337,7 @@ public abstract class EnvUtil {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     final ClassLoader envUtilClassLoader = EnvUtil.class.getClassLoader();
 
-    return ErraiAppPropertiesFiles.getUrlsFrom(contextClassLoader, envUtilClassLoader);
+    return ErraiAppPropertiesFiles.getUrls(contextClassLoader, envUtilClassLoader);
   }
 
   private static void fillInInterfacesAndSuperTypes(final Set<MetaClass> set, final MetaClass type) {
