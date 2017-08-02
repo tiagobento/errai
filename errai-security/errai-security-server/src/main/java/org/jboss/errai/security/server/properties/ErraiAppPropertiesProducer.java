@@ -25,7 +25,7 @@ import javax.enterprise.inject.Produces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jboss.errai.common.metadata.ErraiAppProperties.STUB_NAME;
+import static org.jboss.errai.common.metadata.ErraiAppPropertiesFiles.FILE_NAME;
 
 /**
  * Creates {@link Properties} instance from the ErraiApp.properties resource.
@@ -42,7 +42,7 @@ public class ErraiAppPropertiesProducer {
     final Properties properties = new Properties();
     
     final InputStream erraiAppPropertiesStream =
-            getClass().getClassLoader().getResourceAsStream(STUB_NAME);
+            getClass().getClassLoader().getResourceAsStream(FILE_NAME); //FIXME: change it to use ErraiAppPropertiesFiles
     try {
       if (erraiAppPropertiesStream != null) {
         properties.load(erraiAppPropertiesStream);

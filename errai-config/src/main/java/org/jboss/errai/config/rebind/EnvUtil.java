@@ -37,7 +37,7 @@ import org.jboss.errai.common.client.api.annotations.LocalEvent;
 import org.jboss.errai.common.client.api.annotations.NonPortable;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.client.types.TypeHandlerFactory;
-import org.jboss.errai.common.metadata.ErraiAppProperties;
+import org.jboss.errai.common.metadata.ErraiAppPropertiesFiles;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.common.rebind.CacheStore;
 import org.jboss.errai.common.rebind.CacheUtil;
@@ -138,9 +138,7 @@ public abstract class EnvUtil {
     addExposedInnerClasses(exposedClasses, exposedFromScanner);
     exposedClasses.addAll(exposedFromScanner);
 
-    final Collection<URL> erraiAppProperties = getErraiAppProperties();
-
-    processErraiAppPropertiesUrls(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, explicitTypes, erraiAppProperties);
+    processErraiAppPropertiesUrls(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, explicitTypes);
     processEnvironmentConfigExtensions(exposedClasses);
 
     // must do this before filling in interfaces and supertypes!
@@ -174,9 +172,8 @@ public abstract class EnvUtil {
   }
 
   private static void processErraiAppPropertiesUrls(final Map<String, String> frameworkProps, final Map<String, String> mappingAliases,
-          final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final Set<String> explicitTypes,
-          final Collection<URL> erraiAppProperties) {
-    for (final URL url : erraiAppProperties) {
+          final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final Set<String> explicitTypes) {
+    for (final URL url : getErraiAppPropertiesFilesUrls()) {
       InputStream inputStream = null;
       try {
         log.debug("checking " + url.getFile() + " for configured types ...");
@@ -336,11 +333,11 @@ public abstract class EnvUtil {
     }
   }
 
-  public static Collection<URL> getErraiAppProperties() {
+  public static Collection<URL> getErraiAppPropertiesFilesUrls() {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     final ClassLoader envUtilClassLoader = EnvUtil.class.getClassLoader();
 
-    return ErraiAppProperties.getUrlsFrom(contextClassLoader, envUtilClassLoader);
+    return ErraiAppPropertiesFiles.getUrlsFrom(contextClassLoader, envUtilClassLoader);
   }
 
   private static void fillInInterfacesAndSuperTypes(final Set<MetaClass> set, final MetaClass type) {

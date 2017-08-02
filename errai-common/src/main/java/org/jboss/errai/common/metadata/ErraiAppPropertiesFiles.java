@@ -1,5 +1,8 @@
 package org.jboss.errai.common.metadata;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -12,32 +15,38 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ErraiAppProperties {
+public class ErraiAppPropertiesFiles {
 
-  public static final String STUB_NAME = "ErraiApp.properties";
+  private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesFiles.class);
+
+  public static final String FILE_NAME = "ErraiApp.properties";
+  private static final String META_INF_FILE_NAME = "META-INF/ErraiApp.properties";
 
   public static List<URL> getUrlsFrom(final ClassLoader... classLoaders) {
     return Stream.of(classLoaders)
-            .map(ErraiAppProperties::getUrlsFrom)
+            .map(ErraiAppPropertiesFiles::getUrlsFrom)
             .flatMap(e -> Collections.list(e).stream())
             .collect(Collectors.toList());
   }
 
   private static Enumeration<URL> getUrlsFrom(final ClassLoader classLoader) {
     try {
-      return classLoader.getResources(ErraiAppProperties.STUB_NAME);
+      Enumeration<URL> resources = classLoader.getResources(FILE_NAME);
+      Enumeration<URL> metaInfResources = classLoader.getResources(META_INF_FILE_NAME);
+
+      return resources;
     } catch (final IOException e) {
-      throw new RuntimeException("failed to load " + STUB_NAME + " from classloader", e);
+      throw new RuntimeException("failed to load " + FILE_NAME + " from classloader", e);
     }
   }
 
-  public static List<URL> getConfigUrls() {
-    return getConfigUrls(ErraiAppProperties.class.getClassLoader());
+  public static List<URL> getDirUrls() {
+    return getDirUrls(ErraiAppPropertiesFiles.class.getClassLoader());
   }
 
-  static List<URL> getConfigUrls(ClassLoader... classLoader) {
+  static List<URL> getDirUrls(ClassLoader... classLoader) {
     try {
-      final List<URL> configTargets = ErraiAppProperties.getUrlsFrom(classLoader);
+      final List<URL> configTargets = getUrlsFrom(classLoader);
       final List<URL> urls = new ArrayList<>();
 
       for (URL url : configTargets) {
@@ -52,7 +61,7 @@ public class ErraiAppProperties {
         }
 
         String urlString = url.toExternalForm();
-        urlString = urlString.substring(0, urlString.indexOf(ErraiAppProperties.STUB_NAME));
+        urlString = urlString.substring(0, urlString.indexOf(FILE_NAME));
         // URLs returned by the classloader are UTF-8 encoded. The URLDecoder assumes
         // a HTML form encoded String, which is why we escape the plus symbols here.
         // Otherwise, they would be decoded into space characters.

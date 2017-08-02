@@ -55,7 +55,7 @@ public class MetaDataScannerTest {
   }
 
   private void testJarUrlDecoding(String jarFileName) throws IOException {
-    File erraiAppPropertiesFile = new File(System.getProperty("java.io.tmpdir"), "ErraiApp.properties");
+    File erraiAppPropertiesFile = new File(System.getProperty("java.io.tmpdir"), ErraiAppPropertiesFiles.FILE_NAME);
     erraiAppPropertiesFile.createNewFile();
 
     File jarFile = File.createTempFile(jarFileName, ".jar");
@@ -70,27 +70,29 @@ public class MetaDataScannerTest {
     assertNotNull("Jar file not found: " + jarFile, testJarURL);
 
     ClassLoader loader = URLClassLoader.newInstance(new URL[] { testJarURL }, getClass().getClassLoader());
+    List<URL> urls = ErraiAppPropertiesFiles.getDirUrls(loader);
+    assertFalse("No URLs returned", urls.isEmpty());
+
     /*
      * Errai Common now has an ErraiApp.properties file.
      * Thus the temporary properties file made in this test will be the second url returned.
      */
-    List<URL> urls = ErraiAppProperties.getConfigUrls(loader);
-    assertFalse("No URLs returned", urls.isEmpty());
-    String[] segments = urls.get(1).getPath().split("/");
+    URL erraiAppPropertiesTestFile = urls.get(1);
 
+    String[] segments = erraiAppPropertiesTestFile.getPath().split("/");
     assertTrue("No path segments found in URL", segments.length > 0);
     assertEquals("URL not properly decoded", jarFile.getName() +"!", segments[segments.length - 1]);
-    assertNotNull("Could not open jar", new ZipDir(urls.get(1)).getFiles());
+    assertNotNull("Could not open jar", new ZipDir(erraiAppPropertiesTestFile).getFiles());
 
     Set<String> zipContents = new TreeSet<String>();
-    for (Vfs.File path : new ZipDir(urls.get(1)).getFiles()) {
+    for (Vfs.File path : new ZipDir(erraiAppPropertiesTestFile).getFiles()) {
       if (!path.getRelativePath().endsWith("/")) {
         zipContents.add(path.getRelativePath());
       }
     }
 
     Set<String> expectedContents = new TreeSet<String>();
-    expectedContents.add("ErraiApp.properties");
+    expectedContents.add(ErraiAppPropertiesFiles.FILE_NAME);
     expectedContents.add("org/jboss/errai/common/metadata/MetaDataScannerTest.class");
 
     assertEquals("Wrong file contents", expectedContents, zipContents);
@@ -102,7 +104,7 @@ public class MetaDataScannerTest {
   @Test
   public void testClasspathUrlDecoding() throws Exception {
     
-    File erraiAppPropertiesFile = new File(System.getProperty("java.io.tmpdir"), "ErraiApp.properties");
+    File erraiAppPropertiesFile = new File(System.getProperty("java.io.tmpdir"), ErraiAppPropertiesFiles.FILE_NAME);
     erraiAppPropertiesFile.createNewFile();
 
     File jarFile = File.createTempFile("testjar-\u00e4\u00f6\u00e9\u00f8 +abc!@$%^&()_+}{", ".jar");
@@ -134,7 +136,7 @@ public class MetaDataScannerTest {
     }
 
     Set<String> expectedContents = new TreeSet<String>();
-    expectedContents.add("ErraiApp.properties");
+    expectedContents.add(ErraiAppPropertiesFiles.FILE_NAME);
     expectedContents.add("org/jboss/errai/common/metadata/MetaDataScannerTest.class");
 
     assertEquals("Wrong file contents", expectedContents, zipContents);

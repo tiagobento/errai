@@ -41,8 +41,7 @@ import javax.tools.ToolProvider;
 
 import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
-import org.jboss.errai.common.metadata.ErraiAppProperties;
-import org.jboss.errai.common.metadata.MetaDataScanner;
+import org.jboss.errai.common.metadata.ErraiAppPropertiesFiles;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.slf4j.Logger;
 
@@ -189,18 +188,18 @@ public class ClassChangeUtil {
       }
 
       final StringBuilder sb = new StringBuilder(4096);
-      final List<URL> configUrls = ErraiAppProperties.getConfigUrls();
+      final List<URL> configUrls = ErraiAppPropertiesFiles.getDirUrls();
       final List<File> classpathElements = new ArrayList<>(configUrls.size());
       classpathElements.add(new File(outputPath));
 
-      log.debug(">>> Searching for all jars using " + ErraiAppProperties.STUB_NAME);
+      log.debug(">>> Searching for all jars using " + ErraiAppPropertiesFiles.FILE_NAME);
       for (final URL url : configUrls) {
         final File file = getFileIfExists(url.getFile());
         if (file != null) {
           classpathElements.add(file);
         }
       }
-      log.debug("<<< Done searching for all jars using " + ErraiAppProperties.STUB_NAME);
+      log.debug("<<< Done searching for all jars using " + ErraiAppPropertiesFiles.FILE_NAME);
 
       for (final File file : classpathElements) {
         sb.append(file.getAbsolutePath()).append(File.pathSeparator);

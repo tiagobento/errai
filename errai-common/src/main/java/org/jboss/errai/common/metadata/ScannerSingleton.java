@@ -31,14 +31,16 @@ public class ScannerSingleton {
 
   private static volatile MetaDataScanner scanner;
 
+  private static final String ERRAI_REFLECTIONS_CACHE_PROPERTY = "errai.reflections.cache";
+  private static final String CACHE_FILE_NAME = RebindUtils.getClasspathHash() + ".cache.xml";
+
+  private static final Object lock = new Object();
+
   private static final FutureTask<MetaDataScanner> future = new FutureTask<>(() -> {
 
-    String cacheFileName = RebindUtils.getClasspathHash() + ".cache.xml";
-    Boolean cacheFileExists = RebindUtils.cacheFileExists(cacheFileName);
-
-    if (Boolean.getBoolean("errai.reflections.cache") && cacheFileExists) {
+    if (erraiReflectionsCacheIsEnabled() && cacheFileExists()) {
       try {
-        return MetaDataScanner.createInstance(RebindUtils.getCacheFile(cacheFileName));
+        return MetaDataScanner.createInstance(getCacheFile());
       } catch (final ReflectionsException e) {
         e.printStackTrace();
       }
@@ -47,11 +49,11 @@ public class ScannerSingleton {
     return MetaDataScanner.createInstance();
   });
 
+
   static {
     new Thread(future).start();
   }
 
-  private static final Object lock = new Object();
 
   public static MetaDataScanner getOrCreateInstance() {
     synchronized (lock) {
@@ -59,8 +61,8 @@ public class ScannerSingleton {
         try {
           scanner = future.get();
 
-          if (scanner != null && Boolean.getBoolean("errai.reflections.cache") ) {
-            scanner.save(RebindUtils.getCacheFile(RebindUtils.getClasspathHash() + ".cache.xml").getAbsolutePath());
+          if (scanner != null && erraiReflectionsCacheIsEnabled()) {
+            scanner.save(getCacheFile().getAbsolutePath());
           }
         }
         catch (Throwable t) {
@@ -70,5 +72,17 @@ public class ScannerSingleton {
       }
       return scanner;
     }
+  }
+
+  private static boolean erraiReflectionsCacheIsEnabled() {
+    return Boolean.getBoolean(ERRAI_REFLECTIONS_CACHE_PROPERTY);
+  }
+
+  private static File getCacheFile() {
+    return new File(RebindUtils.getErraiCacheDir(), CACHE_FILE_NAME).getAbsoluteFile();
+  }
+
+  private static boolean cacheFileExists() {
+    return getCacheFile().exists();
   }
 }

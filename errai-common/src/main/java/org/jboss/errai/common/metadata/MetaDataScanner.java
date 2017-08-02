@@ -68,26 +68,38 @@ import java.util.regex.Pattern;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public class MetaDataScanner extends Reflections {
+
   private static final Logger log = LoggerFactory.getLogger(MetaDataScanner.class);
+
   private static final String EXTENSION_KEY = "errai.class_scanning_extension";
 
-  public static class CacheHolder implements CacheStore {
-    final Map<String, Set<SortableClassFileWrapper>> ANNOTATIONS_TO_CLASS = new ConcurrentHashMap<>();
+  private static final ErraiPropertyScanner propScanner = new ErraiPropertyScanner(file -> file.endsWith(".properties"));
 
-    @Override
-    public void clear() {
-      ANNOTATIONS_TO_CLASS.clear();
-    }
+  static MetaDataScanner createInstance() {
+    return createInstance(ErraiAppPropertiesFiles.getDirUrls());
   }
 
-  private static final ErraiPropertyScanner propScanner = new ErraiPropertyScanner(new Predicate<String>() {
-    @Override
-    public boolean apply(final String file) {
-      return file.endsWith(".properties");
-    }
-  });
+  //tests only
+  public static MetaDataScanner createInstance(final List<URL> urls) {
+    return createInstance(urls, null);
+  }
 
-  MetaDataScanner(final List<URL> urls, final File cacheFile) {
+  static MetaDataScanner createInstance(final File cacheFile) {
+    return createInstance(ErraiAppPropertiesFiles.getDirUrls(), cacheFile);
+  }
+
+  private static MetaDataScanner createInstance(final List<URL> urls, final File cacheFile) {
+    registerDefaultHandlers();
+
+    final DeploymentContext ctx = new DeploymentContext(urls);
+    final List<URL> actualUrls = ctx.process();
+
+    final MetaDataScanner scanner = new MetaDataScanner(actualUrls, cacheFile);
+    ctx.close(); // needs to be closed after the scanner is created
+    return scanner;
+  }
+
+  private MetaDataScanner(final List<URL> urls, final File cacheFile) {
     super(getConfiguration(urls));
     try {
       for (final Class<? extends Vfs.UrlType> cls : findExtensions()) {
@@ -110,11 +122,10 @@ public class MetaDataScanner extends Reflections {
   }
 
   private List<Class<? extends Vfs.UrlType>> findExtensions() {
-    final Collection<URL> erraiAppProperties = getErraiAppProperties();
 
     final List<Class<? extends Vfs.UrlType>> extensions = new ArrayList<>();
 
-    for (final URL url : erraiAppProperties) {
+    for (final URL url : getErraiAppPropertiesFilesUrls()) {
       InputStream inputStream = null;
       try {
         inputStream = url.openStream();
@@ -151,17 +162,12 @@ public class MetaDataScanner extends Reflections {
     return extensions;
   }
 
-
-  ///
-
-  private static Collection<URL> getErraiAppProperties() {
+  private static Collection<URL> getErraiAppPropertiesFilesUrls() {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     final ClassLoader metaDataScannerClassLoader = MetaDataScanner.class.getClassLoader();
 
-    return ErraiAppProperties.getUrlsFrom(contextClassLoader, metaDataScannerClassLoader);
+    return ErraiAppPropertiesFiles.getUrlsFrom(contextClassLoader, metaDataScannerClassLoader);
   }
-
-  ///
 
   private static Configuration getConfiguration(final List<URL> urls) {
     return new ConfigurationBuilder().setUrls(urls).setExecutorService(Executors.newFixedThreadPool(2))
@@ -169,26 +175,7 @@ public class MetaDataScanner extends Reflections {
                     new ExtendedTypeAnnotationScanner(), propScanner);
   }
 
-  static MetaDataScanner createInstance() {
-    return createInstance(ErraiAppProperties.getConfigUrls(), null);
-  }
-
-  static MetaDataScanner createInstance(final File cacheFile) {
-    return createInstance(ErraiAppProperties.getConfigUrls(), cacheFile);
-  }
-
-  public static MetaDataScanner createInstance(final List<URL> urls, final File cacheFile) {
-    registerDefaultHandlers();
-
-    final DeploymentContext ctx = new DeploymentContext(urls);
-    final List<URL> actualUrls = ctx.process();
-    final MetaDataScanner scanner = new MetaDataScanner(actualUrls, cacheFile);
-    ctx.close(); // needs to closed after the scanner was created
-
-    return scanner;
-  }
-
-  public static void registerTypeHandler(final Vfs.UrlType handler) {
+  private static void registerTypeHandler(final Vfs.UrlType handler) {
     Vfs.addDefaultURLTypes(handler);
   }
 
@@ -314,5 +301,14 @@ public class MetaDataScanner extends Reflections {
 
   public Multimap<String, String> getErraiProperties() {
     return propScanner.getProperties();
+  }
+
+  public static class CacheHolder implements CacheStore {
+    final Map<String, Set<SortableClassFileWrapper>> ANNOTATIONS_TO_CLASS = new ConcurrentHashMap<>();
+
+    @Override
+    public void clear() {
+      ANNOTATIONS_TO_CLASS.clear();
+    }
   }
 }

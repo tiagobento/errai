@@ -170,14 +170,6 @@ public class RebindUtils {
     return fileCacheDir;
   }
 
-  public static File getCacheFile(final String name) {
-    return new File(getErraiCacheDir(), name).getAbsoluteFile();
-  }
-
-  public static boolean cacheFileExists(final String name) {
-    return getCacheFile(name).exists();
-  }
-
   private static volatile Boolean _hasClasspathChanged;
 
   public static boolean hasClasspathChanged() {
@@ -326,7 +318,7 @@ public class RebindUtils {
       return new File("").getAbsolutePath() + "/";
     }
     try {
-      final List<URL> configUrls = ErraiAppProperties.getConfigUrls();
+      final List<URL> configUrls = ErraiAppPropertiesFiles.getDirUrls();
       final Set<String> candidateRoots = new HashSet<String>();
       final String workingDir = new File("").getAbsolutePath();
 
