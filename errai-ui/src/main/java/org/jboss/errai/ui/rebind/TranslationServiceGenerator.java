@@ -252,12 +252,12 @@ public class TranslationServiceGenerator extends AbstractAsyncGenerator {
     final Collection<URL> urls = new HashSet<>();
 
     addUrlsFromBundleAnnotations(bundleAnnotatedClasses, urls);
-    addErraiAppPropertiesFilesDirUrls(urls);
+    addErraiAppPropertiesModulesUrls(urls);
 
     return urls;
   }
 
-  private void addErraiAppPropertiesFilesDirUrls(final Collection<URL> urls) {
+  private void addErraiAppPropertiesModulesUrls(final Collection<URL> urls) {
     urls.addAll(ErraiAppPropertiesFiles.getModulesUrls());
   }
 
