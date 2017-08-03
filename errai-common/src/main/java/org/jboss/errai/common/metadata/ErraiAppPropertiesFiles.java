@@ -61,24 +61,21 @@ public class ErraiAppPropertiesFiles {
             .collect(Collectors.toList());
   }
 
-  private static void logUnreadablePropertiesFiles(final URL url) {
-    try {
-      try (InputStream stream = url.openStream()) {
-        new Properties().load(stream);
-      }
-    } catch (final IOException e) {
-      System.err.println("could not read properties file");
-      e.printStackTrace();
-    }
-  }
-
   static String getModuleDir(final URL url) {
+
     final String urlString = url.toExternalForm();
 
-    //will contain -1 if META_INF_FILE_NAME is not present
-    final int metaInfIndex = urlString.indexOf(META_INF_FILE_NAME);
+    final int metaInfEndIndex = urlString.indexOf(META_INF_FILE_NAME);
+    if (metaInfEndIndex > -1) {
+      return urlString.substring(0, metaInfEndIndex);
+    }
 
-    return urlString.substring(0, metaInfIndex > -1 ? metaInfIndex : urlString.indexOf(FILE_NAME));
+    final int rootDirEndIndex = urlString.indexOf(FILE_NAME);
+    if (rootDirEndIndex > -1) {
+      return urlString.substring(0, rootDirEndIndex);
+    }
+
+    throw new RuntimeException("URL " + url.toExternalForm() + " is not of a " + FILE_NAME);
   }
 
   private static URL decodeUrl(final String moduleUrlString) {
@@ -87,6 +84,17 @@ public class ErraiAppPropertiesFiles {
     } catch (final IOException e) {
       e.printStackTrace();
       throw new RuntimeException("Failed to scan configuration Url's", e);
+    }
+  }
+
+  private static void logUnreadablePropertiesFiles(final URL url) {
+    try {
+      try (InputStream stream = url.openStream()) {
+        new Properties().load(stream);
+      }
+    } catch (final IOException e) {
+      System.err.println("could not read properties file");
+      e.printStackTrace();
     }
   }
 
