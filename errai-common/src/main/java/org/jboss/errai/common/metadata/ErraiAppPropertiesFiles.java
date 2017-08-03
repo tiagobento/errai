@@ -51,7 +51,6 @@ public class ErraiAppPropertiesFiles {
     return getModulesUrls(ErraiAppPropertiesFiles.class.getClassLoader());
   }
 
-  //tests only
   static List<URL> getModulesUrls(final ClassLoader... classLoader) {
     return getUrls(classLoader).stream()
             .peek(ErraiAppPropertiesFiles::logUnreadablePropertiesFiles)

@@ -80,7 +80,6 @@ public class MetaDataScanner extends Reflections {
     return createInstance(ErraiAppPropertiesFiles.getModulesUrls());
   }
 
-  //tests only
   public static MetaDataScanner createInstance(final List<URL> urls) {
     return createInstance(urls, null);
   }
