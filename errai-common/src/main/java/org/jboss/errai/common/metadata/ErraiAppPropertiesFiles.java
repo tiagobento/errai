@@ -10,7 +10,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +39,7 @@ public class ErraiAppPropertiesFiles {
       allResources.addAll(rootDirResources);
       allResources.addAll(metaInfResources);
 
-      logModulesWithTwoErraiAppPropertiesFiles(allResources);
+      logModulesWithErraiAppPropertiesFileInRootDir(rootDirResources);
 
       return allResources.stream();
     } catch (final IOException e) {
@@ -91,18 +90,10 @@ public class ErraiAppPropertiesFiles {
     }
   }
 
-  private static void logModulesWithTwoErraiAppPropertiesFiles(final List<URL> concat) {
-
-    final Map<String, Long> occurrencesByDir = concat.stream()
-            .map(ErraiAppPropertiesFiles::getModuleDir)
-            .collect(Collectors.groupingBy(dir -> dir, Collectors.counting()));
-
-    occurrencesByDir.entrySet()
-            .stream()
-            .filter(e -> e.getValue() > 1L)
-            .map(Map.Entry::getKey)
-            .forEach(m -> log.warn("Module {} contains both /{} and /{} files. Please consider using only {}", m,
-                    FILE_NAME, META_INF_FILE_NAME, META_INF_FILE_NAME));
+  private static void logModulesWithErraiAppPropertiesFileInRootDir(final List<URL> fileUrls) {
+    fileUrls.stream().map(ErraiAppPropertiesFiles::getModuleDir).forEach(m -> {
+      log.warn("Module {} contains {} in root dir. Please consider moving it to META-INF/", m, FILE_NAME);
+    });
   }
 
 }
