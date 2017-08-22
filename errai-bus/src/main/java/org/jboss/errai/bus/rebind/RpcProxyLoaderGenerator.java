@@ -16,10 +16,9 @@
 
 package org.jboss.errai.bus.rebind;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.function.Function;
-
+import com.google.gwt.core.ext.GeneratorContext;
+import com.google.gwt.core.ext.TreeLogger;
+import com.google.gwt.core.ext.UnableToCompleteException;
 import org.jboss.errai.bus.client.api.messaging.MessageBus;
 import org.jboss.errai.bus.client.framework.RpcProxyLoader;
 import org.jboss.errai.bus.server.annotations.Remote;
@@ -45,9 +44,9 @@ import org.jboss.errai.config.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.core.ext.GeneratorContext;
-import com.google.gwt.core.ext.TreeLogger;
-import com.google.gwt.core.ext.UnableToCompleteException;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * Generates the implementation of {@link RpcProxyLoader}.
@@ -63,7 +62,7 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
 
   @Override
   public String generate(final TreeLogger logger, final GeneratorContext context, final String typeName)
-      throws UnableToCompleteException {
+          throws UnableToCompleteException {
 
     return startAsyncGeneratorsAndWaitFor(RpcProxyLoader.class, context, logger, packageName, className);
   }
@@ -74,15 +73,16 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
 
     ClassStructureBuilder<?> classBuilder = ClassBuilder.implement(RpcProxyLoader.class);
     final long time = System.currentTimeMillis();
-    final MethodBlockBuilder<?> loadProxies =
-            classBuilder.publicMethod(void.class, "loadProxies", Parameter.of(MessageBus.class, "bus", true));
+    final MethodBlockBuilder<?> loadProxies = classBuilder.publicMethod(void.class, "loadProxies",
+            Parameter.of(MessageBus.class, "bus", true));
 
     final Collection<MetaClass> remotes = ClassScanner.getTypesAnnotatedWith(Remote.class,
-        RebindUtils.findTranslatablePackages(context), context);
+            RebindUtils.findTranslatablePackages(context), context);
     addCacheRelevantClasses(remotes);
 
     final InterceptorProvider interceptorProvider = getInterceptorProvider(context);
-    final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(RebindUtils.findTranslatablePackages(context));
+    final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(
+            RebindUtils.findTranslatablePackages(context));
     final boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
 
     for (final MetaClass remote : remotes) {
@@ -111,14 +111,13 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     return gen;
   }
 
-
   private InterceptorProvider getInterceptorProvider(final GeneratorContext context) {
     final Collection<MetaClass> featureInterceptors = ClassScanner.getTypesAnnotatedWith(FeatureInterceptor.class,
-        RebindUtils.findTranslatablePackages(context), context);
+            RebindUtils.findTranslatablePackages(context), context);
     addCacheRelevantClasses(featureInterceptors);
 
     final Collection<MetaClass> standaloneInterceptors = ClassScanner.getTypesAnnotatedWith(InterceptsRemoteCall.class,
-        RebindUtils.findTranslatablePackages(context), context);
+            RebindUtils.findTranslatablePackages(context), context);
     addCacheRelevantClasses(standaloneInterceptors);
 
     return new InterceptorProvider(featureInterceptors, standaloneInterceptors);
@@ -135,7 +134,5 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
 
     return false;
   }
-
-
 
 }

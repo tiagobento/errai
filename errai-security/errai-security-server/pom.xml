@@ -34,7 +34,7 @@
 
     <dependency>
       <groupId>org.jboss.errai</groupId>
-      <artifactId>errai-security-export-apt</artifactId>
+      <artifactId>errai-bus-export-apt</artifactId>
       <scope>provided</scope>
     </dependency>
 
