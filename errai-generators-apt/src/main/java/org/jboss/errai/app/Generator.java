@@ -16,11 +16,16 @@
 
 package org.jboss.errai.app;
 
+import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
 import org.jboss.errai.common.apt.ErraiModuleExportFile;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
-import org.jboss.errai.common.apt.exportfile.ExportFilePackage;
+import org.jboss.errai.common.apt.exportfile.ExportFilesPackage;
+import org.jboss.errai.common.apt.metaclass.APTClass;
+import org.jboss.errai.common.apt.metaclass.APTClassUtil;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -28,42 +33,51 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.FileObject;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.jboss.errai.app.SupportedAnnotationTypes.ERRAI_APP;
+import static org.jboss.errai.app.SupportedAnnotationTypes.ERRAI_MODULE_EXPORT_FILE;
 
 /**
- * @author Max Barkley <mbarkley@redhat.com>
+ * @author Tiago Bento <tfernand@redhat.com>
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes(ERRAI_APP)
+@SupportedAnnotationTypes({ ERRAI_APP, ERRAI_MODULE_EXPORT_FILE })
 public class Generator extends AbstractProcessor {
-
-  private static final String IMPL_FQCN = "org.jboss.errai.bus.client.local.RpcProxyLoaderImpl";
 
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    for (TypeElement _erraiAppAnnotation : annotations) {
+    if (roundEnv.processingOver()) {
       System.out.println("===== BEGIN");
 
+      APTClassUtil.setTypes(processingEnv.getTypeUtils());
+      APTClassUtil.setElements(processingEnv.getElementUtils());
+
       List<? extends Element> exportFiles = processingEnv.getElementUtils()
-              .getPackageElement(ExportFilePackage.path())
+              .getPackageElement(ExportFilesPackage.path())
               .getEnclosedElements();
 
-      Map<String, Map<String, List<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName = exportFiles.stream()
-              .collect(groupingBy(this::exportFileModuleName,
-                      groupingBy(this::exportFileAnnotationClassName, flatMapping(this::exportedTypes, toList()))));
+      Map<String, Map<String, Set<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName = exportFiles.stream()
+              .collect(groupingBy(this::exportFileModuleName, groupingBy(this::exportFileAnnotationClassName,
+                      flatMapping(this::exportedTypes, Collectors.toSet()))));
 
       print(exportedClassesByAnnotationClassNameByModuleName);
+
+      generateRpcProxyLoaderImpl(exportedClassesByAnnotationClassNameByModuleName);
 
       System.out.println("===== END");
     }
@@ -71,7 +85,32 @@ public class Generator extends AbstractProcessor {
     return true;
   }
 
-  private void print(Map<String, Map<String, List<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName) {
+  private void generateRpcProxyLoaderImpl(Map<String, Map<String, Set<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName) {
+    String generatedSource = new RpcProxyLoaderGenerator().generate(
+            (context, annotation) -> exportedClassesByAnnotationClassNameByModuleName.getOrDefault("bus",
+                    Collections.emptyMap())
+                    .getOrDefault(annotation.getName(), Collections.emptySet())
+                    .stream()
+                    .map(APTClass::new)
+                    .collect(Collectors.toList()), false, Function.identity(), null);
+
+    saveSourceFile(generatedSource);
+  }
+
+  private void saveSourceFile(String generatedSource) {
+    try {
+      final Filer filer = processingEnv.getFiler();
+      final FileObject sourceFile = filer.createSourceFile("org.jboss.errai.bus.client.local.RpcProxyLoaderImpl");
+      try (Writer writer = sourceFile.openWriter()) {
+        writer.write(generatedSource);
+      }
+    } catch (final IOException e) {
+      final Messager messager = processingEnv.getMessager();
+      messager.printMessage(ERROR, String.format("Unable to generate RpcProxyLoaderImpl. Error: %s", e.getMessage()));
+    }
+  }
+
+  private void print(final Map<String, Map<String, Set<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName) {
     exportedClassesByAnnotationClassNameByModuleName.forEach((moduleName, exportedTypesByAnnotationClassName) -> {
       System.out.println("+ " + moduleName);
       exportedTypesByAnnotationClassName.forEach((annotationClassName, exportedTypes) -> {
@@ -80,7 +119,7 @@ public class Generator extends AbstractProcessor {
     });
   }
 
-  private String exportFileAnnotationClassName(Element e) {
+  private String exportFileAnnotationClassName(final Element e) {
     return ExportFileName.getAnnotationClassNameFromExportFileName(e);
   }
 

@@ -30,7 +30,6 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Parameterizable;
-import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -44,8 +43,6 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.List;
@@ -94,20 +91,19 @@ public final class APTClassUtil {
   }
 
   public static Annotation[] getAnnotations(final Element target) {
-    final List<? extends AnnotationMirror> annoMirrors = elements.getAllAnnotationMirrors(target);
-    return annoMirrors.stream().flatMap(mirror -> {
+
+    final List<? extends AnnotationMirror> annotationMirrors = elements.getAllAnnotationMirrors(target);
+    return annotationMirrors.stream().flatMap(mirror -> {
       try {
-        final Object annoProxy = createAnnotationProxy(mirror);
-        return Stream.of((Annotation) annoProxy);
-      } catch (final Throwable t) {
-        if (t instanceof ClassNotFoundException) {
-          logger.warn(String.format("Unable to lookup Class for annotation type [%s]. Ignoring annotation on [%s].",
-                  mirror.getAnnotationType(), target));
-        } else {
-          logger.warn(String.format("Unable to proxy annotation for mirror [%s].", mirror), t);
-        }
-        return Stream.empty();
+        return Stream.of((Annotation) createAnnotationProxy(mirror));
+      } catch (ClassNotFoundException e) {
+        logger.warn(String.format("Unable to lookup Class for annotation type [%s]. Ignoring annotation on [%s].",
+                mirror.getAnnotationType(), target));
+      } catch (Throwable t) {
+        logger.warn(String.format("Unable to proxy annotation for mirror [%s].", mirror), t);
       }
+
+      return Stream.empty();
     }).toArray(Annotation[]::new);
   }
 
@@ -115,38 +111,37 @@ public final class APTClassUtil {
     final DeclaredType type = mirror.getAnnotationType();
     final TypeElement element = (TypeElement) APTClassUtil.types.asElement(type);
     final String fqcn = element.getQualifiedName().toString();
-    final Class<?> annoClazz = Class.forName(fqcn);
     final Map<? extends ExecutableElement, ? extends AnnotationValue> values = mirror.getElementValues();
-    return createAnnotationProxy(fqcn, annoClazz, values);
+    return createAnnotationProxy(fqcn, Class.forName(fqcn), values);
   }
 
-  private static Object createAnnotationProxy(final String fqcn, final Class<?> annoClazz,
+  private static Object createAnnotationProxy(final String fqcn,
+          final Class<?> annoClazz,
           final Map<? extends ExecutableElement, ? extends AnnotationValue> values) {
+
     final Map<String, Object> valueLookup = values.entrySet()
             .stream()
             .collect(toMap(e -> e.getKey().getSimpleName().toString(), e -> e.getValue().getValue()));
-    return Proxy.newProxyInstance(annoClazz.getClassLoader(), new Class<?>[] { annoClazz },
-            new InvocationHandler() {
-              @Override
-              public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-                if ("annotationType".equals(method.getName())) {
-                  return annoClazz;
-                } else if ("getClass".equals(method.getName())) {
-                  return annoClazz;
-                } else if ("toString".equals(method.getName())) {
-                  return AnnotationUtils.toString((Annotation) proxy);
-                } else if ("hashCode".equals(method.getName())) {
-                  return AnnotationUtils.hashCode((Annotation) proxy);
-                } else if (valueLookup.containsKey(method.getName())) {
-                  final Object value = valueLookup.get(method.getName());
-                  return convertValue(value, method.getReturnType());
-                } else {
-                  throw new IllegalArgumentException(
-                          String.format("Unrecognized attribute [%s] for annotation type [%s].", method.getName(),
-                                  fqcn));
-                }
-              }
-            });
+
+    return Proxy.newProxyInstance(annoClazz.getClassLoader(), new Class<?>[] { annoClazz }, (proxy, method, args) -> {
+      if ("equals".equals(method.getName())) {
+        return AnnotationUtils.equals((Annotation) proxy, (Annotation) args[0]);
+      } else if ("annotationType".equals(method.getName())) {
+        return annoClazz;
+      } else if ("getClass".equals(method.getName())) {
+        return annoClazz;
+      } else if ("toString".equals(method.getName())) {
+        return AnnotationUtils.toString((Annotation) proxy);
+      } else if ("hashCode".equals(method.getName())) {
+        return AnnotationUtils.hashCode((Annotation) proxy);
+      } else if (valueLookup.containsKey(method.getName())) {
+        final Object value = valueLookup.get(method.getName());
+        return convertValue(value, method.getReturnType());
+      } else {
+        throw new IllegalArgumentException(
+                String.format("Unrecognized attribute [%s] for annotation type [%s].", method.getName(), fqcn));
+      }
+    });
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.bus.processor;
+package org.jboss.errai.bus.apt.export;
 
 /**
  *

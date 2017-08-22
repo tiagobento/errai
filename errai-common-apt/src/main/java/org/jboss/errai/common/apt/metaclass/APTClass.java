@@ -432,7 +432,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
       return types
               .stream()
               .filter(type -> type.getModifiers().contains(Modifier.PUBLIC))
-              .map(type -> type.asType())
+              .map(Element::asType)
               .map(APTClass::new)
               .toArray(MetaClass[]::new);
     case BOOLEAN:
@@ -804,6 +804,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case LONG:
     case SHORT:
     case ARRAY:
+    case VOID:
       return this;
     default:
       return throwUnsupportedTypeError(mirror);

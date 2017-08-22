@@ -156,6 +156,11 @@
       <artifactId>jetty-server</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-bus-export-apt</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

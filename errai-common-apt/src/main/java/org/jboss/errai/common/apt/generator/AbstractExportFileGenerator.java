@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.bus.processor;
+package org.jboss.errai.common.apt.generator;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
@@ -24,13 +24,10 @@ import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.errai.common.apt.ErraiModuleExportFile;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
-import org.jboss.errai.common.apt.exportfile.ExportFilePackage;
+import org.jboss.errai.common.apt.exportfile.ExportFilesPackage;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
@@ -42,16 +39,13 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static org.jboss.errai.bus.processor.SupportedAnnotationTypes.FEATURE_INTERCEPTOR;
-import static org.jboss.errai.bus.processor.SupportedAnnotationTypes.INTERCEPTED_CALL;
-import static org.jboss.errai.bus.processor.SupportedAnnotationTypes.REMOTE;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({ REMOTE, INTERCEPTED_CALL, FEATURE_INTERCEPTOR })
-public class ErraiBusExportFileGenerator extends AbstractProcessor {
+public abstract class AbstractExportFileGenerator extends AbstractProcessor {
+
+  protected abstract String getModuleName();
 
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
@@ -61,7 +55,7 @@ public class ErraiBusExportFileGenerator extends AbstractProcessor {
 
     elementsByItsAnnotations.entrySet()
             .stream()
-            .map((e) -> generateExportFile(e.getKey(), e.getValue()))
+            .map(e -> generateExportFile(e.getKey(), e.getValue()))
             .forEach(this::saveExportFile);
 
     return false;
@@ -80,26 +74,21 @@ public class ErraiBusExportFileGenerator extends AbstractProcessor {
             .build();
   }
 
-  private List<FieldSpec> buildFields(final Set<? extends Element> elements) {
-    return elements.stream().map(this::buildField).collect(Collectors.toList());
-  }
-
   private FieldSpec buildField(final Element element) {
     return FieldSpec.builder(TypeName.get(element.asType()), RandomStringUtils.randomAlphabetic(6))
             .addModifiers(PUBLIC)
             .build();
   }
 
+  private List<FieldSpec> buildFields(final Set<? extends Element> elements) {
+    return elements.stream().map(this::buildField).collect(Collectors.toList());
+  }
+
   private void saveExportFile(final TypeSpec exportFileTypeSpec) {
     try {
-      JavaFile.builder(ExportFilePackage.path(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
+      JavaFile.builder(ExportFilesPackage.path(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
     } catch (IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
     }
   }
-
-  private String getModuleName() {
-    return "bus";
-  }
-
 }

@@ -19,16 +19,12 @@ package org.jboss.errai.common.apt.exportfile;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ExportFilePackage {
+public class ExportFilesPackage {
 
-  private static final String EXPORT_FILES_PACKAGE = "org.jboss.errai.apt.secret";
+  private static final String EXPORT_FILES_PACKAGE_PATH = "org.jboss.errai.apt.internal.export";
 
   public static String path() {
-    return EXPORT_FILES_PACKAGE;
-  }
-
-  public static String nested(final String subPackageName) {
-    return path() + "." + subPackageName;
+    return EXPORT_FILES_PACKAGE_PATH;
   }
 
 }

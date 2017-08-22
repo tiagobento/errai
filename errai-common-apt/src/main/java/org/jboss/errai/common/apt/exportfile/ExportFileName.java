@@ -30,7 +30,8 @@ public class ExportFileName {
 
   public static String buildExportFileNameForAnnotation(final TypeElement annotation) {
     String annotationName = annotation.getQualifiedName().toString().replace(".", "_");
-    return RandomStringUtils.randomAlphabetic(4) + "_" + ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX + annotationName;
+    //FIXME: possible name conflict
+    return RandomStringUtils.randomAlphabetic(12) + "_" + ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX + annotationName;
   }
 
   public static String getAnnotationClassNameFromExportFileName(final Element e) {

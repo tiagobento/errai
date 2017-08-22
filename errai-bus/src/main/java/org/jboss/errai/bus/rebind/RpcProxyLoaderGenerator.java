@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -70,26 +71,41 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     log.info("generating RPC proxy loader class...");
+    final boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
+    final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(
+            RebindUtils.findTranslatablePackages(context));
+
+    return generate(this::getClassesAnnotatedWith, iocEnabled, annoFilter, context);
+  }
+
+  public String generate(final BiFunction<GeneratorContext, Class<? extends Annotation>, Collection<MetaClass>> annotationUsageFinder,
+          final boolean iocEnabled,
+          final Function<Annotation[], Annotation[]> annotationFilter,
+          GeneratorContext context) {
 
     ClassStructureBuilder<?> classBuilder = ClassBuilder.implement(RpcProxyLoader.class);
     final long time = System.currentTimeMillis();
     final MethodBlockBuilder<?> loadProxies = classBuilder.publicMethod(void.class, "loadProxies",
             Parameter.of(MessageBus.class, "bus", true));
 
-    final Collection<MetaClass> remotes = ClassScanner.getTypesAnnotatedWith(Remote.class,
-            RebindUtils.findTranslatablePackages(context), context);
+    final Collection<MetaClass> remotes = annotationUsageFinder.apply(context, Remote.class);
     addCacheRelevantClasses(remotes);
 
-    final InterceptorProvider interceptorProvider = getInterceptorProvider(context);
-    final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(
-            RebindUtils.findTranslatablePackages(context));
-    final boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
+    final Collection<MetaClass> featureInterceptors = annotationUsageFinder.apply(context, FeatureInterceptor.class);
+    addCacheRelevantClasses(featureInterceptors);
+
+    final Collection<MetaClass> standaloneInterceptors = annotationUsageFinder.apply(context,
+            InterceptsRemoteCall.class);
+    addCacheRelevantClasses(standaloneInterceptors);
+
+    final InterceptorProvider interceptorProvider = new InterceptorProvider(featureInterceptors,
+            standaloneInterceptors);
 
     for (final MetaClass remote : remotes) {
       if (remote.isInterface()) {
         // create the remote proxy for this interface
-        final ClassStructureBuilder<?> remoteProxy = new RpcProxyGenerator(remote, interceptorProvider, annoFilter,
-                iocEnabled).generate();
+        final ClassStructureBuilder<?> remoteProxy = new RpcProxyGenerator(remote, interceptorProvider,
+                annotationFilter, iocEnabled).generate();
         loadProxies.append(new InnerClass(remoteProxy.getClassDefinition()));
 
         // create the proxy provider
@@ -111,28 +127,21 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     return gen;
   }
 
-  private InterceptorProvider getInterceptorProvider(final GeneratorContext context) {
-    final Collection<MetaClass> featureInterceptors = ClassScanner.getTypesAnnotatedWith(FeatureInterceptor.class,
-            RebindUtils.findTranslatablePackages(context), context);
-    addCacheRelevantClasses(featureInterceptors);
-
-    final Collection<MetaClass> standaloneInterceptors = ClassScanner.getTypesAnnotatedWith(InterceptsRemoteCall.class,
-            RebindUtils.findTranslatablePackages(context), context);
-    addCacheRelevantClasses(standaloneInterceptors);
-
-    return new InterceptorProvider(featureInterceptors, standaloneInterceptors);
-  }
-
   @Override
   protected boolean isRelevantClass(final MetaClass clazz) {
-    for (final Annotation anno : clazz.getAnnotations()) {
-      if (anno.annotationType().equals(Remote.class) || anno.annotationType().equals(FeatureInterceptor.class)
-              || anno.annotationType().equals(InterceptsRemoteCall.class)) {
+    for (final Annotation annotation : clazz.getAnnotations()) {
+      if (annotation.annotationType().equals(Remote.class) || annotation.annotationType()
+              .equals(FeatureInterceptor.class) || annotation.annotationType().equals(InterceptsRemoteCall.class)) {
         return true;
       }
     }
 
     return false;
+  }
+
+  private Collection<MetaClass> getClassesAnnotatedWith(final GeneratorContext context,
+          final Class<? extends Annotation> annotation) {
+    return ClassScanner.getTypesAnnotatedWith(annotation, RebindUtils.findTranslatablePackages(context), context);
   }
 
 }

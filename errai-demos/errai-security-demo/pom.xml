@@ -191,13 +191,19 @@
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-generators-apt</artifactId>
-      <version>4.1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-bus-export-apt</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-common-apt</artifactId>
-      <version>4.1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
