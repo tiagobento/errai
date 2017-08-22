@@ -17,11 +17,7 @@
 package org.jboss.errai.bus.processor;
 
 /**
- *
- * @author Max Barkley <mbarkley@redhat.com>
+ * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface TypeNames {
-  static final String REMOTE = "org.jboss.errai.bus.server.annotations.Remote";
-  static final String FEATURE_INTERCEPTOR = "org.jboss.errai.common.client.api.interceptor.FeatureInterceptor";
-  static final String INTERCEPTED_CALL = "org.jboss.errai.common.client.api.interceptor.InterceptedCall";
+public @interface ErraiModuleExportFile {
 }

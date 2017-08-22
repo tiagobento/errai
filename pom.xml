@@ -107,8 +107,9 @@
     <module>errai-forge-addon</module>
     <module>errai-api</module>
     <module>errai-codegen-apt</module>
-    <module>errai-bus-processors</module>
     <module>errai-jaxrs-processors</module>
+    <module>errai-app-apt</module>
+    <module>errai-security-export-apt</module>
   </modules>
 
   <repositories>
