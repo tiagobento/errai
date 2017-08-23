@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.bus.apt.export;
+package org.jboss.errai.common.apt.exportfile;
 
 /**
- * @author Max Barkley <mbarkley@redhat.com>
+ * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface SupportedAnnotationTypes {
-  String REMOTE = "org.jboss.errai.bus.server.annotations.Remote";
-  String FEATURE_INTERCEPTOR = "org.jboss.errai.common.client.api.interceptor.FeatureInterceptor";
-  String INTERCEPTED_CALL = "org.jboss.errai.common.client.api.interceptor.InterceptedCall";
-  String INTERCEPTS_REMOTE_CALL = "org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall";
+public class ExportFileModule {
+
+  public static final String BUS = "bus";
 }

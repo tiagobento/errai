@@ -21,9 +21,15 @@
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-bus</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-dev</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
         </dependency>
 
     </dependencies>

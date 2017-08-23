@@ -16,15 +16,13 @@
 
 package org.jboss.errai.common.apt.metaclass;
 
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.elements;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.getSimpleName;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.sameTypes;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.throwUnsupportedTypeError;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.types;
-
-import java.lang.annotation.Annotation;
-import java.util.Iterator;
-import java.util.List;
+import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaConstructor;
+import org.jboss.errai.codegen.meta.MetaField;
+import org.jboss.errai.codegen.meta.MetaMethod;
+import org.jboss.errai.codegen.meta.MetaParameterizedType;
+import org.jboss.errai.codegen.meta.MetaTypeVariable;
+import org.jboss.errai.codegen.meta.impl.AbstractMetaClass;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -40,17 +38,17 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import java.lang.annotation.Annotation;
+import java.util.Iterator;
+import java.util.List;
 
-import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.meta.MetaConstructor;
-import org.jboss.errai.codegen.meta.MetaField;
-import org.jboss.errai.codegen.meta.MetaMethod;
-import org.jboss.errai.codegen.meta.MetaParameterizedType;
-import org.jboss.errai.codegen.meta.MetaTypeVariable;
-import org.jboss.errai.codegen.meta.impl.AbstractMetaClass;
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.elements;
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.getSimpleName;
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.sameTypes;
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.throwUnsupportedTypeError;
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.types;
 
 /**
- *
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public class APTClass extends AbstractMetaClass<TypeMirror> {
@@ -65,16 +63,13 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case DECLARED:
       final DeclaredType dType = (DeclaredType) mirror;
       final List<? extends TypeMirror> typeArgs = dType.getTypeArguments();
-      final Iterator<TypeMirror> typeParams =
-              ((TypeElement) dType.asElement())
-                .getTypeParameters()
-                .stream()
-                .map(Element::asType)
-                .iterator();
+      final Iterator<TypeMirror> typeParams = ((TypeElement) dType.asElement()).getTypeParameters()
+              .stream()
+              .map(Element::asType)
+              .iterator();
       if (typeArgs.isEmpty() || sameTypes(typeParams, typeArgs.iterator())) {
         return null;
-      }
-      else {
+      } else {
         return new APTParameterizedType(dType);
       }
     default:
@@ -206,8 +201,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<ExecutableElement> methods = ElementFilter.methodsIn(elements.getAllMembers(element));
-      return methods
-              .stream()
+      return methods.stream()
               .filter(method -> !method.getModifiers().contains(Modifier.PRIVATE))
               .map(APTMethod::new)
               .toArray(MetaMethod[]::new);
@@ -234,10 +228,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
-      return methods
-              .stream()
-              .map(APTMethod::new)
-              .toArray(MetaMethod[]::new);
+      return methods.stream().map(APTMethod::new).toArray(MetaMethod[]::new);
     case ARRAY:
     case BOOLEAN:
     case BYTE:
@@ -261,8 +252,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<VariableElement> fields = ElementFilter.fieldsIn(elements.getAllMembers(element));
-      return fields
-              .stream()
+      return fields.stream()
               .filter(field -> field.getModifiers().contains(Modifier.PUBLIC))
               .map(APTField::new)
               .toArray(MetaField[]::new);
@@ -289,10 +279,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<VariableElement> fields = ElementFilter.fieldsIn(element.getEnclosedElements());
-      return fields
-              .stream()
-              .map(APTField::new)
-              .toArray(MetaField[]::new);
+      return fields.stream().map(APTField::new).toArray(MetaField[]::new);
     case ARRAY:
     case BOOLEAN:
     case BYTE:
@@ -316,12 +303,11 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<VariableElement> fields = ElementFilter.fieldsIn(elements.getAllMembers(element));
-      return fields
-        .stream()
-        .filter(field -> field.getModifiers().contains(Modifier.PUBLIC))
-        .map(APTField::new)
-        .findFirst()
-        .orElse(null);
+      return fields.stream()
+              .filter(field -> field.getModifiers().contains(Modifier.PUBLIC))
+              .map(APTField::new)
+              .findFirst()
+              .orElse(null);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -345,12 +331,11 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<VariableElement> fields = ElementFilter.fieldsIn(element.getEnclosedElements());
-      return fields
-        .stream()
-        .filter(field -> field.getSimpleName().contentEquals(name))
-        .map(APTField::new)
-        .findFirst()
-        .orElse(null);
+      return fields.stream()
+              .filter(field -> field.getSimpleName().contentEquals(name))
+              .map(APTField::new)
+              .findFirst()
+              .orElse(null);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -374,11 +359,10 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<ExecutableElement> ctors = ElementFilter.constructorsIn(element.getEnclosedElements());
-      return ctors
-        .stream()
-        .filter(ctor -> ctor.getModifiers().contains(Modifier.PUBLIC))
-        .map(APTConstructor::new)
-        .toArray(MetaConstructor[]::new);
+      return ctors.stream()
+              .filter(ctor -> ctor.getModifiers().contains(Modifier.PUBLIC))
+              .map(APTConstructor::new)
+              .toArray(MetaConstructor[]::new);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -402,10 +386,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<ExecutableElement> ctors = ElementFilter.constructorsIn(element.getEnclosedElements());
-      return ctors
-        .stream()
-        .map(APTConstructor::new)
-        .toArray(MetaConstructor[]::new);
+      return ctors.stream().map(APTConstructor::new).toArray(MetaConstructor[]::new);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -429,8 +410,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<TypeElement> types = ElementFilter.typesIn(element.getEnclosedElements());
-      return types
-              .stream()
+      return types.stream()
               .filter(type -> type.getModifiers().contains(Modifier.PUBLIC))
               .map(Element::asType)
               .map(APTClass::new)
@@ -457,11 +437,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case DECLARED:
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
-      return element
-              .getInterfaces()
-              .stream()
-              .map(APTClass::new)
-              .toArray(MetaClass[]::new);
+      return element.getInterfaces().stream().map(APTClass::new).toArray(MetaClass[]::new);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -486,8 +462,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
       final TypeMirror superclass = element.getSuperclass();
       if (TypeKind.NONE.equals(superclass.getKind())) {
         return null;
-      }
-      else {
+      } else {
         return new APTClass(superclass);
       }
     case BOOLEAN:
@@ -552,8 +527,8 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case DECLARED:
     case TYPEVAR:
       final Element element = types.asElement(mirror);
-      return element.getKind().isInterface()
-              || element.getKind().isClass() && element.getModifiers().contains(Modifier.ABSTRACT);
+      return element.getKind().isInterface() || element.getKind().isClass() && element.getModifiers()
+              .contains(Modifier.ABSTRACT);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -791,8 +766,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
       final TypeMirror erased = types.erasure(mirror);
       if (types.isSameType(erased, mirror)) {
         return this;
-      }
-      else {
+      } else {
         return new APTClass(erased);
       }
     case BOOLEAN:
@@ -811,4 +785,12 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     }
   }
 
+  @Override
+  public synchronized Class<?> asClass() {
+    try {
+      return Class.forName(getFullyQualifiedName());
+    } catch (final ClassNotFoundException e) {
+      return super.asClass();
+    }
+  }
 }

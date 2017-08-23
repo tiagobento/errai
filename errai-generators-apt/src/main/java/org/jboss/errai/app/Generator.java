@@ -50,6 +50,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.jboss.errai.app.SupportedAnnotationTypes.ERRAI_APP;
 import static org.jboss.errai.app.SupportedAnnotationTypes.ERRAI_MODULE_EXPORT_FILE;
+import static org.jboss.errai.common.apt.exportfile.ExportFileModule.BUS;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -86,13 +87,13 @@ public class Generator extends AbstractProcessor {
   }
 
   private void generateRpcProxyLoaderImpl(Map<String, Map<String, Set<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName) {
-    String generatedSource = new RpcProxyLoaderGenerator().generate(
-            (context, annotation) -> exportedClassesByAnnotationClassNameByModuleName.getOrDefault("bus",
-                    Collections.emptyMap())
-                    .getOrDefault(annotation.getName(), Collections.emptySet())
-                    .stream()
-                    .map(APTClass::new)
-                    .collect(Collectors.toList()), false, Function.identity(), null);
+    String generatedSource = new RpcProxyLoaderGenerator().generate((context, annotation) -> {
+      return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(BUS, Collections.emptyMap())
+              .getOrDefault(annotation.getName(), Collections.emptySet())
+              .stream()
+              .map(APTClass::new)
+              .collect(Collectors.toList());
+    }, true, Function.identity(), null);
 
     saveSourceFile(generatedSource);
   }
@@ -100,7 +101,7 @@ public class Generator extends AbstractProcessor {
   private void saveSourceFile(String generatedSource) {
     try {
       final Filer filer = processingEnv.getFiler();
-      final FileObject sourceFile = filer.createSourceFile("org.jboss.errai.bus.client.local.RpcProxyLoaderImpl");
+      final FileObject sourceFile = filer.createSourceFile("org.jboss.errai.bus.client.framework.RpcProxyLoaderImpl");
       try (Writer writer = sourceFile.openWriter()) {
         writer.write(generatedSource);
       }
