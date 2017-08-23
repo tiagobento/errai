@@ -111,7 +111,7 @@ public final class APTClassUtil {
     final DeclaredType type = mirror.getAnnotationType();
     final TypeElement element = (TypeElement) APTClassUtil.types.asElement(type);
     final String fqcn = element.getQualifiedName().toString();
-    final Map<? extends ExecutableElement, ? extends AnnotationValue> values = mirror.getElementValues();
+    final Map<? extends ExecutableElement, ? extends AnnotationValue> values = APTClassUtil.elements.getElementValuesWithDefaults(mirror);
     return createAnnotationProxy(fqcn, Class.forName(fqcn), values);
   }
 
