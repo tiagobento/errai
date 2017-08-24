@@ -16,10 +16,8 @@
 
 package org.jboss.errai.bus.rebind;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.bus.client.api.builder.RemoteCallSendable;
@@ -54,19 +52,15 @@ public class RpcProxyGenerator {
   private final MetaClass remote;
   private final InterceptorProvider interceptorProvider;
   private final boolean iocEnabled;
-  private final Function<Annotation[], Annotation[]> annoFilter;
+  private final AnnotationFilter annotationFilter;
 
 
   public RpcProxyGenerator(final MetaClass remote, final InterceptorProvider interceptorProvider,
-          final Function<Annotation[], Annotation[]> annoFilter, final boolean iocEnabled) {
+          final AnnotationFilter annotationFilter, final boolean iocEnabled) {
     this.remote = remote;
     this.interceptorProvider = interceptorProvider;
-    this.annoFilter = annoFilter;
+    this.annotationFilter = annotationFilter;
     this.iocEnabled = iocEnabled;
-  }
-
-  public MetaClass getRemoteType() {
-    return remote;
   }
 
   public ClassStructureBuilder<?> generate() {
@@ -124,7 +118,7 @@ public class RpcProxyGenerator {
   private Statement generateInterceptorLogic(final ClassStructureBuilder<?> classBuilder,
       final MetaMethod method, final Statement requestLogic, final List<Statement> parmVars, final List<Class<?>> interceptors) {
     final Statement callContext = ProxyUtil.generateProxyMethodCallContext(RemoteCallContext.class,
-        classBuilder.getClassDefinition(), method, requestLogic, interceptors, annoFilter, iocEnabled).finish();
+        classBuilder.getClassDefinition(), method, requestLogic, interceptors, annotationFilter, iocEnabled).finish();
 
     return Stmt.try_()
             .append(

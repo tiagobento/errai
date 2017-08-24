@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * Generates the implementation of {@link RpcProxyLoader}.
@@ -71,17 +69,20 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
 
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
-    final boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
-    final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(
-            RebindUtils.findTranslatablePackages(context));
+    final Boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
+    final AnnotationFilter gwtAnnotationFilter = gwtAnnotationFilter(context);
 
-    return generate(this::getClassesAnnotatedWith, iocEnabled, annoFilter, context);
+    return generate(this::getMetaClasses, iocEnabled, gwtAnnotationFilter, context);
   }
 
-  public String generate(final BiFunction<GeneratorContext, Class<? extends Annotation>, Collection<MetaClass>> annotationUsageFinder,
+  private AnnotationFilter gwtAnnotationFilter(final GeneratorContext context) {
+    return (annotation) -> ProxyUtil.packageFilter(RebindUtils.findTranslatablePackages(context)).apply(annotation);
+  }
+
+  public String generate(final MetaClassFinder metaClassFinder,
           final boolean iocEnabled,
-          final Function<Annotation[], Annotation[]> annotationFilter,
-          GeneratorContext context) {
+          final AnnotationFilter annotationFilter,
+          final GeneratorContext context) {
 
     log.info("generating RPC proxy loader class...");
 
@@ -90,14 +91,13 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     final MethodBlockBuilder<?> loadProxies = classBuilder.publicMethod(void.class, "loadProxies",
             Parameter.of(MessageBus.class, "bus", true));
 
-    final Collection<MetaClass> remotes = annotationUsageFinder.apply(context, Remote.class);
+    final Collection<MetaClass> remotes = metaClassFinder.find(context, Remote.class);
     addCacheRelevantClasses(remotes);
 
-    final Collection<MetaClass> featureInterceptors = annotationUsageFinder.apply(context, FeatureInterceptor.class);
+    final Collection<MetaClass> featureInterceptors = metaClassFinder.find(context, FeatureInterceptor.class);
     addCacheRelevantClasses(featureInterceptors);
 
-    final Collection<MetaClass> standaloneInterceptors = annotationUsageFinder.apply(context,
-            InterceptsRemoteCall.class);
+    final Collection<MetaClass> standaloneInterceptors = metaClassFinder.find(context, InterceptsRemoteCall.class);
     addCacheRelevantClasses(standaloneInterceptors);
 
     final InterceptorProvider interceptorProvider = new InterceptorProvider(featureInterceptors,
@@ -141,7 +141,7 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     return false;
   }
 
-  private Collection<MetaClass> getClassesAnnotatedWith(final GeneratorContext context,
+  private Collection<MetaClass> getMetaClasses(final GeneratorContext context,
           final Class<? extends Annotation> annotation) {
     return ClassScanner.getTypesAnnotatedWith(annotation, RebindUtils.findTranslatablePackages(context), context);
   }
