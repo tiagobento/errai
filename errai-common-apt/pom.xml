@@ -22,7 +22,6 @@
             <type>test-jar</type>
         </dependency>
 
-
         <!-- FIXME: remove -->
         <dependency>
             <groupId>com.squareup</groupId>
@@ -42,10 +41,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.jboss.errai</groupId>
-            <artifactId>errai-bus</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

@@ -17,7 +17,7 @@
 package org.jboss.errai.bus.apt.export;
 
 import org.jboss.errai.common.apt.exportfile.ExportFileModule;
-import org.jboss.errai.common.apt.generator.AbstractExportFileGenerator;
+import org.jboss.errai.common.apt.generator.AbstractErraiModuleExportFileGenerator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -33,7 +33,7 @@ import static org.jboss.errai.bus.apt.export.SupportedAnnotationTypes.REMOTE;
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({ REMOTE, INTERCEPTED_CALL, FEATURE_INTERCEPTOR, INTERCEPTS_REMOTE_CALL })
-public class ErraiBusExportFileGenerator extends AbstractExportFileGenerator {
+public class ErraiBusExportFileGenerator extends AbstractErraiModuleExportFileGenerator {
 
   @Override
   protected String getModuleName() {

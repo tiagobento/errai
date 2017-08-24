@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt;
+package org.jboss.errai.common.apt;
 
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.common.apt.ErraiApp;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
-import org.jboss.errai.common.apt.exportfile.ExportFilesPackage;
+import org.jboss.errai.common.apt.generator.AbstractErraiModuleExportFileGenerator;
 import org.jboss.errai.common.apt.metaclass.APTClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -40,29 +41,41 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
+import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFilesPackagePath;
+import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportedAnnotationsPackagePath;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class ExportedTypes {
 
-  private final Map<String, Set<TypeMirror>> exportedClassesByAnnotationClassNameByModuleName;
-  private final RoundEnvironment roundEnv;
+  private static final Logger log = LoggerFactory.getLogger(ExportedTypes.class);
 
-  public ExportedTypes(final RoundEnvironment roundEnv, final ProcessingEnvironment processingEnvironment) {
-    this.roundEnv = roundEnv;
+  private static Map<String, Set<TypeMirror>> exportedClassesByAnnotationClassNameByModuleName;
+  private static RoundEnvironment roundEnv;
+  private static ProcessingEnvironment processingEnvironment;
 
-    final List<? extends Element> exportFiles = processingEnvironment.getElementUtils()
-            .getPackageElement(ExportFilesPackage.path())
-            .getEnclosedElements();
+  private ExportedTypes() {
+  }
 
-    exportedClassesByAnnotationClassNameByModuleName = exportFiles.stream()
-            .collect(groupingBy(this::exportFileAnnotationClassName, flatMapping(this::exportedTypes, toSet())));
+  public static void init(final RoundEnvironment roundEnv, final ProcessingEnvironment processingEnvironment) {
+    ExportedTypes.roundEnv = roundEnv;
+    ExportedTypes.processingEnvironment = processingEnvironment;
 
-    print();
+    // Loads all exported types from ErraiModuleExportFiles
+    exportedClassesByAnnotationClassNameByModuleName = processingEnvironment.getElementUtils()
+            .getPackageElement(exportFilesPackagePath())
+            .getEnclosedElements()
+            .stream()
+            .collect(groupingBy(ExportedTypes::annotationName, flatMapping(ExportedTypes::exportedTypes, toSet())));
 
-    ErraiApp.SupportedAnnotationTypes.ALL.stream()
-            .collect(groupingBy(Class::getName, flatMapping(this::exportableLocalTypes, toSet())))
+    // Because annotation processors execution order is random we have to look for local exportable types one more time
+    processingEnvironment.getElementUtils()
+            .getPackageElement(exportedAnnotationsPackagePath())
+            .getEnclosedElements()
+            .stream()
+            .flatMap(ExportedTypes::exportedTypes)
+            .collect(groupingBy(TypeMirror::toString, flatMapping(ExportedTypes::exportableLocalTypes, toSet())))
             .entrySet()
             .stream()
             .filter(s -> !s.getValue().isEmpty())
@@ -71,24 +84,26 @@ public class ExportedTypes {
     print();
   }
 
-  private Stream<TypeMirror> exportableLocalTypes(Class<? extends Annotation> c) {
-    return roundEnv.getElementsAnnotatedWith(c).stream().map(Element::asType);
+  private static Stream<TypeMirror> exportableLocalTypes(final TypeMirror element) {
+    final TypeElement annotation = (TypeElement) processingEnvironment.getTypeUtils().asElement(element);
+    return roundEnv.getElementsAnnotatedWith(annotation).stream().map(Element::asType);
   }
 
-  void print() {
-    exportedClassesByAnnotationClassNameByModuleName.forEach(
-            (annotationClassName, e) -> System.out.println(annotationClassName + ": " + e.size()));
+  private static void print() {
+    exportedClassesByAnnotationClassNameByModuleName.forEach((annotationClassName, e) -> System.out.println(
+            annotationClassName + ": " + e.size())); //FIXME: change for log.debug
   }
 
-  private String exportFileAnnotationClassName(final Element e) {
+  private static String annotationName(final Element e) {
     return ExportFileName.getAnnotationClassNameFromExportFileName(e);
   }
 
-  private Stream<TypeMirror> exportedTypes(final Element exportFile) {
+  private static Stream<TypeMirror> exportedTypes(final Element exportFile) {
     return exportFile.getEnclosedElements().stream().filter(x -> x.getKind().isField()).map(Element::asType);
   }
 
-  public Collection<MetaClass> getMetaClasses(final String module, final Class<? extends Annotation> annotation) {
+  public static Collection<MetaClass> getMetaClasses(final String module,
+          final Class<? extends Annotation> annotation) {
     return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(annotation.getName(), emptySet())
             .stream()
             .map(APTClass::new)

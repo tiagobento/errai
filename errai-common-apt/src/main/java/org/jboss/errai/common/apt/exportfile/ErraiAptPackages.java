@@ -19,12 +19,22 @@ package org.jboss.errai.common.apt.exportfile;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ExportFilesPackage {
+public class ErraiAptPackages {
 
   private static final String EXPORT_FILES_PACKAGE_PATH = "org.jboss.errai.apt.internal.export";
+  private static final String EXPORTED_ANNOTATIONS_PACKAGE_PATH = "org.jboss.errai.apt.internal.export.annotation";
+  private static final String GENERATORS_PACKAGE_PACKAGE_PATH = "org.jboss.errai.apt.internal.generator";
 
-  public static String path() {
+  public static String exportFilesPackagePath() {
     return EXPORT_FILES_PACKAGE_PATH;
+  }
+
+  public static String exportedAnnotationsPackagePath() {
+    return EXPORTED_ANNOTATIONS_PACKAGE_PATH;
+  }
+
+  public static String generatorsPackagePath() {
+    return GENERATORS_PACKAGE_PACKAGE_PATH;
   }
 
 }

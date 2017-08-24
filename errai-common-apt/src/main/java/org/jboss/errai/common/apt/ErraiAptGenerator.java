@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt;
+package org.jboss.errai.common.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface SupportedAnnotationTypes {
-  String ERRAI_APP = "org.jboss.errai.common.apt.ErraiApp";
+public interface ErraiAptGenerator {
+  String generate();
+
+  String className();
 }

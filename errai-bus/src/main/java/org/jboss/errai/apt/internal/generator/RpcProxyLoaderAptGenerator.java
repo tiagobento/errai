@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt.bus;
+package org.jboss.errai.apt.internal.generator;
 
-import org.jboss.errai.apt.ExportedTypes;
 import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
+import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.common.apt.ExportedTypes;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -25,32 +26,34 @@ import java.util.Arrays;
 import static org.jboss.errai.common.apt.exportfile.ExportFileModule.BUS;
 
 /**
+ * IMPORTANT: Do not move this class. ErraiAppGenerator depends on it being in this exact package.
+ *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class AptRpcProxyLoaderGenerator {
+public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
 
-  private final ExportedTypes exportedTypes;
   private final RpcProxyLoaderGenerator rpcProxyLoaderGenerator;
   private final Boolean iocEnabled;
 
-  public AptRpcProxyLoaderGenerator(final ExportedTypes exportedTypes) {
+  public RpcProxyLoaderAptGenerator() {
     this.iocEnabled = true; //FIXME: tiago:
-    this.exportedTypes = exportedTypes;
     this.rpcProxyLoaderGenerator = new RpcProxyLoaderGenerator();
   }
 
+  @Override
   public String generate() {
-    return rpcProxyLoaderGenerator.generate((context, annotation) -> exportedTypes.getMetaClasses(BUS, annotation),
+    return rpcProxyLoaderGenerator.generate((context, annotation) -> ExportedTypes.getMetaClasses(BUS, annotation),
             iocEnabled, this::annotationFilter, null);
+  }
+
+  @Override
+  public String className() {
+    return rpcProxyLoaderGenerator.getFullQualifiedClassName();
   }
 
   private Annotation[] annotationFilter(final Annotation[] annotations) {
     return Arrays.stream(annotations)
-            .filter(s -> !s.annotationType().getPackage().getName().contains("server"))
+            .filter(s -> !s.annotationType().getPackage().getName().contains("server")) //FIXME: tiago:  is that it?
             .toArray(Annotation[]::new);
-  }
-
-  public String className() {
-    return rpcProxyLoaderGenerator.getFullQualifiedClassName();
   }
 }
