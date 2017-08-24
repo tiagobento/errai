@@ -17,7 +17,6 @@
 package org.jboss.errai.apt;
 
 import org.jboss.errai.apt.bus.AptRpcProxyLoaderGenerator;
-import org.jboss.errai.common.apt.ErraiApp;
 import org.jboss.errai.common.apt.metaclass.APTClassUtil;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -28,7 +27,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -46,8 +45,6 @@ import static org.jboss.errai.apt.SupportedAnnotationTypes.ERRAI_MODULE_EXPORT_F
 @SupportedAnnotationTypes({ ERRAI_APP, ERRAI_MODULE_EXPORT_FILE })
 public class ErraiAppGenerator extends AbstractProcessor {
 
-  private ExportedTypes exportedTypes;
-
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
@@ -58,19 +55,15 @@ public class ErraiAppGenerator extends AbstractProcessor {
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    if (annotations.isEmpty()) {
-      exportedTypes = new ExportedTypes(processingEnv);
-      exportedTypes.print();
+    if (roundEnv.processingOver()) {
       System.out.println("===== BEGIN");
-      generateRpcProxyLoaderImpl();
+      ExportedTypes exportedTypes = new ExportedTypes(processingEnv);
+      exportedTypes.print();
+      generateRpcProxyLoaderImpl(exportedTypes);
       System.out.println("===== END");
     }
 
-    return false;
-  }
-
-  private boolean isLastRound(final Set<? extends TypeElement> annotations) {
-    return annotations.size() == 1 && annotationNames(annotations).contains(ErraiApp.class.getName());
+    return true;
   }
 
   private List<String> annotationNames(final Set<? extends TypeElement> annotations) {
@@ -79,14 +72,14 @@ public class ErraiAppGenerator extends AbstractProcessor {
             .collect(Collectors.toList());
   }
 
-  private void generateRpcProxyLoaderImpl() {
+  private void generateRpcProxyLoaderImpl(final ExportedTypes exportedTypes) {
     final AptRpcProxyLoaderGenerator generator = new AptRpcProxyLoaderGenerator(exportedTypes);
     saveSourceFile(generator.generate(), generator.className());
   }
 
   private void saveSourceFile(final String generatedSource, final String fileName) {
     try {
-      final FileObject sourceFile = processingEnv.getFiler().createSourceFile(fileName);
+      final JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(fileName);
       try (Writer writer = sourceFile.openWriter()) {
         writer.write(generatedSource);
       }

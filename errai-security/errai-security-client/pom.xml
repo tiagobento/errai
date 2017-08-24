@@ -160,6 +160,7 @@
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-bus-export-apt</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

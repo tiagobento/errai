@@ -67,14 +67,11 @@ public abstract class AbstractExportFileGenerator extends AbstractProcessor {
 
   private TypeSpec generateExportFile(final TypeElement annotation, Set<? extends Element> elements) {
 
-    final String fileName = ExportFileName.buildExportFileNameForAnnotation(annotation);
-    log.info("Generating export file [{}]", fileName);
-
     final AnnotationSpec erraiModuleExportFileAnnotationSpec = AnnotationSpec.builder(ErraiModuleExportFile.class)
             .addMember("value", "$S", getModuleName())
             .build();
 
-    return TypeSpec.classBuilder(fileName)
+    return TypeSpec.classBuilder(ExportFileName.buildExportFileNameForAnnotation(annotation))
             .addAnnotation(erraiModuleExportFileAnnotationSpec)
             .addModifiers(PUBLIC, FINAL)
             .addFields(buildFields(elements))
