@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFilesPackagePath;
 import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportedAnnotationsPackagePath;
@@ -102,12 +103,11 @@ public class ExportedTypes {
     return exportFile.getEnclosedElements().stream().filter(x -> x.getKind().isField()).map(Element::asType);
   }
 
-  public static Collection<MetaClass> getMetaClasses(final String module,
-          final Class<? extends Annotation> annotation) {
+  public static Collection<MetaClass> getMetaClasses(final Class<? extends Annotation> annotation) {
     return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(annotation.getName(), emptySet())
             .stream()
             .map(APTClass::new)
-            .collect(Collectors.toList());
+            .collect(toList());
   }
 
   // Java 9 will implement this method, so when it's released and we upgrade, this can be removed.

@@ -23,8 +23,6 @@ import org.jboss.errai.common.apt.ExportedTypes;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
-import static org.jboss.errai.common.apt.exportfile.ExportFileModule.BUS;
-
 /**
  * IMPORTANT: Do not move this class. ErraiAppGenerator depends on it being in this exact package.
  *
@@ -42,7 +40,7 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
 
   @Override
   public String generate() {
-    return rpcProxyLoaderGenerator.generate((context, annotation) -> ExportedTypes.getMetaClasses(BUS, annotation),
+    return rpcProxyLoaderGenerator.generate((context, annotation) -> ExportedTypes.getMetaClasses(annotation),
             iocEnabled, this::annotationFilter, null);
   }
 
