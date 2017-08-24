@@ -19,13 +19,11 @@
     <when-type-is class="org.jboss.errai.bus.client.api.messaging.MessageBus" />
   </replace-with>
 
-  <define-property name="errai.useAptGenerators" values="true,false" />
+  <define-property name="errai.useAptGenerators" values="false,true" />
   <set-property name="errai.useAptGenerators" value="false" />
 
   <generate-with class="org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator">
-    <all>
-        <when-type-assignable class="org.jboss.errai.bus.client.framework.RpcProxyLoader" />
-        <when-property-is name="errai.useAptGenerators" value="false" />
-    </all>
+      <when-type-assignable class="org.jboss.errai.bus.client.framework.RpcProxyLoader" />
+      <when-property-is name="errai.useAptGenerators" value="false" />
   </generate-with>
 </module>

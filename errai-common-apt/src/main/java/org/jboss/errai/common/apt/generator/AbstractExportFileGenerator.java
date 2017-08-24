@@ -22,6 +22,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.errai.common.apt.ErraiApp;
 import org.jboss.errai.common.apt.ErraiModuleExportFile;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
 import org.jboss.errai.common.apt.exportfile.ExportFilesPackage;
@@ -54,10 +55,10 @@ public abstract class AbstractExportFileGenerator extends AbstractProcessor {
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    final Map<TypeElement, Set<? extends Element>> elementsByItsAnnotations = annotations.stream()
+    final Map<TypeElement, Set<? extends Element>> elementsByItsAnnotation = annotations.stream()
             .collect(toMap(e -> e, roundEnv::getElementsAnnotatedWith));
 
-    elementsByItsAnnotations.entrySet()
+    elementsByItsAnnotation.entrySet()
             .stream()
             .map(e -> generateExportFile(e.getKey(), e.getValue()))
             .forEach(this::saveExportFile);

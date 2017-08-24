@@ -16,12 +16,25 @@
 
 package org.jboss.errai.common.apt;
 
+import org.jboss.errai.bus.server.annotations.Remote;
+import org.jboss.errai.common.client.api.interceptor.FeatureInterceptor;
+import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
+import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
+
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @Retention(RetentionPolicy.SOURCE)
 public @interface ErraiApp {
+
+  class SupportedAnnotationTypes {
+    public static final List<Class<? extends Annotation>> ALL = Arrays.asList(Remote.class, FeatureInterceptor.class,
+            InterceptedCall.class, InterceptsRemoteCall.class);
+  }
 }

@@ -26,23 +26,21 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.jboss.errai.apt.SupportedAnnotationTypes.ERRAI_APP;
-import static org.jboss.errai.apt.SupportedAnnotationTypes.ERRAI_MODULE_EXPORT_FILE;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({ ERRAI_APP, ERRAI_MODULE_EXPORT_FILE })
+@SupportedAnnotationTypes({ ERRAI_APP })
 public class ErraiAppGenerator extends AbstractProcessor {
 
   @Override
@@ -55,21 +53,17 @@ public class ErraiAppGenerator extends AbstractProcessor {
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    if (roundEnv.processingOver()) {
-      System.out.println("===== BEGIN");
-      ExportedTypes exportedTypes = new ExportedTypes(processingEnv);
-      exportedTypes.print();
-      generateRpcProxyLoaderImpl(exportedTypes);
-      System.out.println("===== END");
+    for (final TypeElement erraiAppAnnotation : annotations) {
+      for (final Element erraiAppElement : roundEnv.getElementsAnnotatedWith(erraiAppAnnotation)) {
+        System.out.println("===== BEGIN");
+        ExportedTypes exportedTypes = new ExportedTypes(roundEnv, processingEnv);
+        generateRpcProxyLoaderImpl(exportedTypes);
+        System.out.println("===== END");
+        return true;
+      }
     }
 
-    return true;
-  }
-
-  private List<String> annotationNames(final Set<? extends TypeElement> annotations) {
-    return annotations.stream()
-            .map(typeElement -> typeElement.getQualifiedName().toString())
-            .collect(Collectors.toList());
+    return false;
   }
 
   private void generateRpcProxyLoaderImpl(final ExportedTypes exportedTypes) {
