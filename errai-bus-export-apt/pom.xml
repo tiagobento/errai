@@ -18,7 +18,6 @@
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-common-apt</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

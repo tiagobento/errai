@@ -19,8 +19,6 @@ package org.jboss.errai.apt;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class SupportedAnnotationTypes {
-
-  public static final String ERRAI_APP = "org.jboss.errai.common.apt.ErraiApp";
-  public static final String ERRAI_MODULE_EXPORT_FILE = "org.jboss.errai.common.apt.ErraiModuleExportFile";
+public interface SupportedAnnotationTypes {
+  String ERRAI_APP = "org.jboss.errai.common.apt.ErraiApp";
 }
