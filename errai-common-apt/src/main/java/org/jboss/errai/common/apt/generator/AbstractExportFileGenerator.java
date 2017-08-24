@@ -25,6 +25,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.errai.common.apt.ErraiModuleExportFile;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
 import org.jboss.errai.common.apt.exportfile.ExportFilesPackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -45,6 +47,8 @@ import static javax.lang.model.element.Modifier.PUBLIC;
  */
 public abstract class AbstractExportFileGenerator extends AbstractProcessor {
 
+  private static final Logger log = LoggerFactory.getLogger(AbstractExportFileGenerator.class);
+
   protected abstract String getModuleName();
 
   @Override
@@ -63,11 +67,14 @@ public abstract class AbstractExportFileGenerator extends AbstractProcessor {
 
   private TypeSpec generateExportFile(final TypeElement annotation, Set<? extends Element> elements) {
 
+    final String fileName = ExportFileName.buildExportFileNameForAnnotation(annotation);
+    log.info("Generating export file [{}]", fileName);
+
     final AnnotationSpec erraiModuleExportFileAnnotationSpec = AnnotationSpec.builder(ErraiModuleExportFile.class)
             .addMember("value", "$S", getModuleName())
             .build();
 
-    return TypeSpec.classBuilder(ExportFileName.buildExportFileNameForAnnotation(annotation))
+    return TypeSpec.classBuilder(fileName)
             .addAnnotation(erraiModuleExportFileAnnotationSpec)
             .addModifiers(PUBLIC, FINAL)
             .addFields(buildFields(elements))
@@ -87,6 +94,7 @@ public abstract class AbstractExportFileGenerator extends AbstractProcessor {
   private void saveExportFile(final TypeSpec exportFileTypeSpec) {
     try {
       JavaFile.builder(ExportFilesPackage.path(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
+      log.info("Successfully saved export file [{}]", exportFileTypeSpec.name);
     } catch (IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
     }

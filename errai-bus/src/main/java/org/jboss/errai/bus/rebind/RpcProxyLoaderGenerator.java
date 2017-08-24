@@ -58,19 +58,19 @@ import java.util.function.Function;
 public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   private static final String IOC_MODULE_NAME = "org.jboss.errai.ioc.Container";
   private static final Logger log = LoggerFactory.getLogger(RpcProxyLoaderGenerator.class);
-  private final String packageName = RpcProxyLoader.class.getPackage().getName();
-  private final String className = RpcProxyLoader.class.getSimpleName() + "Impl";
+
+  private final String packageName = "org.jboss.errai.bus.client.framework";
+  private final String classSimpleName = "RpcProxyLoaderImpl";
 
   @Override
   public String generate(final TreeLogger logger, final GeneratorContext context, final String typeName)
           throws UnableToCompleteException {
 
-    return startAsyncGeneratorsAndWaitFor(RpcProxyLoader.class, context, logger, packageName, className);
+    return startAsyncGeneratorsAndWaitFor(RpcProxyLoader.class, context, logger, packageName, classSimpleName);
   }
 
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
-    log.info("generating RPC proxy loader class...");
     final boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
     final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(
             RebindUtils.findTranslatablePackages(context));
@@ -82,6 +82,8 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
           final boolean iocEnabled,
           final Function<Annotation[], Annotation[]> annotationFilter,
           GeneratorContext context) {
+
+    log.info("generating RPC proxy loader class...");
 
     ClassStructureBuilder<?> classBuilder = ClassBuilder.implement(RpcProxyLoader.class);
     final long time = System.currentTimeMillis();
@@ -142,6 +144,10 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   private Collection<MetaClass> getClassesAnnotatedWith(final GeneratorContext context,
           final Class<? extends Annotation> annotation) {
     return ClassScanner.getTypesAnnotatedWith(annotation, RebindUtils.findTranslatablePackages(context), context);
+  }
+
+  public String getFullQualifiedClassName() {
+    return packageName + "." + classSimpleName;
   }
 
 }

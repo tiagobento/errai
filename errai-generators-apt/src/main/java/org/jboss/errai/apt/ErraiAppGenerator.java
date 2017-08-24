@@ -21,19 +21,17 @@ import org.jboss.errai.common.apt.ErraiApp;
 import org.jboss.errai.common.apt.metaclass.APTClassUtil;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.FileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,47 +46,52 @@ import static org.jboss.errai.apt.SupportedAnnotationTypes.ERRAI_MODULE_EXPORT_F
 @SupportedAnnotationTypes({ ERRAI_APP, ERRAI_MODULE_EXPORT_FILE })
 public class ErraiAppGenerator extends AbstractProcessor {
 
+  private ExportedTypes exportedTypes;
+
+  @Override
+  public synchronized void init(final ProcessingEnvironment processingEnv) {
+    super.init(processingEnv);
+    APTClassUtil.setTypes(processingEnv.getTypeUtils());
+    APTClassUtil.setElements(processingEnv.getElementUtils());
+  }
+
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    if (isLastRound(annotations)) {
-
+    if (annotations.isEmpty()) {
+      exportedTypes = new ExportedTypes(processingEnv);
+      exportedTypes.print();
       System.out.println("===== BEGIN");
-
-      final ExportedTypes exportedTypes = new ExportedTypes(processingEnv);
-
-      APTClassUtil.setTypes(processingEnv.getTypeUtils());
-      APTClassUtil.setElements(processingEnv.getElementUtils());
-
-      generateRpcProxyLoaderImpl(exportedTypes);
-
+      generateRpcProxyLoaderImpl();
       System.out.println("===== END");
     }
 
-    return true;
+    return false;
   }
 
-  private boolean isLastRound(Set<? extends TypeElement> annotations) {
-    final List<String> currentAnnotations = annotations.stream()
+  private boolean isLastRound(final Set<? extends TypeElement> annotations) {
+    return annotations.size() == 1 && annotationNames(annotations).contains(ErraiApp.class.getName());
+  }
+
+  private List<String> annotationNames(final Set<? extends TypeElement> annotations) {
+    return annotations.stream()
             .map(typeElement -> typeElement.getQualifiedName().toString())
             .collect(Collectors.toList());
-
-    return currentAnnotations.size() == 1 && currentAnnotations.contains(ErraiApp.class.getName());
   }
 
-  private void generateRpcProxyLoaderImpl(final ExportedTypes exportedTypes) {
+  private void generateRpcProxyLoaderImpl() {
     final AptRpcProxyLoaderGenerator generator = new AptRpcProxyLoaderGenerator(exportedTypes);
-    saveSourceFile(generator.generate(), generator.fileName());
+    saveSourceFile(generator.generate(), generator.className());
   }
 
   private void saveSourceFile(final String generatedSource, final String fileName) {
     try {
-      final Filer filer = processingEnv.getFiler();
-      final FileObject sourceFile = filer.createSourceFile(fileName);
+      final FileObject sourceFile = processingEnv.getFiler().createSourceFile(fileName);
       try (Writer writer = sourceFile.openWriter()) {
         writer.write(generatedSource);
       }
     } catch (final IOException e) {
+      //FIXME: tiago: see how errors work in apt
       final Messager messager = processingEnv.getMessager();
       messager.printMessage(ERROR, String.format("Unable to generate %s. Error: %s", fileName, e.getMessage()));
     }

@@ -31,15 +31,17 @@ public class AptRpcProxyLoaderGenerator {
 
   private final ExportedTypes exportedTypes;
   private final RpcProxyLoaderGenerator rpcProxyLoaderGenerator;
+  private final Boolean iocEnabled;
 
   public AptRpcProxyLoaderGenerator(final ExportedTypes exportedTypes) {
+    this.iocEnabled = true; //FIXME: tiago:
     this.exportedTypes = exportedTypes;
     this.rpcProxyLoaderGenerator = new RpcProxyLoaderGenerator();
   }
 
   public String generate() {
     return rpcProxyLoaderGenerator.generate((context, annotation) -> exportedTypes.getMetaClasses(BUS, annotation),
-            true, this::annotationFilter, null);
+            iocEnabled, this::annotationFilter, null);
   }
 
   private Annotation[] annotationFilter(final Annotation[] annotations) {
@@ -48,7 +50,7 @@ public class AptRpcProxyLoaderGenerator {
             .toArray(Annotation[]::new);
   }
 
-  public String fileName() {
-    return "org.jboss.errai.bus.client.framework.RpcProxyLoaderImpl";
+  public String className() {
+    return rpcProxyLoaderGenerator.getFullQualifiedClassName();
   }
 }

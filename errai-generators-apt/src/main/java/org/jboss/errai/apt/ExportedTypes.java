@@ -44,21 +44,19 @@ import static java.util.stream.Collectors.groupingBy;
  */
 public class ExportedTypes {
 
-  final Map<String, Map<String, Set<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName;
+  private final Map<String, Map<String, Set<TypeMirror>>> exportedClassesByAnnotationClassNameByModuleName;
 
   public ExportedTypes(final ProcessingEnvironment processingEnvironment) {
-    List<? extends Element> exportFiles = processingEnvironment.getElementUtils()
+    final List<? extends Element> exportFiles = processingEnvironment.getElementUtils()
             .getPackageElement(ExportFilesPackage.path())
             .getEnclosedElements();
 
     exportedClassesByAnnotationClassNameByModuleName = exportFiles.stream()
             .collect(groupingBy(this::exportFileModuleName, groupingBy(this::exportFileAnnotationClassName,
                     flatMapping(this::exportedTypes, Collectors.toSet()))));
-
-    print();
   }
 
-  private void print() {
+  void print() {
     exportedClassesByAnnotationClassNameByModuleName.forEach((moduleName, exportedTypesByAnnotationClassName) -> {
       System.out.println("+ " + moduleName);
       exportedTypesByAnnotationClassName.forEach((annotationClassName, e) -> {
@@ -79,6 +77,14 @@ public class ExportedTypes {
     return exportFile.getEnclosedElements().stream().filter(x -> x.getKind().isField()).map(Element::asType);
   }
 
+  public Collection<MetaClass> getMetaClasses(String module, Class<? extends Annotation> annotation) {
+    return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(module, Collections.emptyMap())
+            .getOrDefault(annotation.getName(), Collections.emptySet())
+            .stream()
+            .map(APTClass::new)
+            .collect(Collectors.toList());
+  }
+
   // Java 9 will implement this method, so when it's released and we upgrade, this can be removed.
   private static <T, U, A, R> Collector<T, ?, R> flatMapping(Function<? super T, ? extends Stream<? extends U>> mapper,
           Collector<? super U, A, R> downstream) {
@@ -92,13 +98,5 @@ public class ExportedTypes {
               }
             }, downstream.combiner(), downstream.finisher(),
             downstream.characteristics().toArray(new Collector.Characteristics[0]));
-  }
-
-  public Collection<MetaClass> getMetaClasses(String module, Class<? extends Annotation> annotation) {
-    return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(module, Collections.emptyMap())
-            .getOrDefault(annotation.getName(), Collections.emptySet())
-            .stream()
-            .map(APTClass::new)
-            .collect(Collectors.toList());
   }
 }
