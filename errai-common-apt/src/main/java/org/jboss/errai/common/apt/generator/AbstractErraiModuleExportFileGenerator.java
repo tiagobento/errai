@@ -16,9 +16,9 @@
 
 package org.jboss.errai.common.apt.generator;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
@@ -26,6 +26,7 @@ import org.jboss.errai.common.apt.exportfile.ExportFileName;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.util.List;
@@ -81,9 +82,14 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   }
 
   private FieldSpec buildField(final Element element) {
-    return FieldSpec.builder(TypeName.get(element.asType()), RandomStringUtils.randomAlphabetic(6))
-            .addModifiers(PUBLIC)
-            .build();
+
+    final TypeElement typeElement = (TypeElement) element;
+    final QualifiedNameable enclosingElement = (QualifiedNameable) element.getEnclosingElement();
+    final String enclosingElementName = enclosingElement.getQualifiedName().toString();
+    final String classSimpleName = typeElement.getSimpleName().toString();
+
+    return FieldSpec.builder(ClassName.get(enclosingElementName, classSimpleName),
+            RandomStringUtils.randomAlphabetic(6)).addModifiers(PUBLIC).build();
   }
 
   private List<FieldSpec> buildFields(final Set<? extends Element> elements) {
@@ -94,7 +100,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
     try {
       JavaFile.builder(exportFilesPackagePath(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
       System.out.println("Successfully generated export file [" + exportFileTypeSpec.name + "]");
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
     }
   }
