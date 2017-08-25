@@ -49,8 +49,6 @@ import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.generatorsP
 @SupportedAnnotationTypes({ "org.jboss.errai.common.apt.ErraiApp" })
 public class ErraiAppAptGenerator extends AbstractProcessor {
 
-  private static final Logger log = LoggerFactory.getLogger(ErraiAppAptGenerator.class);
-
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
@@ -72,7 +70,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   private void generateFiles(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
     for (final TypeElement erraiAppAnnotation : annotations) {
-      log.info("Generating files using Errai APT Generators..");
+      System.out.println("Generating files using Errai APT Generators..");
       ExportedTypes.init(roundEnv, processingEnv);
       findGenerators().forEach(this::generateAndSaveSourceFile);
     }

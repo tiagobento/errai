@@ -50,8 +50,6 @@ import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportedAnn
  */
 public class ExportedTypes {
 
-  private static final Logger log = LoggerFactory.getLogger(ExportedTypes.class);
-
   private static Map<String, Set<TypeMirror>> exportedClassesByAnnotationClassNameByModuleName;
   private static RoundEnvironment roundEnv;
   private static ProcessingEnvironment processingEnvironment;

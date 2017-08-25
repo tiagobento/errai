@@ -16,16 +16,12 @@
 
 package org.jboss.errai.common.apt.generator;
 
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jboss.errai.common.apt.ErraiModuleExportFile;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -47,10 +43,6 @@ import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFiles
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public abstract class AbstractErraiModuleExportFileGenerator extends AbstractProcessor {
-
-  private static final Logger log = LoggerFactory.getLogger(AbstractErraiModuleExportFileGenerator.class);
-
-  protected abstract String getModuleName();
 
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
@@ -82,13 +74,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   }
 
   private TypeSpec generateExportFile(final TypeElement annotation, Set<? extends Element> elements) {
-
-    final AnnotationSpec erraiModuleExportFileAnnotationSpec = AnnotationSpec.builder(ErraiModuleExportFile.class)
-            .addMember("value", "$S", getModuleName())
-            .build();
-
     return TypeSpec.classBuilder(ExportFileName.buildExportFileNameForAnnotation(annotation))
-            .addAnnotation(erraiModuleExportFileAnnotationSpec)
             .addModifiers(PUBLIC, FINAL)
             .addFields(buildFields(elements))
             .build();
@@ -107,7 +93,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   private void saveExportFile(final TypeSpec exportFileTypeSpec) {
     try {
       JavaFile.builder(exportFilesPackagePath(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
-      log.info("Successfully generated export file [{}]", exportFileTypeSpec.name);
+      System.out.println("Successfully generated export file [" + exportFileTypeSpec.name + "]");
     } catch (IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
     }

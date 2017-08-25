@@ -16,12 +16,6 @@
             <artifactId>errai-codegen</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.jboss.errai</groupId>
-            <artifactId>errai-codegen</artifactId>
-            <type>test-jar</type>
-        </dependency>
-
         <!-- FIXME: remove -->
         <dependency>
             <groupId>com.squareup</groupId>
@@ -30,8 +24,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-codegen</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
