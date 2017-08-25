@@ -26,8 +26,9 @@ import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 //FIXME: tiago: generate this file?
-public final class ExportedAnnotations {
-  private ExportedAnnotations() {
+public final class ErraiBusExportedAnnotations {
+
+  private ErraiBusExportedAnnotations() {
   }
 
   private Remote remote;

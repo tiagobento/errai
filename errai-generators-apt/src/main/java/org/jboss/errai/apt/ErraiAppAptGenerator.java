@@ -19,8 +19,6 @@ package org.jboss.errai.apt;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
 import org.jboss.errai.common.apt.ExportedTypes;
 import org.jboss.errai.common.apt.metaclass.APTClassUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
@@ -35,12 +33,13 @@ import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 import static javax.tools.Diagnostic.Kind.ERROR;
-import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.generatorsPackagePath;
+import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.generatorsPackagePackageElement;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -77,11 +76,9 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   }
 
   private List<ErraiAptGenerator> findGenerators() {
-    final List<? extends Element> generatorElements = processingEnv.getElementUtils()
-            .getPackageElement(generatorsPackagePath())
-            .getEnclosedElements();
-
-    return generatorElements.stream().map(this::loadClass).map(this::newGenerators).collect(toList());
+    return generatorsPackagePackageElement(processingEnv).map(
+            p -> p.getEnclosedElements().stream().map(this::loadClass).map(this::newGenerators).collect(toList()))
+            .orElseGet(ArrayList::new);
   }
 
   private void generateAndSaveSourceFile(final ErraiAptGenerator generator) {

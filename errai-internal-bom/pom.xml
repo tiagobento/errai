@@ -317,9 +317,16 @@
 
       <dependency>
         <groupId>org.jboss.errai</groupId>
+        <artifactId>errai-jaxrs-export-apt</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.errai</groupId>
         <artifactId>errai-generators-apt</artifactId>
         <version>${project.version}</version>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 

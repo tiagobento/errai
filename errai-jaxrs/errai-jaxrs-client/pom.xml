@@ -167,6 +167,13 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-jaxrs-export-apt</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <profiles>

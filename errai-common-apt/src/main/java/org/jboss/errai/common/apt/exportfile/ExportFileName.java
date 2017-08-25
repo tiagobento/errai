@@ -24,13 +24,16 @@ import javax.lang.model.element.TypeElement;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ExportFileName {
+public final class ExportFileName {
 
   private static final String ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX = "ErraiModuleExportFile_";
 
+  private ExportFileName() {
+  }
+
   public static String buildExportFileNameForAnnotation(final TypeElement annotation) {
     String annotationName = annotation.getQualifiedName().toString().replace(".", "_");
-    //FIXME: possible name conflict
+    //FIXME: possible name conflict?
     return RandomStringUtils.randomAlphabetic(12) + "_" + ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX + annotationName;
   }
 
