@@ -382,6 +382,18 @@
   </build>
 
   <profiles>
+
+    <profile>
+      <id>apt-generators</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-generators-apt</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
     <profile>
       <id>jetty</id>
       <properties>
@@ -426,7 +438,9 @@
     <profile>
       <id>wildfly</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!skipDefaultProfile</name>
+        </property>
       </activation>
       <properties>
         <webDescriptor>wildfly</webDescriptor>

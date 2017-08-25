@@ -188,12 +188,6 @@
       <artifactId>errai-jboss-as-support</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.jboss.errai</groupId>
-      <artifactId>errai-generators-apt</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -334,11 +328,26 @@
       </plugin>
     </plugins>
   </build>
+
   <profiles>
+
+    <profile>
+      <id>apt-generators</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-generators-apt</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
     <profile>
       <id>wildfly</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!skipDefaultProfile</name>
+        </property>
       </activation>
       <build>
         <plugins>
