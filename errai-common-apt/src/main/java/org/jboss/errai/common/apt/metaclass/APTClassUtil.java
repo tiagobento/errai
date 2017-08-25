@@ -55,23 +55,21 @@ import static java.util.stream.Collectors.toMap;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public final class APTClassUtil {
-  private APTClassUtil() {
-  }
 
   private static Logger logger = LoggerFactory.getLogger(APTClassUtil.class);
 
   static Types types;
   static Elements elements;
 
-  public static void setTypes(final Types types) {
-    APTClassUtil.types = types;
+  private APTClassUtil() {
   }
 
-  public static void setElements(final Elements elements) {
+  public static void init(final Elements elements, final Types types) {
+    APTClassUtil.types = types;
     APTClassUtil.elements = elements;
   }
 
-  public static MetaType fromTypeMirror(final TypeMirror mirror) {
+  static MetaType fromTypeMirror(final TypeMirror mirror) {
     switch (mirror.getKind()) {
     case DECLARED:
       final DeclaredType dType = (DeclaredType) mirror;
@@ -90,7 +88,7 @@ public final class APTClassUtil {
     }
   }
 
-  public static Annotation[] getAnnotations(final Element target) {
+  static Annotation[] getAnnotations(final Element target) {
 
     final List<? extends AnnotationMirror> annotationMirrors = elements.getAllAnnotationMirrors(target);
     return annotationMirrors.stream().flatMap(mirror -> {
@@ -111,7 +109,8 @@ public final class APTClassUtil {
     final DeclaredType type = mirror.getAnnotationType();
     final TypeElement element = (TypeElement) APTClassUtil.types.asElement(type);
     final String fqcn = element.getQualifiedName().toString();
-    final Map<? extends ExecutableElement, ? extends AnnotationValue> values = APTClassUtil.elements.getElementValuesWithDefaults(mirror);
+    final Map<? extends ExecutableElement, ? extends AnnotationValue> values = APTClassUtil.elements.getElementValuesWithDefaults(
+            mirror);
     return createAnnotationProxy(fqcn, Class.forName(fqcn), values);
   }
 
@@ -229,15 +228,15 @@ public final class APTClassUtil {
     }
   }
 
-  public static MetaTypeVariable[] getTypeParameters(final Parameterizable target) {
+  static MetaTypeVariable[] getTypeParameters(final Parameterizable target) {
     return target.getTypeParameters().stream().map(APTMetaTypeVariable::new).toArray(MetaTypeVariable[]::new);
   }
 
-  public static MetaParameter[] getParameters(final ExecutableElement target) {
+  static MetaParameter[] getParameters(final ExecutableElement target) {
     return target.getParameters().stream().map(APTParameter::new).toArray(MetaParameter[]::new);
   }
 
-  public static MetaType[] getGenericParameterTypes(final ExecutableElement target) {
+  static MetaType[] getGenericParameterTypes(final ExecutableElement target) {
     return target.getParameters()
             .stream()
             .map(Element::asType)
@@ -245,21 +244,20 @@ public final class APTClassUtil {
             .toArray(MetaType[]::new);
   }
 
-  public static MetaClass[] getCheckedExceptions(final ExecutableElement target) {
+  static MetaClass[] getCheckedExceptions(final ExecutableElement target) {
     return target.getThrownTypes().stream().map(APTClass::new).toArray(APTClass[]::new);
   }
 
-  public static <T> T throwUnsupportedTypeError(final TypeMirror type) {
+  static <T> T throwUnsupportedTypeError(final TypeMirror type) {
     throw new UnsupportedOperationException(String.format("Unsupported TypeMirror %s [%s].", type.getKind(), type));
   }
 
-  public static MetaClass eraseOrReturn(final TypeMirror type) {
+  static MetaClass eraseOrReturn(final TypeMirror type) {
     final TypeMirror erased = APTClassUtil.types.erasure(type);
     return new APTClass(erased);
   }
 
-  public static boolean sameTypes(final Iterator<? extends TypeMirror> iter1,
-          final Iterator<? extends TypeMirror> iter2) {
+  static boolean sameTypes(final Iterator<? extends TypeMirror> iter1, final Iterator<? extends TypeMirror> iter2) {
     while (iter1.hasNext() && iter2.hasNext()) {
       if (!APTClassUtil.types.isSameType(iter1.next(), iter2.next())) {
         return false;
@@ -269,7 +267,7 @@ public final class APTClassUtil {
     return iter1.hasNext() == iter2.hasNext();
   }
 
-  public static String getSimpleName(final TypeMirror mirror) {
+  static String getSimpleName(final TypeMirror mirror) {
     switch (mirror.getKind()) {
     case DECLARED:
     case TYPEVAR:

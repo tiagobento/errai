@@ -22,7 +22,6 @@ import org.jboss.errai.common.apt.metaclass.APTClassUtil;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -49,30 +48,26 @@ import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.generatorsP
 public class ErraiAppAptGenerator extends AbstractProcessor {
 
   @Override
-  public synchronized void init(final ProcessingEnvironment processingEnv) {
-    super.init(processingEnv);
-    APTClassUtil.setTypes(processingEnv.getTypeUtils());
-    APTClassUtil.setElements(processingEnv.getElementUtils());
-  }
-
-  @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
     //    if (!processingEnv.getOptions().containsKey("errai.useAptGenerators")) {
     //      return false;
     //    }
 
-    generateFiles(annotations, roundEnv);
+    for (final TypeElement erraiAppAnnotation : annotations) {
+      generateFiles(roundEnv);
+    }
+
     return false;
   }
 
-  private void generateFiles(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+  private void generateFiles(final RoundEnvironment roundEnv) {
+    System.out.println("Generating files using Errai APT Generators..");
 
-    for (final TypeElement erraiAppAnnotation : annotations) {
-      System.out.println("Generating files using Errai APT Generators..");
-      ExportedTypes.init(roundEnv, processingEnv);
-      findGenerators().forEach(this::generateAndSaveSourceFile);
-    }
+    APTClassUtil.init(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
+    ExportedTypes.init(roundEnv, processingEnv);
+
+    findGenerators().forEach(this::generateAndSaveSourceFile);
   }
 
   private List<ErraiAptGenerator> findGenerators() {

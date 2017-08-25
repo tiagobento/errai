@@ -191,6 +191,7 @@
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-generators-apt</artifactId>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
