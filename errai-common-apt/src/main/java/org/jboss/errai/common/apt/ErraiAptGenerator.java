@@ -20,6 +20,7 @@ package org.jboss.errai.common.apt;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public interface ErraiAptGenerator {
+
   String generate();
 
   String className();

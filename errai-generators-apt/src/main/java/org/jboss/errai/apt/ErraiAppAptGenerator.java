@@ -50,12 +50,13 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    //    if (!processingEnv.getOptions().containsKey("errai.useAptGenerators")) {
-    //      return false;
-    //    }
-
-    for (final TypeElement erraiAppAnnotation : annotations) {
-      generateFiles(roundEnv);
+    try {
+      for (final TypeElement erraiAppAnnotation : annotations) {
+        generateFiles(roundEnv);
+      }
+    } catch(final Exception e) {
+      System.out.println("Error generating files");
+      e.printStackTrace();
     }
 
     return false;

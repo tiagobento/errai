@@ -48,11 +48,13 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-    //    if (!processingEnv.getOptions().containsKey("errai.useAptGenerators")) {
-    //      return false;
-    //    }
+    try {
+      generateExportFiles(annotations, roundEnv);
+    } catch (final Exception e) {
+      System.out.println("Error generating export files");
+      e.printStackTrace();
+    }
 
-    generateExportFiles(annotations, roundEnv);
     return false;
   }
 
