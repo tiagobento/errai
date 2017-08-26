@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016 Red Hat, Inc. and/or its affiliates.
+/*
+ * Copyright (C) 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.jsinterop.demo.client.local;
+package org.jboss.errai.apt.internal.generator;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import org.jboss.errai.common.apt.ErraiAptGenerator;
 
-import org.jboss.errai.common.apt.ErraiApp;
-import org.jboss.errai.common.client.dom.Document;
-import org.jboss.errai.ioc.client.api.EntryPoint;
-
-@ErraiApp
-@EntryPoint
-public class AppSetup {
-
-  @Inject
-  private IpsumListDisplay display;
-
-  @Inject
-  private Document doc;
-
-  @PostConstruct
-  public void setup() {
-    doc.getElementById("rootPanel").appendChild(display.getElement());
+/**
+ * @author Tiago Bento <tfernand@redhat.com>
+ */
+public class TestGenerator implements ErraiAptGenerator {
+  @Override
+  public String generate() {
+    return "";
   }
 
+  @Override
+  public String className() {
+    return "TestGeneratedSourceImpl";
+  }
 }

@@ -21,6 +21,8 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.errai.common.apt.AnnotatedElementsFinder;
+import org.jboss.errai.common.apt.AptAnnotatedElementsFinder;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -31,11 +33,9 @@ import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFilesPackagePath;
@@ -49,7 +49,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
     try {
-      generateExportFiles(annotations, roundEnv);
+      generateAndSaveExportFiles(annotations, new AptAnnotatedElementsFinder(roundEnv));
     } catch (final Exception e) {
       System.out.println("Error generating export files");
       e.printStackTrace();
@@ -58,35 +58,53 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
     return false;
   }
 
-  private void generateExportFiles(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-    annotations.stream()
-            .collect(toMap(identity(), annotation -> annotatedClassesAndInterfaces(roundEnv, annotation)))
-            .entrySet()
-            .stream()
-            .map(e -> generateExportFile(e.getKey(), e.getValue()))
-            .forEach(this::saveExportFile);
+  void generateAndSaveExportFiles(final Set<? extends TypeElement> annotations,
+          final AnnotatedElementsFinder annotatedElementsFinder) {
+
+    generateExportFilesTypeSpecs(annotations, annotatedElementsFinder).forEach(this::save);
   }
 
-  private Set<? extends Element> annotatedClassesAndInterfaces(final RoundEnvironment roundEnv,
-          final TypeElement typeElement) {
+  private Set<TypeSpec> generateExportFilesTypeSpecs(final Set<? extends TypeElement> annotations,
+          final AnnotatedElementsFinder annotatedElementsFinder) {
 
-    return roundEnv.getElementsAnnotatedWith(typeElement)
+    return generateExportFiles(annotations, annotatedElementsFinder).stream()
+            .map(this::newExportFileTypeSpec)
+            .collect(toSet());
+  }
+
+  Set<ExportFile> generateExportFiles(final Set<? extends TypeElement> annotations,
+          final AnnotatedElementsFinder annotatedElementsFinder) {
+
+    return annotations.stream()
+            .map(a -> new ExportFile(a, annotatedClassesAndInterfaces(annotatedElementsFinder, a)))
+            .filter(ExportFile::hasExportedTypes)
+            .collect(toSet());
+  }
+
+  Set<? extends Element> annotatedClassesAndInterfaces(final AnnotatedElementsFinder annotatedElementsFinder,
+          final TypeElement annotationTypeElement) {
+
+    return annotatedElementsFinder.getElementsAnnotatedWith(annotationTypeElement)
             .stream()
             .filter(e -> e.getKind().isClass() || e.getKind().isInterface())
-            .collect(Collectors.toSet());
+            .collect(toSet());
   }
 
-  private TypeSpec generateExportFile(final TypeElement annotation, Set<? extends Element> elements) {
-    return TypeSpec.classBuilder(ExportFileName.buildExportFileNameForAnnotation(annotation))
+  private TypeSpec newExportFileTypeSpec(final ExportFile exportFile) {
+    return TypeSpec.classBuilder(ExportFileName.encodeAnnotationNameAsExportFileName(exportFile.annotation))
             .addModifiers(PUBLIC, FINAL)
-            .addFields(buildFields(elements))
+            .addFields(buildFields(exportFile.exportedTypes))
             .build();
   }
 
-  private FieldSpec buildField(final Element element) {
+  private List<FieldSpec> buildFields(final Set<? extends Element> exportedElements) {
+    return exportedElements.stream().map(this::newFieldSpec).collect(toList());
+  }
 
-    final TypeElement typeElement = (TypeElement) element;
-    final QualifiedNameable enclosingElement = (QualifiedNameable) element.getEnclosingElement();
+  private FieldSpec newFieldSpec(final Element exportedElement) {
+
+    final TypeElement typeElement = (TypeElement) exportedElement;
+    final QualifiedNameable enclosingElement = (QualifiedNameable) exportedElement.getEnclosingElement();
     final String enclosingElementName = enclosingElement.getQualifiedName().toString();
     final String classSimpleName = typeElement.getSimpleName().toString();
 
@@ -94,16 +112,27 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
             RandomStringUtils.randomAlphabetic(6)).addModifiers(PUBLIC).build();
   }
 
-  private List<FieldSpec> buildFields(final Set<? extends Element> elements) {
-    return elements.stream().map(this::buildField).collect(toList());
-  }
-
-  private void saveExportFile(final TypeSpec exportFileTypeSpec) {
+  private void save(final TypeSpec exportFileTypeSpec) {
     try {
       JavaFile.builder(exportFilesPackagePath(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
       System.out.println("Successfully generated export file [" + exportFileTypeSpec.name + "]");
     } catch (final IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
+    }
+  }
+
+  static class ExportFile {
+
+    final TypeElement annotation;
+    final Set<? extends Element> exportedTypes;
+
+    ExportFile(final TypeElement annotation, final Set<? extends Element> exportedTypes) {
+      this.annotation = annotation;
+      this.exportedTypes = exportedTypes;
+    }
+
+    Boolean hasExportedTypes() {
+      return !exportedTypes.isEmpty();
     }
   }
 }

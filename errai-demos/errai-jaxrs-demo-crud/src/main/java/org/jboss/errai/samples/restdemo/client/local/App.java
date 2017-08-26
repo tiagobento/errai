@@ -49,8 +49,8 @@ import java.util.Map;
  *
  * @author Christian Sadilek <csadilek@redhat.com>
  */
-@EntryPoint
 @ErraiApp
+@EntryPoint
 public class App {
 
   @Inject

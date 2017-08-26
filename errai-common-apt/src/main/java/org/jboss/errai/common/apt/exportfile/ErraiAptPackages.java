@@ -16,8 +16,8 @@
 
 package org.jboss.errai.common.apt.exportfile;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.PackageElement;
+import javax.lang.model.util.Elements;
 import java.util.Optional;
 
 /**
@@ -44,9 +44,8 @@ public final class ErraiAptPackages {
     return GENERATORS_PACKAGE_PACKAGE_PATH;
   }
 
-  public static Optional<PackageElement> exportFilesPackageElement(final ProcessingEnvironment processingEnvironment) {
-    final PackageElement packageElement = processingEnvironment.getElementUtils()
-            .getPackageElement(exportFilesPackagePath());
+  public static Optional<PackageElement> exportFilesPackageElement(final Elements elementUtils) {
+    final PackageElement packageElement = elementUtils.getPackageElement(exportFilesPackagePath());
 
     if (packageElement == null) {
       System.err.println("Export files package not found");
@@ -55,9 +54,8 @@ public final class ErraiAptPackages {
     return Optional.ofNullable(packageElement);
   }
 
-  public static Optional<PackageElement> exportedAnnotationsPackageElement(final ProcessingEnvironment processingEnv) {
-    final PackageElement packageElement = processingEnv.getElementUtils()
-            .getPackageElement(exportedAnnotationsPackagePath());
+  public static Optional<PackageElement> exportedAnnotationsPackageElement(final Elements elementUtils) {
+    final PackageElement packageElement = elementUtils.getPackageElement(exportedAnnotationsPackagePath());
 
     if (packageElement == null) {
       System.err.println("Exported annotations package not found");
@@ -66,9 +64,8 @@ public final class ErraiAptPackages {
     return Optional.ofNullable(packageElement);
   }
 
-  public static Optional<PackageElement> generatorsPackagePackageElement(final ProcessingEnvironment processingEnvironment) {
-    final PackageElement packageElement = processingEnvironment.getElementUtils()
-            .getPackageElement(generatorsPackagePath());
+  public static Optional<PackageElement> generatorsPackageElement(final Elements elementUtils) {
+    final PackageElement packageElement = elementUtils.getPackageElement(generatorsPackagePath());
 
     if (packageElement == null) {
       System.err.println("Generators package not found");

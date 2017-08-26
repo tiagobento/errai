@@ -16,6 +16,8 @@
 
 package org.jboss.errai.apt;
 
+import org.jboss.errai.common.apt.AnnotatedElementsFinder;
+import org.jboss.errai.common.apt.AptAnnotatedElementsFinder;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
 import org.jboss.errai.common.apt.ExportedTypes;
 import org.jboss.errai.common.apt.metaclass.APTClassUtil;
@@ -27,7 +29,9 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
@@ -38,7 +42,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 import static javax.tools.Diagnostic.Kind.ERROR;
-import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.generatorsPackagePackageElement;
+import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.generatorsPackageElement;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -51,10 +55,8 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
     try {
-      for (final TypeElement erraiAppAnnotation : annotations) {
-        generateFiles(roundEnv);
-      }
-    } catch(final Exception e) {
+      generateAndSaveSourceFiles(annotations, new AptAnnotatedElementsFinder(roundEnv));
+    } catch (final Exception e) {
       System.out.println("Error generating files");
       e.printStackTrace();
     }
@@ -62,19 +64,44 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
     return false;
   }
 
-  private void generateFiles(final RoundEnvironment roundEnv) {
-    System.out.println("Generating files using Errai APT Generators..");
+  void generateAndSaveSourceFiles(final Set<? extends TypeElement> annotations,
+          final AnnotatedElementsFinder annotatedElementsFinder) {
 
-    APTClassUtil.init(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
-    ExportedTypes.init(roundEnv, processingEnv);
+    for (final TypeElement erraiAppAnnotation : annotations) {
+      System.out.println("Generating files using Errai APT Generators..");
 
-    findGenerators().forEach(this::generateAndSaveSourceFile);
+      APTClassUtil.init(processingEnv.getTypeUtils(), processingEnv.getElementUtils());
+      ExportedTypes.init(processingEnv.getTypeUtils(), processingEnv.getElementUtils(), annotatedElementsFinder);
+
+      findGenerators(processingEnv.getElementUtils()).forEach(this::generateAndSaveSourceFile);
+    }
   }
 
-  private List<ErraiAptGenerator> findGenerators() {
-    return generatorsPackagePackageElement(processingEnv).map(
-            p -> p.getEnclosedElements().stream().map(this::loadClass).map(this::newGenerators).collect(toList()))
-            .orElseGet(ArrayList::new);
+  private List<ErraiAptGenerator> findGenerators(final Elements elements) {
+    return generatorsPackageElement(elements).map(this::newGenerators).orElseGet(ArrayList::new);
+  }
+
+  private List<ErraiAptGenerator> newGenerators(final PackageElement packageElement) {
+    return packageElement.getEnclosedElements().stream().map(this::loadClass).map(this::newGenerator).collect(toList());
+  }
+
+  @SuppressWarnings("unchecked")
+  private Class<? extends ErraiAptGenerator> loadClass(final Element element) {
+    try {
+      return (Class<? extends ErraiAptGenerator>) Class.forName(element.asType().toString());
+    } catch (final ClassNotFoundException e) {
+      throw new RuntimeException("Class " + element.asType().toString() + " is not an ErraiAptGenerator", e);
+    }
+  }
+
+  private ErraiAptGenerator newGenerator(final Class<? extends ErraiAptGenerator> generatorClass) {
+    try {
+      final Constructor<? extends ErraiAptGenerator> constructor = generatorClass.getConstructor();
+      constructor.setAccessible(true);
+      return constructor.newInstance();
+    } catch (final Exception e) {
+      throw new RuntimeException("Class " + generatorClass.getName() + " couldn't be instantiated.", e);
+    }
   }
 
   private void generateAndSaveSourceFile(final ErraiAptGenerator generator) {
@@ -90,25 +117,6 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
       //FIXME: tiago: see how errors work in apt
       final Messager messager = processingEnv.getMessager();
       messager.printMessage(ERROR, String.format("Unable to generate %s. Error: %s", fileName, e.getMessage()));
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private Class<? extends ErraiAptGenerator> loadClass(final Element element) {
-    try {
-      return (Class<? extends ErraiAptGenerator>) Class.forName(element.asType().toString());
-    } catch (final ClassNotFoundException e) {
-      throw new RuntimeException("Class " + element.asType().toString() + " is not an ErraiAptGenerator", e);
-    }
-  }
-
-  private ErraiAptGenerator newGenerators(final Class<? extends ErraiAptGenerator> generatorClass) {
-    try {
-      final Constructor<? extends ErraiAptGenerator> constructor = generatorClass.getConstructor();
-      constructor.setAccessible(true);
-      return constructor.newInstance();
-    } catch (final Exception e) {
-      throw new RuntimeException("Class " + generatorClass.getName() + " couldn't be instantiated.", e);
     }
   }
 }

@@ -64,7 +64,7 @@ public final class APTClassUtil {
   private APTClassUtil() {
   }
 
-  public static void init(final Elements elements, final Types types) {
+  public static void init(final Types types, final Elements elements) {
     APTClassUtil.types = types;
     APTClassUtil.elements = elements;
   }

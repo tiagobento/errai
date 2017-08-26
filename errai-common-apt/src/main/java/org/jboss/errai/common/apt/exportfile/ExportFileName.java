@@ -18,7 +18,6 @@ package org.jboss.errai.common.apt.exportfile;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 /**
@@ -31,14 +30,13 @@ public final class ExportFileName {
   private ExportFileName() {
   }
 
-  public static String buildExportFileNameForAnnotation(final TypeElement annotation) {
+  public static String encodeAnnotationNameAsExportFileName(final TypeElement annotation) {
     String annotationName = annotation.getQualifiedName().toString().replace(".", "_");
     //FIXME: possible name conflict?
     return RandomStringUtils.randomAlphabetic(12) + "_" + ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX + annotationName;
   }
 
-  public static String getAnnotationClassNameFromExportFileName(final Element e) {
-    final String exportFileName = e.asType().toString();
+  public static String decodeAnnotationClassNameFromExportFileName(final String exportFileName) {
     return exportFileName.substring(getAnnotationNameBeginIndex(exportFileName)).replace("_", ".");
   }
 

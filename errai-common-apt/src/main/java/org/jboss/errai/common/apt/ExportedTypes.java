@@ -20,11 +20,11 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
 import org.jboss.errai.common.apt.metaclass.APTClass;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFilesPackageElement;
 import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportedAnnotationsPackageElement;
@@ -49,26 +48,28 @@ import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportedAnn
 public class ExportedTypes {
 
   private static Map<String, Set<TypeMirror>> exportedClassesByAnnotationClassNameByModuleName;
-  private static RoundEnvironment roundEnvironment;
-  private static ProcessingEnvironment processingEnvironment;
+  private static Types types;
+  private static Elements elements;
+  private static AnnotatedElementsFinder roundEnvironment;
 
   private ExportedTypes() {
   }
 
-  public static void init(final RoundEnvironment roundEnvironment, final ProcessingEnvironment processingEnvironment) {
+  public static void init(final Types types, final Elements elements, final AnnotatedElementsFinder roundEnvironment) {
 
+    ExportedTypes.types = types;
+    ExportedTypes.elements = elements;
     ExportedTypes.roundEnvironment = roundEnvironment;
-    ExportedTypes.processingEnvironment = processingEnvironment;
 
     // Loads all exported types from ErraiModuleExportFiles
-    exportedClassesByAnnotationClassNameByModuleName = exportFilesPackageElement(processingEnvironment).map(
+    exportedClassesByAnnotationClassNameByModuleName = exportFilesPackageElement(ExportedTypes.elements).map(
             p -> p.getEnclosedElements()
                     .stream()
                     .collect(groupingBy(ExportedTypes::annotationName,
                             flatMapping(ExportedTypes::exportedTypes, toSet())))).orElseGet(HashMap::new);
 
     // Because annotation processors execution order is random we have to look for local exportable types one more time
-    exportedAnnotationsPackageElement(processingEnvironment).ifPresent(p -> p.getEnclosedElements()
+    exportedAnnotationsPackageElement(elements).ifPresent(p -> p.getEnclosedElements()
             .stream()
             .flatMap(ExportedTypes::exportedTypes)
             .collect(groupingBy(TypeMirror::toString, flatMapping(ExportedTypes::exportableLocalTypes, toSet())))
@@ -88,14 +89,14 @@ public class ExportedTypes {
   }
 
   private static Stream<TypeMirror> exportableLocalTypes(final TypeMirror element) {
-    final TypeElement annotation = (TypeElement) processingEnvironment.getTypeUtils().asElement(element);
+    final TypeElement annotation = (TypeElement) types.asElement(element);
     return roundEnvironment.getElementsAnnotatedWith(annotation).stream().map(Element::asType);
   }
 
   private static void print() {
 
     if (exportedClassesByAnnotationClassNameByModuleName.isEmpty()) {
-      System.out.println("No exported classes found");
+      System.out.println("No exported types found");
     }
 
     exportedClassesByAnnotationClassNameByModuleName.forEach(
@@ -103,7 +104,7 @@ public class ExportedTypes {
   }
 
   private static String annotationName(final Element e) {
-    return ExportFileName.getAnnotationClassNameFromExportFileName(e);
+    return ExportFileName.decodeAnnotationClassNameFromExportFileName(e.asType().toString());
   }
 
   private static Stream<TypeMirror> exportedTypes(final Element exportFile) {
@@ -114,7 +115,7 @@ public class ExportedTypes {
     return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(annotation.getName(), emptySet())
             .stream()
             .map(APTClass::new)
-            .collect(toList());
+            .collect(toSet());
   }
 
   // Java 9 will implement this method, so when it's released and we upgrade, this can be removed.
