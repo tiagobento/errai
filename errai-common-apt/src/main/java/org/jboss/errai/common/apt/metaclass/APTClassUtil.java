@@ -148,7 +148,7 @@ public final class APTClassUtil {
     if (value instanceof String) {
       return value;
     } else if (value instanceof TypeMirror) {
-      return loadClass(value);
+      return loadClass((TypeMirror) value);
     } else if (value instanceof VariableElement) {
       final VariableElement var = (VariableElement) value;
       final Class<?> enumClass = loadClass(var.asType());
@@ -183,10 +183,10 @@ public final class APTClassUtil {
             .toArray(n -> (Object[]) Array.newInstance(arrayClass.getComponentType(), n));
   }
 
-  private static Class<?> loadClass(final Object value) {
-    switch (((TypeMirror) value).getKind()) {
+  private static Class<?> loadClass(final TypeMirror value) {
+    switch (value.getKind()) {
     case ARRAY: {
-      TypeMirror cur = (TypeMirror) value;
+      TypeMirror cur = value;
       int dim = 0;
       do {
         cur = ((ArrayType) cur).getComponentType();
@@ -224,7 +224,7 @@ public final class APTClassUtil {
     case VOID:
       return void.class;
     default:
-      return throwUnsupportedTypeError((TypeMirror) value);
+      return throwUnsupportedTypeError(value);
     }
   }
 

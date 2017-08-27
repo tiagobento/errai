@@ -3,9 +3,9 @@ package org.jboss.errai.common.apt.exportfile;
 import org.jboss.errai.common.apt.test.ErraiAptTest;
 import org.junit.Test;
 
-import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
 
+import static java.util.Collections.emptySet;
 import static org.jboss.errai.common.apt.exportfile.ExportFileName.decodeAnnotationClassNameFromExportFileName;
 import static org.jboss.errai.common.apt.exportfile.ExportFileName.encodeAnnotationNameAsExportFileName;
 import static org.junit.Assert.assertEquals;
@@ -26,8 +26,8 @@ public class ExportFileNameTest extends ErraiAptTest {
   }
 
   private void testEncodeDecode(final Class<? extends Annotation> testAnnotationClass) {
-    final TypeElement testAnnotationTypeElement = getTypeElement(testAnnotationClass);
-    final String encodedName = encodeAnnotationNameAsExportFileName(testAnnotationTypeElement);
+    final ExportFile exportFile = new ExportFile("test", getTypeElement(testAnnotationClass), emptySet());
+    final String encodedName = encodeAnnotationNameAsExportFileName(exportFile);
     assertEquals(testAnnotationClass.getCanonicalName(), decodeAnnotationClassNameFromExportFileName(encodedName));
   }
 

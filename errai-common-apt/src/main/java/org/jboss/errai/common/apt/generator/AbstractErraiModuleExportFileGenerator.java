@@ -23,6 +23,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.errai.common.apt.AnnotatedElementsFinder;
 import org.jboss.errai.common.apt.AptAnnotatedElementsFinder;
+import org.jboss.errai.common.apt.exportfile.ExportFile;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -38,7 +39,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFilesPackagePath;
+import static org.jboss.errai.common.apt.ErraiAptPackages.exportFilesPackagePath;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -76,7 +77,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
           final AnnotatedElementsFinder annotatedElementsFinder) {
 
     return annotations.stream()
-            .map(a -> new ExportFile(a, annotatedClassesAndInterfaces(annotatedElementsFinder, a)))
+            .map(a -> new ExportFile(getModuleName(), a, annotatedClassesAndInterfaces(annotatedElementsFinder, a)))
             .filter(ExportFile::hasExportedTypes)
             .collect(toSet());
   }
@@ -91,7 +92,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   }
 
   private TypeSpec newExportFileTypeSpec(final ExportFile exportFile) {
-    return TypeSpec.classBuilder(ExportFileName.encodeAnnotationNameAsExportFileName(exportFile.annotation))
+    return TypeSpec.classBuilder(ExportFileName.encodeAnnotationNameAsExportFileName(exportFile))
             .addModifiers(PUBLIC, FINAL)
             .addFields(buildFields(exportFile.exportedTypes))
             .build();
@@ -121,18 +122,5 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
     }
   }
 
-  static class ExportFile {
-
-    final TypeElement annotation;
-    final Set<? extends Element> exportedTypes;
-
-    ExportFile(final TypeElement annotation, final Set<? extends Element> exportedTypes) {
-      this.annotation = annotation;
-      this.exportedTypes = exportedTypes;
-    }
-
-    Boolean hasExportedTypes() {
-      return !exportedTypes.isEmpty();
-    }
-  }
+  protected abstract String getModuleName();
 }

@@ -34,4 +34,8 @@ import static org.jboss.errai.enterprise.apt.export.SupportedAnnotationTypes.PAT
 @SupportedAnnotationTypes({ PATH, INTERCEPTED_CALL, FEATURE_INTERCEPTOR, INTERCEPTS_REMOTE_CALL })
 public class ErraiJaxrsExportFileGenerator extends AbstractErraiModuleExportFileGenerator {
 
+  @Override
+  protected String getModuleName() {
+    return "jaxrs";
+  }
 }

@@ -1,8 +1,9 @@
 package org.jboss.errai.common.apt.exportfile;
 
 import org.jboss.errai.apt.internal.export.annotation.ErraiCommonAptExportedAnnotations;
-import org.jboss.errai.apt.internal.export.randomString_ErraiModuleExportFile_org_jboss_errai_common_apt_test_TestAnnotation;
+import org.jboss.errai.apt.internal.export.test_hYbKGF_ExportFile_org_jboss_errai_common_apt_test_TestAnnotation;
 import org.jboss.errai.apt.internal.generator.TestGenerator;
+import org.jboss.errai.common.apt.ErraiAptPackages;
 import org.jboss.errai.common.apt.test.ErraiAptTest;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ public class ErraiAptPackagesTest extends ErraiAptTest {
     assertTrue(ErraiAptPackages.exportFilesPackageElement(elements)
             .map(p -> p.getEnclosedElements()
                     .contains(getTypeElement(
-                            randomString_ErraiModuleExportFile_org_jboss_errai_common_apt_test_TestAnnotation.class)))
+                            test_hYbKGF_ExportFile_org_jboss_errai_common_apt_test_TestAnnotation.class)))
             .orElse(false));
 
     assertTrue(ErraiAptPackages.exportedAnnotationsPackageElement(elements)

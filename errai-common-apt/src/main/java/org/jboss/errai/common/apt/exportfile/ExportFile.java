@@ -14,13 +14,28 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt.internal.export;
+package org.jboss.errai.common.apt.exportfile;
 
-import org.jboss.errai.common.apt.exportfile.TestExportedType;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import java.util.Set;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class randomString_ErraiModuleExportFile_org_jboss_errai_common_apt_test_TestAnnotation {
-  TestExportedType randomName;
+public class ExportFile {
+
+  public final String moduleName;
+  public final TypeElement annotation;
+  public final Set<? extends Element> exportedTypes;
+
+  public ExportFile(final String moduleName, final TypeElement annotation, final Set<? extends Element> exportedTypes) {
+    this.moduleName = moduleName;
+    this.annotation = annotation;
+    this.exportedTypes = exportedTypes;
+  }
+
+  public Boolean hasExportedTypes() {
+    return !exportedTypes.isEmpty();
+  }
 }

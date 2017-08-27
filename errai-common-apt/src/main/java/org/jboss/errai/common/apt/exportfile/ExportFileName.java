@@ -16,24 +16,21 @@
 
 package org.jboss.errai.common.apt.exportfile;
 
-import org.apache.commons.lang3.RandomStringUtils;
-
-import javax.lang.model.element.TypeElement;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public final class ExportFileName {
 
-  private static final String ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX = "ErraiModuleExportFile_";
+  private static final String PREFIX = "ExportFile_";
 
   private ExportFileName() {
   }
 
-  public static String encodeAnnotationNameAsExportFileName(final TypeElement annotation) {
-    String annotationName = annotation.getQualifiedName().toString().replace(".", "_");
-    //FIXME: possible name conflict?
-    return RandomStringUtils.randomAlphabetic(12) + "_" + ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX + annotationName;
+  public static String encodeAnnotationNameAsExportFileName(final ExportFile exportFile) {
+    final String annotationName = exportFile.annotation.getQualifiedName().toString().replace(".", "_");
+    return exportFile.moduleName + "_" + randomAlphabetic(6) + "_" + PREFIX + annotationName;
   }
 
   public static String decodeAnnotationClassNameFromExportFileName(final String exportFileName) {
@@ -41,6 +38,6 @@ public final class ExportFileName {
   }
 
   private static int getAnnotationNameBeginIndex(final String exportFileName) {
-    return exportFileName.indexOf(ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX) + ERRAI_MODULE_EXPORT_FILE_NAME_PREFIX.length();
+    return exportFileName.indexOf(PREFIX) + PREFIX.length();
   }
 }

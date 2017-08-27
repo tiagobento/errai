@@ -34,4 +34,8 @@ import static org.jboss.errai.bus.apt.export.SupportedAnnotationTypes.REMOTE;
 @SupportedAnnotationTypes({ REMOTE, INTERCEPTED_CALL, FEATURE_INTERCEPTOR, INTERCEPTS_REMOTE_CALL })
 public class ErraiBusExportFileGenerator extends AbstractErraiModuleExportFileGenerator {
 
+  @Override
+  protected String getModuleName() {
+    return "bus";
+  }
 }

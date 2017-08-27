@@ -22,7 +22,7 @@ import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
 import javax.ws.rs.Path;
 
 /**
- * IMPORTANT: Do not move this class. ExportedTypes depends on it being in this exact package.
+ * IMPORTANT: Do not move this class. ErraiAptExportedTypes depends on it being in this exact package.
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */

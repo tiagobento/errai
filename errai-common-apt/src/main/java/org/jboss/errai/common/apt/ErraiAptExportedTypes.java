@@ -39,44 +39,46 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
-import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportFilesPackageElement;
-import static org.jboss.errai.common.apt.exportfile.ErraiAptPackages.exportedAnnotationsPackageElement;
+import static org.jboss.errai.common.apt.ErraiAptPackages.exportFilesPackageElement;
+import static org.jboss.errai.common.apt.ErraiAptPackages.exportedAnnotationsPackageElement;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ExportedTypes {
+public final class ErraiAptExportedTypes {
 
-  private static Map<String, Set<TypeMirror>> exportedClassesByAnnotationClassNameByModuleName;
+  private static Map<String, Set<TypeMirror>> exportedClassesByAnnotationClassName;
   private static Types types;
   private static Elements elements;
   private static AnnotatedElementsFinder roundEnvironment;
 
-  private ExportedTypes() {
+  private ErraiAptExportedTypes() {
   }
 
   public static void init(final Types types, final Elements elements, final AnnotatedElementsFinder roundEnvironment) {
 
-    ExportedTypes.types = types;
-    ExportedTypes.elements = elements;
-    ExportedTypes.roundEnvironment = roundEnvironment;
+    ErraiAptExportedTypes.types = types;
+    ErraiAptExportedTypes.elements = elements;
+    ErraiAptExportedTypes.roundEnvironment = roundEnvironment;
 
     // Loads all exported types from ErraiModuleExportFiles
-    exportedClassesByAnnotationClassNameByModuleName = exportFilesPackageElement(ExportedTypes.elements).map(
+    exportedClassesByAnnotationClassName = exportFilesPackageElement(ErraiAptExportedTypes.elements).map(
             p -> p.getEnclosedElements()
                     .stream()
-                    .collect(groupingBy(ExportedTypes::annotationName,
-                            flatMapping(ExportedTypes::exportedTypes, toSet())))).orElseGet(HashMap::new);
+                    .collect(groupingBy(ErraiAptExportedTypes::annotationName,
+                            flatMapping(ErraiAptExportedTypes::getExportedTypesFromExportFile, toSet()))))
+            .orElseGet(HashMap::new);
 
     // Because annotation processors execution order is random we have to look for local exportable types one more time
     exportedAnnotationsPackageElement(elements).ifPresent(p -> p.getEnclosedElements()
             .stream()
-            .flatMap(ExportedTypes::exportedTypes)
-            .collect(groupingBy(TypeMirror::toString, flatMapping(ExportedTypes::exportableLocalTypes, toSet())))
+            .flatMap(ErraiAptExportedTypes::getExportedTypesFromExportFile)
+            .collect(
+                    groupingBy(TypeMirror::toString, flatMapping(ErraiAptExportedTypes::exportableLocalTypes, toSet())))
             .entrySet()
             .stream()
             .filter(s -> !s.getValue().isEmpty())
-            .forEach(ExportedTypes::addExportableLocalTypesToExportedTypes));
+            .forEach(ErraiAptExportedTypes::addExportableLocalTypesToExportedTypes));
 
     print();
   }
@@ -84,8 +86,8 @@ public class ExportedTypes {
   private static void addExportableLocalTypesToExportedTypes(final Map.Entry<String, Set<TypeMirror>> entry) {
     final String annotationName = entry.getKey();
     final Set<TypeMirror> mappedTypes = entry.getValue();
-    exportedClassesByAnnotationClassNameByModuleName.putIfAbsent(annotationName, new HashSet<>());
-    exportedClassesByAnnotationClassNameByModuleName.get(annotationName).addAll(mappedTypes);
+    exportedClassesByAnnotationClassName.putIfAbsent(annotationName, new HashSet<>());
+    exportedClassesByAnnotationClassName.get(annotationName).addAll(mappedTypes);
   }
 
   private static Stream<TypeMirror> exportableLocalTypes(final TypeMirror element) {
@@ -95,11 +97,11 @@ public class ExportedTypes {
 
   private static void print() {
 
-    if (exportedClassesByAnnotationClassNameByModuleName.isEmpty()) {
+    if (exportedClassesByAnnotationClassName.isEmpty()) {
       System.out.println("No exported types found");
     }
 
-    exportedClassesByAnnotationClassNameByModuleName.forEach(
+    exportedClassesByAnnotationClassName.forEach(
             (annotationClassName, e) -> System.out.println(annotationClassName + ": " + e.size()));
   }
 
@@ -107,12 +109,12 @@ public class ExportedTypes {
     return ExportFileName.decodeAnnotationClassNameFromExportFileName(e.asType().toString());
   }
 
-  private static Stream<TypeMirror> exportedTypes(final Element exportFile) {
+  private static Stream<TypeMirror> getExportedTypesFromExportFile(final Element exportFile) {
     return exportFile.getEnclosedElements().stream().filter(x -> x.getKind().isField()).map(Element::asType);
   }
 
   public static Collection<MetaClass> getMetaClasses(final Class<? extends Annotation> annotation) {
-    return exportedClassesByAnnotationClassNameByModuleName.getOrDefault(annotation.getName(), emptySet())
+    return exportedClassesByAnnotationClassName.getOrDefault(annotation.getName(), emptySet())
             .stream()
             .map(APTClass::new)
             .collect(toSet());

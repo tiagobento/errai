@@ -19,8 +19,8 @@ package org.jboss.errai.apt.internal.generator;
 import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
-import org.jboss.errai.common.apt.ExportedTypes;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -46,7 +46,7 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
   }
 
   private Collection<MetaClass> getMetaClasses(final GeneratorContext context, Class<? extends Annotation> annotation) {
-    return ExportedTypes.getMetaClasses(annotation);
+    return ErraiAptExportedTypes.getMetaClasses(annotation);
   }
 
   @Override

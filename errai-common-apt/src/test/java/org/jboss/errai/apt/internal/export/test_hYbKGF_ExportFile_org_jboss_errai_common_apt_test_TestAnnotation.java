@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.generator;
+package org.jboss.errai.apt.internal.export;
+
+import org.jboss.errai.common.apt.exportfile.TestExportedType;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-class TestGenerator extends AbstractErraiModuleExportFileGenerator {
-  @Override
-  protected String getModuleName() {
-    return "test";
-  }
+public class test_hYbKGF_ExportFile_org_jboss_errai_common_apt_test_TestAnnotation {
+  TestExportedType randomName;
 }

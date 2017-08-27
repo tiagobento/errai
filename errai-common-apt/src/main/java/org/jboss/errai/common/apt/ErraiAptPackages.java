@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.exportfile;
+package org.jboss.errai.common.apt;
 
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.util.Elements;
