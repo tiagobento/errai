@@ -77,7 +77,8 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
           final AnnotatedElementsFinder annotatedElementsFinder) {
 
     return annotations.stream()
-            .map(a -> new ExportFile(getModuleName(), a, annotatedClassesAndInterfaces(annotatedElementsFinder, a)))
+            .map(annotation -> new ExportFile(getModuleName(), annotation,
+                    annotatedClassesAndInterfaces(annotatedElementsFinder, annotation)))
             .filter(ExportFile::hasExportedTypes)
             .collect(toSet());
   }

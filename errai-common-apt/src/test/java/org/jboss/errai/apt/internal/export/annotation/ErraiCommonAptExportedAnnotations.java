@@ -16,6 +16,8 @@
 
 package org.jboss.errai.apt.internal.export.annotation;
 
+import org.jboss.errai.common.apt.generator.TestUnusedAnnotation;
+
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
