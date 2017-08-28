@@ -101,7 +101,7 @@ public abstract class ProxyUtil {
               .publicOverridesMethod("getReturnType")
               .append(Stmt.load(method.getReturnType()).returnValue())
               .finish()
-              .publicOverridesMethod("unsafeGetAnnotations")
+              .publicOverridesMethod("getAnnotations")
               .append(Stmt.load(annoFilter.apply(method.unsafeGetAnnotations())).returnValue())
               .finish()
               .publicOverridesMethod("getTypeAnnotations")
