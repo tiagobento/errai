@@ -54,8 +54,8 @@ abstract class BaseDependency implements Dependency {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
-    return getAnnotated().getAnnotations();
+  public Annotation[] unsafeGetAnnotations() {
+    return getAnnotated().unsafeGetAnnotations();
   }
 
   @Override

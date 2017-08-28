@@ -102,7 +102,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
+  public Annotation[] unsafeGetAnnotations() {
     final TypeMirror mirror = getEnclosedMetaObject();
     switch (mirror.getKind()) {
     case DECLARED:
@@ -786,11 +786,11 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
   }
 
   @Override
-  public synchronized Class<?> asClass() {
+  public synchronized Class<?> unsafeAsClass() {
     try {
       return Class.forName(getFullyQualifiedName());
     } catch (final ClassNotFoundException e) {
-      return super.asClass();
+      return super.unsafeAsClass();
     }
   }
 }

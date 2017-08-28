@@ -392,7 +392,7 @@ public abstract class AbstractMetaClass<T> extends MetaClass {
     MetaClass scanTarget = this;
     while (scanTarget != null) {
       for (final MetaMethod m : scanTarget.getDeclaredMethods()) {
-        for (final Annotation a : m.getAnnotations()) {
+        for (final Annotation a : m.unsafeGetAnnotations()) {
           if (_findMetaAnnotation(a.annotationType(), annotation)) {
             methods.add(m);
           }
@@ -435,7 +435,7 @@ public abstract class AbstractMetaClass<T> extends MetaClass {
     MetaClass scanTarget = this;
     while (scanTarget != null) {
       for (final MetaField m : scanTarget.getDeclaredFields()) {
-        for (final Annotation a : m.getAnnotations()) {
+        for (final Annotation a : m.unsafeGetAnnotations()) {
           if (_findMetaAnnotation(a.annotationType(), annotation)) {
             methods.add(m);
           }
@@ -589,7 +589,7 @@ public abstract class AbstractMetaClass<T> extends MetaClass {
   }
 
   @Override
-  public synchronized Class<?> asClass() {
+  public synchronized Class<?> unsafeAsClass() {
     if (_asClassCache != null) {
       return _asClassCache;
     }
@@ -790,8 +790,8 @@ public abstract class AbstractMetaClass<T> extends MetaClass {
   public int hashContent() {
     if (contentString == null) {
       final StringBuilder sb = new StringBuilder();
-      if (getAnnotations() != null) {
-        for (final Annotation a : getAnnotations()) {
+      if (unsafeGetAnnotations() != null) {
+        for (final Annotation a : unsafeGetAnnotations()) {
           sb.append(a.toString());
         }
       }

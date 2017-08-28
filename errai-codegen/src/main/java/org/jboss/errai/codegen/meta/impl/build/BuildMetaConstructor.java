@@ -106,7 +106,7 @@ public class BuildMetaConstructor extends MetaConstructor implements Builder {
           }
 
           @Override
-          public Annotation[] getAnnotations() {
+          public Annotation[] unsafeGetAnnotations() {
             return new Annotation[0];
           }
 
@@ -116,7 +116,7 @@ public class BuildMetaConstructor extends MetaConstructor implements Builder {
           }
 
           @Override
-          public <A extends Annotation> A getAnnotation(final Class<A> annotation) {
+          public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
             return null;
           }
         });
@@ -200,7 +200,7 @@ public class BuildMetaConstructor extends MetaConstructor implements Builder {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
+  public Annotation[] unsafeGetAnnotations() {
     return new Annotation[0];
   }
 

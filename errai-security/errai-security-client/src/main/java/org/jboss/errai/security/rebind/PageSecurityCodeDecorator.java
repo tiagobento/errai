@@ -50,7 +50,7 @@ public class PageSecurityCodeDecorator extends IOCDecoratorExtension<Page> {
     final List<Statement> statements = new ArrayList<Statement>();
 
     if (decorable.getDecorableDeclaringType().isAnnotationPresent(RestrictedAccess.class)) {
-      final RestrictedAccess annotation = decorable.getDecorableDeclaringType().getAnnotation(RestrictedAccess.class);
+      final RestrictedAccess annotation = decorable.getDecorableDeclaringType().unsafeGetAnnotation(RestrictedAccess.class);
       final String roleListenerVar = "roleListener";
 
       statements.add(controller.setReferenceStmt(roleListenerVar,

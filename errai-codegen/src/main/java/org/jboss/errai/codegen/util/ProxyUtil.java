@@ -101,12 +101,12 @@ public abstract class ProxyUtil {
               .publicOverridesMethod("getReturnType")
               .append(Stmt.load(method.getReturnType()).returnValue())
               .finish()
-              .publicOverridesMethod("getAnnotations")
-              .append(Stmt.load(annoFilter.apply(method.getAnnotations())).returnValue())
+              .publicOverridesMethod("unsafeGetAnnotations")
+              .append(Stmt.load(annoFilter.apply(method.unsafeGetAnnotations())).returnValue())
               .finish()
               .publicOverridesMethod("getTypeAnnotations")
               .append(
-                  Stmt.load(annoFilter.apply(method.getDeclaringClass().getAnnotations())).returnValue())
+                  Stmt.load(annoFilter.apply(method.getDeclaringClass().unsafeGetAnnotations())).returnValue())
               .finish()
               .publicOverridesMethod("proceed")
               .append(generateInterceptorStackProceedMethod(callContextType, proceed, interceptors, iocEnabled))
@@ -260,20 +260,20 @@ public abstract class ProxyUtil {
     private void setFeatureInterceptors(final Collection<? extends MetaClass> featureInterceptors) {
       for (final MetaClass featureInterceptor : featureInterceptors) {
         final Class<? extends Annotation>[] annotations =
-            featureInterceptor.getAnnotation(FeatureInterceptor.class).value();
+            featureInterceptor.unsafeGetAnnotation(FeatureInterceptor.class).value();
 
         for (int i = 0; i < annotations.length; i++) {
-          this.featureInterceptors.put(annotations[i], featureInterceptor.asClass());
+          this.featureInterceptors.put(annotations[i], featureInterceptor.unsafeAsClass());
         }
       }
     }
 
     private void setStandaloneInterceptors(final Collection<? extends MetaClass> standaloneInterceptors) {
       for (final MetaClass interceptorClass : standaloneInterceptors) {
-        final InterceptsRemoteCall interceptor = interceptorClass.getAnnotation(InterceptsRemoteCall.class);
+        final InterceptsRemoteCall interceptor = interceptorClass.unsafeGetAnnotation(InterceptsRemoteCall.class);
         final Class<?>[] intercepts = interceptor.value();
         for (final Class<?> intercept : intercepts) {
-          this.standaloneInterceptors.put(intercept, interceptorClass.asClass());
+          this.standaloneInterceptors.put(intercept, interceptorClass.unsafeAsClass());
         }
       }
     }
@@ -292,13 +292,13 @@ public abstract class ProxyUtil {
     public List<Class<?>> getInterceptors(final MetaClass type, final MetaMethod method) {
       final List<Class<?>> interceptors = new ArrayList<>();
 
-      InterceptedCall interceptedCall = method.getAnnotation(InterceptedCall.class);
+      InterceptedCall interceptedCall = method.unsafeGetAnnotation(InterceptedCall.class);
       if (interceptedCall == null) {
-        interceptedCall = type.getAnnotation(InterceptedCall.class);
+        interceptedCall = type.unsafeGetAnnotation(InterceptedCall.class);
       }
 
       if (interceptedCall == null) {
-        interceptors.addAll(standaloneInterceptors.get(type.asClass()));
+        interceptors.addAll(standaloneInterceptors.get(type.unsafeAsClass()));
       }
       else {
         for (final Class<?> clazz : interceptedCall.value()) {

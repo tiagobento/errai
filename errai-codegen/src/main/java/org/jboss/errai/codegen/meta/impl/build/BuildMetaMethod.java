@@ -134,7 +134,7 @@ public class BuildMetaMethod extends MetaMethod implements Builder {
           }
 
           @Override
-          public Annotation[] getAnnotations() {
+          public Annotation[] unsafeGetAnnotations() {
             return new Annotation[0];
           }
 
@@ -144,7 +144,7 @@ public class BuildMetaMethod extends MetaMethod implements Builder {
           }
 
           @Override
-          public <A extends Annotation> A getAnnotation(final Class<A> annotation) {
+          public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
             return null;
           }
         });
@@ -226,7 +226,7 @@ public class BuildMetaMethod extends MetaMethod implements Builder {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
+  public Annotation[] unsafeGetAnnotations() {
     return annotations.toArray(new Annotation[annotations.size()]);
   }
 
@@ -311,7 +311,7 @@ public class BuildMetaMethod extends MetaMethod implements Builder {
     final StringBuilder buf = new StringBuilder(256);
 
     if (!annotations.isEmpty()) {
-      for (final Annotation a : getAnnotations()) {
+      for (final Annotation a : unsafeGetAnnotations()) {
         buf.append(new AnnotationLiteral(a).getCanonicalString(context)).append(" ");
       }
       buf.append("\n");

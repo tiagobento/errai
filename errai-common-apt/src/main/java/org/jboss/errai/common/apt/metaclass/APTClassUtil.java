@@ -151,7 +151,7 @@ public final class APTClassUtil {
       return loadClass((TypeMirror) value);
     } else if (value instanceof VariableElement) {
       final VariableElement var = (VariableElement) value;
-      final Class<?> enumClass = loadClass(var.asType());
+      final Class<?> enumClass = loadClass(var.asType()); //FIXME: tiago: remove this (MetaEnum?)
       return Enum.valueOf((Class) enumClass, var.getSimpleName().toString());
     } else if (value instanceof AnnotationMirror) {
       try {

@@ -40,7 +40,7 @@ public class JaxrsResourceMethod {
   private final JaxrsHeaders methodHeaders;
 
   public JaxrsResourceMethod(MetaMethod method, JaxrsHeaders headers, String rootResourcePath) {
-    Path subResourcePath = method.getAnnotation(Path.class);
+    Path subResourcePath = method.unsafeGetAnnotation(Path.class);
     String fullPath = rootResourcePath;
     if (fullPath.startsWith("/")) {
       fullPath = fullPath.substring(1);

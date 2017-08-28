@@ -154,7 +154,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
       initStatements.add(subscribeStatement);
     }
 
-    for (final Class<?> cls : EnvUtil.getAllPortableConcreteSubtypes(eventType.asClass())) {
+    for (final Class<?> cls : EnvUtil.getAllPortableConcreteSubtypes(eventType.unsafeAsClass())) {
       if (!EnvUtil.isLocalEventType(cls)) {
         final ContextualStatementBuilder routingSubStmt = Stmt.invokeStatic(ErraiBus.class, "get").invoke("subscribe",
                 CDI.getSubjectNameByType(cls.getName()), Stmt.loadStatic(CDI.class, "ROUTING_CALLBACK"));

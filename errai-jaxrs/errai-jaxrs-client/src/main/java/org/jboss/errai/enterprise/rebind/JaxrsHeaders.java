@@ -51,12 +51,12 @@ public class JaxrsHeaders {
   public static JaxrsHeaders fromClass(MetaClass clazz) {
     JaxrsHeaders headers = new JaxrsHeaders();
 
-    Produces p = clazz.getAnnotation(Produces.class);
+    Produces p = clazz.unsafeGetAnnotation(Produces.class);
     if (p != null) {
       headers.setAcceptHeader(p.value());
     }
 
-    Consumes c = clazz.getAnnotation(Consumes.class);
+    Consumes c = clazz.unsafeGetAnnotation(Consumes.class);
     if (c != null) {
       headers.setContentTypeHeader(c.value());
     }
@@ -73,12 +73,12 @@ public class JaxrsHeaders {
   public static JaxrsHeaders fromMethod(MetaMethod method) {
     JaxrsHeaders headers = new JaxrsHeaders();
 
-    Produces p = method.getAnnotation(Produces.class);
+    Produces p = method.unsafeGetAnnotation(Produces.class);
     if (p != null) {
       headers.setAcceptHeader(p.value());
     }
 
-    Consumes c = method.getAnnotation(Consumes.class);
+    Consumes c = method.unsafeGetAnnotation(Consumes.class);
     if (c != null) {
       headers.setContentTypeHeader(c.value());
     }

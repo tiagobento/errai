@@ -402,7 +402,7 @@ public class IOCProcessor {
   }
 
   private Class<?> getAsyncFragmentId(final Injectable injectable) {
-    final LoadAsync loadAsync = injectable.getInjectedType().getAnnotation(LoadAsync.class);
+    final LoadAsync loadAsync = injectable.getInjectedType().unsafeGetAnnotation(LoadAsync.class);
     if (loadAsync == null) {
       return LoadAsync.NO_FRAGMENT.class;
     } else {
@@ -485,7 +485,7 @@ public class IOCProcessor {
   }
 
   private String getBeanName(final Injectable injectable) {
-    final Named named = injectable.getInjectedType().getAnnotation(Named.class);
+    final Named named = injectable.getInjectedType().unsafeGetAnnotation(Named.class);
     return (named != null) ? named.value() : null;
   }
 
@@ -561,7 +561,7 @@ public class IOCProcessor {
         throw new RuntimeException("They type " + scopeContext.getFullyQualifiedName()
                 + " was annotated with @ScopeContext but does not implement " + Context.class.getName());
       }
-      final ScopeContext anno = scopeContext.getAnnotation(ScopeContext.class);
+      final ScopeContext anno = scopeContext.unsafeGetAnnotation(ScopeContext.class);
       for (final Class<? extends Annotation> scope : anno.value()) {
         annoToContextImpl.put(scope, scopeContext);
       }
@@ -668,7 +668,7 @@ public class IOCProcessor {
 
   private Predicate<List<InjectableHandle>> getPathPredicate(final HasAnnotations annotated, final List<String> problems) {
     if (annotated.isAnnotationPresent(Typed.class)) {
-      final Class<?>[] beanTypes = annotated.getAnnotation(Typed.class).value();
+      final Class<?>[] beanTypes = annotated.unsafeGetAnnotation(Typed.class).value();
       validateAssignableTypes(annotated, beanTypes, problems);
       return path -> Object.class.getName().equals(path.get(0)) || Arrays.stream(beanTypes)
               .anyMatch(beanType -> path.get(0).getType().getFullyQualifiedName().equals(beanType.getName()));
@@ -717,7 +717,7 @@ public class IOCProcessor {
   }
 
   private boolean isPublishableJsType(final MetaClass type) {
-    final JsType jsType = type.getAnnotation(JsType.class);
+    final JsType jsType = type.unsafeGetAnnotation(JsType.class);
 
     return jsType != null && !jsType.isNative();
   }
@@ -741,7 +741,7 @@ public class IOCProcessor {
     boolean isTopLevel;
     // Workaround for http://bugs.java.com/view_bug.do?bug_id=2210448
     try {
-      isTopLevel = (type.asClass() == null || type.asClass().getDeclaringClass() == null);
+      isTopLevel = (type.unsafeAsClass() == null || type.unsafeAsClass().getDeclaringClass() == null);
     } catch (final IncompatibleClassChangeError ex) {
       isTopLevel = false;
     }
@@ -753,7 +753,7 @@ public class IOCProcessor {
     Class<?> enclosing;
     // Workaround for http://bugs.java.com/view_bug.do?bug_id=2210448
     try {
-      enclosing = (type.asClass() == null ? null : type.asClass().getDeclaringClass());
+      enclosing = (type.unsafeAsClass() == null ? null : type.unsafeAsClass().getDeclaringClass());
       hasEnclosingClass = true;
     } catch (final IncompatibleClassChangeError ex) {
       enclosing = null;
@@ -765,7 +765,7 @@ public class IOCProcessor {
   }
 
   private boolean isSimpleton(final MetaClass type) {
-    for (final Annotation anno : type.getAnnotations()) {
+    for (final Annotation anno : type.unsafeGetAnnotations()) {
       if (nonSimpletonTypeAnnotations.contains(anno.annotationType())
               || isStereotype(anno)
               || isNonNativeJsTypeAnnotation(anno)) {
@@ -909,7 +909,7 @@ public class IOCProcessor {
       return score2 - score1;
     });
 
-    for (final Annotation anno : annotated.getAnnotations()) {
+    for (final Annotation anno : annotated.unsafeGetAnnotations()) {
       final Class<? extends Annotation> annoType = anno.annotationType();
       if (scopeAnnoTypes.contains(annoType)) {
         pq.add(annoType);
@@ -1261,8 +1261,8 @@ public class IOCProcessor {
   }
 
   private boolean isNativeJSType(final MetaClass type) {
-    final JsType anno = type.getAnnotation(JsType.class);
-    return type.getAnnotation(JsType.class) != null && anno.isNative();
+    final JsType anno = type.unsafeGetAnnotation(JsType.class);
+    return type.unsafeGetAnnotation(JsType.class) != null && anno.isNative();
   }
 
   private boolean scopeDoesNotRequireProxy(final MetaClass type) {
@@ -1314,7 +1314,7 @@ public class IOCProcessor {
   }
 
   private boolean isEnabledByProperty(final MetaClass type) {
-    final EnabledByProperty anno = type.getAnnotation(EnabledByProperty.class);
+    final EnabledByProperty anno = type.unsafeGetAnnotation(EnabledByProperty.class);
     final boolean propValue = getPropertyValue(anno.value(),
                                                anno.matchValue(),
                                                anno.matchByDefault(),

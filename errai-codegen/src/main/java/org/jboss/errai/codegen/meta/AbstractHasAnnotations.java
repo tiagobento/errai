@@ -45,7 +45,7 @@ public abstract class AbstractHasAnnotations implements HasAnnotations {
     Assert.notNull(annotation);
     if (annotationPresentCache == null) {
       annotationPresentCache = new HashSet<String>();
-      for (final Annotation a : getAnnotations()) {
+      for (final Annotation a : unsafeGetAnnotations()) {
         annotationPresentCache.add(a.annotationType().getName());
       }
     }

@@ -102,7 +102,7 @@ public abstract class MetaMethod extends AbstractHasAnnotations implements MetaC
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final Annotation[] annos = getAnnotations();
+    final Annotation[] annos = unsafeGetAnnotations();
     if (annos != null) {
       for (final Annotation anno : annos) {
         sb.append(anno.toString()).append(" ");

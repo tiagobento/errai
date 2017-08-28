@@ -114,7 +114,7 @@ public class JsTypeFactoryBodyGenerator extends AbstractBodyGenerator {
   protected Statement generateFactoryHandleStatement(final Injectable injectable) {
     final Object[] args;
     if (injectable.getInjectedType().isAnnotationPresent(ActivatedBy.class)) {
-      final Class<? extends BeanActivator> activatorType = injectable.getInjectedType().getAnnotation(ActivatedBy.class).value();
+      final Class<? extends BeanActivator> activatorType = injectable.getInjectedType().unsafeGetAnnotation(ActivatedBy.class).value();
       args =  new Object[] {
           loadLiteral(injectable.getInjectedType()),
           injectable.getFactoryName(),

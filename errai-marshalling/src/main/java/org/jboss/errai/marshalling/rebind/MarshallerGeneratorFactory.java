@@ -46,9 +46,7 @@ import org.jboss.errai.codegen.builder.CaseBlockBuilder;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.ConstructorBlockBuilder;
 import org.jboss.errai.codegen.builder.ElseBlockBuilder;
-import org.jboss.errai.codegen.builder.StatementEnd;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
-import org.jboss.errai.codegen.literal.LiteralFactory; 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
@@ -474,7 +472,7 @@ public class MarshallerGeneratorFactory {
 
       addConditionalAssignment(type, 
           Stmt.newObject(QualifyingMarshallerWrapper.class, Stmt.newObject(arrayMarshaller.getType()), type
-              .asClass()));
+              .unsafeAsClass()));
     }
     arrayMarshallers.add(varName);
 
@@ -582,7 +580,7 @@ public class MarshallerGeneratorFactory {
       MarshallingGenUtil.ensureMarshallerFieldCreated(classBuilder, null, toMap, initMethod);
     }
 
-    final Statement demarshallerStatement = Stmt.castTo(toMap.asBoxed().asClass(),
+    final Statement demarshallerStatement = Stmt.castTo(toMap.asBoxed().unsafeAsClass(),
         Stmt.loadVariable(marshallerVarName).invoke("demarshall", loadVariable("a0")
             .invoke("get", loadVariable("i")), Stmt.loadVariable("a1")));
 

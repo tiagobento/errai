@@ -69,7 +69,7 @@ public class LoggerFactoryIOCExtension implements IOCExtensionConfigurator {
       public CustomFactoryInjectable getInjectable(final InjectionSite injectionSite, final FactoryNameGenerator nameGenerator) {
         final String loggerName;
         if (injectionSite.isAnnotationPresent(NamedLogger.class)) {
-          loggerName = injectionSite.getAnnotation(NamedLogger.class).value();
+          loggerName = injectionSite.unsafeGetAnnotation(NamedLogger.class).value();
         }
         else {
           loggerName = injectionSite.getEnclosingType().getFullyQualifiedName();

@@ -729,7 +729,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   public static AbstractStatementBuilder getAssignableTypesArrayStmt(final Injectable injectable) {
     final Object[] assignableTypes =
             injectable.getAnnotatedObject()
-            .flatMap(annotated -> Optional.ofNullable(annotated.getAnnotation(Typed.class)))
+            .flatMap(annotated -> Optional.ofNullable(annotated.unsafeGetAnnotation(Typed.class)))
             .map(typedAnno -> typedAnno.value())
             // Ensure that Object is an assignable type
             .map(beanTypes -> {
@@ -754,7 +754,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   protected Statement generateFactoryHandleStatement(final Injectable injectable) {
     final Statement newObject;
     if (injectable.getInjectedType().isAnnotationPresent(ActivatedBy.class)) {
-      final Class<? extends BeanActivator> activatorType = injectable.getInjectedType().getAnnotation(ActivatedBy.class).value();
+      final Class<? extends BeanActivator> activatorType = injectable.getInjectedType().unsafeGetAnnotation(ActivatedBy.class).value();
       newObject = newObject(FactoryHandleImpl.class, loadLiteral(injectable.getInjectedType()),
               injectable.getFactoryName(), injectable.getScope(), isEager(injectable.getInjectedType()),
               injectable.getBeanName(), !injectable.isContextual(), loadLiteral(activatorType));
@@ -773,7 +773,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   }
 
   protected static boolean hasStartupAnnotation(final MetaClass injectedType) {
-    for (final Annotation anno : injectedType.getAnnotations()) {
+    for (final Annotation anno : injectedType.unsafeGetAnnotations()) {
       if (anno.annotationType().getName().equals("javax.ejb.Startup")) {
         return true;
       }
@@ -796,7 +796,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
 
   protected Collection<Annotation> getQualifiers(final HasAnnotations injectedType) {
     final Collection<Annotation> annos = new ArrayList<>();
-    for (final Annotation anno : injectedType.getAnnotations()) {
+    for (final Annotation anno : injectedType.unsafeGetAnnotations()) {
       if (anno.annotationType().isAnnotationPresent(Qualifier.class)) {
         annos.add(anno);
       }

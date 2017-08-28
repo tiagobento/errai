@@ -94,23 +94,23 @@ public class JaxrsResourceMethodParameters {
     for (final MetaParameter param : method.getParameters()) {
 
       final Statement paramValue = parameterValues.get(i++);
-      Annotation a = param.getAnnotation(PathParam.class);
+      Annotation a = param.unsafeGetAnnotation(PathParam.class);
       if (a != null) {
         params.add(PathParam.class, ((PathParam) a).value(), paramValue);
       }
-      else if ((a = param.getAnnotation(QueryParam.class)) != null) {
+      else if ((a = param.unsafeGetAnnotation(QueryParam.class)) != null) {
         params.add(QueryParam.class, ((QueryParam) a).value(), paramValue);
       }
-      else if ((a = param.getAnnotation(HeaderParam.class)) != null) {
+      else if ((a = param.unsafeGetAnnotation(HeaderParam.class)) != null) {
         params.add(HeaderParam.class, ((HeaderParam) a).value(), paramValue);
       }
-      else if ((a = param.getAnnotation(MatrixParam.class)) != null) {
+      else if ((a = param.unsafeGetAnnotation(MatrixParam.class)) != null) {
         params.add(MatrixParam.class, ((MatrixParam) a).value(), paramValue);
       }
-      else if ((a = param.getAnnotation(FormParam.class)) != null) {
+      else if ((a = param.unsafeGetAnnotation(FormParam.class)) != null) {
         params.add(FormParam.class, ((FormParam) a).value(), paramValue);
       }
-      else if ((a = param.getAnnotation(CookieParam.class)) != null) {
+      else if ((a = param.unsafeGetAnnotation(CookieParam.class)) != null) {
         params.add(CookieParam.class, ((CookieParam) a).value(), paramValue);
       }
       else {

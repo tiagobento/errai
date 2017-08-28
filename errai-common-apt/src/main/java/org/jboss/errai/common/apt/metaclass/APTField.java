@@ -60,7 +60,7 @@ public class APTField extends MetaField implements APTMember {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
-    return APTMember.super.getAnnotations();
+  public Annotation[] unsafeGetAnnotations() {
+    return APTMember.super.unsafeGetAnnotations();
   }
 }

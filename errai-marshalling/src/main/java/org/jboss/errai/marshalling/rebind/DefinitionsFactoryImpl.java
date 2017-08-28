@@ -254,9 +254,9 @@ public class DefinitionsFactoryImpl implements DefinitionsFactory {
 
     for (final MetaClass marshallerMetaClass : cliMarshallers) {
       if (Marshaller_MC.isAssignableFrom(marshallerMetaClass)) {
-        final Class<? extends Marshaller> marshallerCls = marshallerMetaClass.asClass().asSubclass(Marshaller.class);
+        final Class<? extends Marshaller> marshallerCls = marshallerMetaClass.unsafeAsClass().asSubclass(Marshaller.class);
         try {
-          final Class<?> type = marshallerMetaClass.getAnnotation(ClientMarshaller.class).value();
+          final Class<?> type = marshallerMetaClass.unsafeGetAnnotation(ClientMarshaller.class).value();
 
           final MappingDefinition marshallMappingDef = new MappingDefinition(type, true);
           marshallMappingDef.setClientMarshallerClass(marshallerCls);
@@ -340,7 +340,7 @@ public class DefinitionsFactoryImpl implements DefinitionsFactory {
 
     final List<MetaClass> exposedSuperTypes = exposedClasses
       .stream()
-      .filter(mc -> mc.isAnnotationPresent(Portable.class) && mc.getAnnotation(Portable.class).mapSuperTypes())
+      .filter(mc -> mc.isAnnotationPresent(Portable.class) && mc.unsafeGetAnnotation(Portable.class).mapSuperTypes())
       .flatMap(mc -> {
         final Builder<MetaClass> builder = Stream.builder();
         MetaClass cur = mc;
@@ -375,7 +375,7 @@ public class DefinitionsFactoryImpl implements DefinitionsFactory {
       if (mappedClass.isSynthetic())
         continue;
 
-      final Portable portable = mappedClass.getAnnotation(Portable.class);
+      final Portable portable = mappedClass.unsafeGetAnnotation(Portable.class);
       if (portable != null && !portable.aliasOf().equals(Object.class)) {
         aliasToMarshaller.put(mappedClass, MetaClassFactory.get(portable.aliasOf()));
       }
@@ -395,10 +395,10 @@ public class DefinitionsFactoryImpl implements DefinitionsFactory {
     for (final MetaClass enumType : enums) {
       if (!hasDefinition(enumType)) {
         final MappingDefinition enumDef = DefaultJavaDefinitionMapper
-            .map(MetaClassFactory.get(enumType.asClass()), this);
+            .map(MetaClassFactory.get(enumType.unsafeAsClass()), this);
         enumDef.setMarshallerInstance(new DefaultDefinitionMarshaller(enumDef));
         addDefinition(enumDef);
-        exposedClasses.add(MetaClassFactory.get(enumType.asClass()));
+        exposedClasses.add(MetaClassFactory.get(enumType.unsafeAsClass()));
       }
     }
 

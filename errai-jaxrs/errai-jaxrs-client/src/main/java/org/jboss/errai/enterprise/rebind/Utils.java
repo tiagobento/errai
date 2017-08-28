@@ -39,7 +39,7 @@ public class Utils {
     MetaClass genericExceptionMapperClass = null;
     for (final MetaClass metaClass : providers) {
       if (!metaClass.isAbstract() && metaClass.isAssignableTo(ClientExceptionMapper.class)) {
-        final MapsFrom mapsFrom = metaClass.getAnnotation(MapsFrom.class);
+        final MapsFrom mapsFrom = metaClass.unsafeGetAnnotation(MapsFrom.class);
         if (mapsFrom == null) {
           if (genericExceptionMapperClass == null) {
             // Found a generic client-side exception mapper (to be used for all REST interfaces)

@@ -127,7 +127,7 @@ public class JsTypeAntiInliningExtension implements IOCExtensionConfigurator {
       .flatMap(iface -> stream(iface.getInterfaces()))
       .distinct()
       .filter(iface -> !iface.getFullyQualifiedName().startsWith("java.util"))
-      .filter(iface -> iface.isAnnotationPresent(JsType.class) && !iface.getAnnotation(JsType.class).isNative());
+      .filter(iface -> iface.isAnnotationPresent(JsType.class) && !iface.unsafeGetAnnotation(JsType.class).isNative());
   }
 
 }

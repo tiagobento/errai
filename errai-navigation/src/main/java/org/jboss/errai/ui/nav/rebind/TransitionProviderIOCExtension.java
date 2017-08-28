@@ -132,9 +132,9 @@ public class TransitionProviderIOCExtension implements IOCExtensionConfigurator 
     final Collection<MetaClass> pages = ClassScanner.getTypesAnnotatedWith(Page.class, generatorContext);
     pages
       .stream()
-      .filter(type -> type.getAnnotation(Page.class).role().length > 0)
+      .filter(type -> type.unsafeGetAnnotation(Page.class).role().length > 0)
       .forEach(type -> {
-        final Page anno = type.getAnnotation(Page.class);
+        final Page anno = type.unsafeGetAnnotation(Page.class);
         Arrays
           .stream(anno.role())
           .filter(role -> UniquePageRole.class.isAssignableFrom(role))
@@ -176,7 +176,7 @@ public class TransitionProviderIOCExtension implements IOCExtensionConfigurator 
   }
 
   private Class<? extends UniquePageRole> assertRoleExistsAndIsValid(final InjectionSite injectionSite, final InjectionContext injectionContext) {
-    final Class<? extends UniquePageRole> candidateRole = injectionSite.getAnnotation(TransitionToRole.class).value();
+    final Class<? extends UniquePageRole> candidateRole = injectionSite.unsafeGetAnnotation(TransitionToRole.class).value();
     if (pagesByRole.get(candidateRole).size() == 1) {
       return candidateRole;
     }
@@ -194,7 +194,7 @@ public class TransitionProviderIOCExtension implements IOCExtensionConfigurator 
   }
 
   private Class<?> assertIsPage(final InjectionSite injectionSite) {
-    final Class<?> candidate = injectionSite.getAnnotation(TransitionTo.class).value();
+    final Class<?> candidate = injectionSite.unsafeGetAnnotation(TransitionTo.class).value();
     if (!candidate.isAnnotationPresent(Page.class)) {
       throw new IllegalArgumentException(String.format("They type %s is not a valid value for @%s. A @%s is required.",
               candidate.getName(), TransitionTo.class.getSimpleName(), Page.class.getSimpleName()));

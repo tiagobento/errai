@@ -38,7 +38,7 @@ public class APTParameter extends MetaParameter {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
+  public Annotation[] unsafeGetAnnotations() {
     return APTClassUtil.getAnnotations(parameter);
   }
 

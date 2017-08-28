@@ -221,7 +221,7 @@ public class ValidationRulesTest {
 
     final InjectableProvider transitionToRoleProvider = getTransitionToRoleProvider();
     when(injSite.isAnnotationPresent(org.jboss.errai.ui.nav.client.local.api.TransitionToRole.class)).thenReturn(true);
-    when(injSite.getAnnotation(org.jboss.errai.ui.nav.client.local.api.TransitionToRole.class)).thenReturn(toRoleAnno);
+    when(injSite.unsafeGetAnnotation(org.jboss.errai.ui.nav.client.local.api.TransitionToRole.class)).thenReturn(toRoleAnno);
     when(toRoleAnno.value()).thenReturn((Class) MyUniquePageRole.class);
 
     transitionToRoleProvider.getInjectable(injSite, nameGenerator);
@@ -235,7 +235,7 @@ public class ValidationRulesTest {
 
     final InjectableProvider transitionToRoleProvider = getTransitionToRoleProvider();
     when(injSite.isAnnotationPresent(org.jboss.errai.ui.nav.client.local.api.TransitionToRole.class)).thenReturn(true);
-    when(injSite.getAnnotation(org.jboss.errai.ui.nav.client.local.api.TransitionToRole.class)).thenReturn(toRoleAnno);
+    when(injSite.unsafeGetAnnotation(org.jboss.errai.ui.nav.client.local.api.TransitionToRole.class)).thenReturn(toRoleAnno);
     when(toRoleAnno.value()).thenReturn((Class) MyUniquePageRole.class);
 
     transitionToRoleProvider.getInjectable(injSite, nameGenerator);

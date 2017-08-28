@@ -394,7 +394,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
 
     for (final MetaMethod method : declaringClass.getMethodsAnnotatedWith(EventHandler.class)) {
 
-      final String[] targetDataFieldNames = method.getAnnotation(EventHandler.class).value();
+      final String[] targetDataFieldNames = method.unsafeGetAnnotation(EventHandler.class).value();
 
       validateNonEmptyEventHandlerTargets(declaringClass, method, targetDataFieldNames);
       final MetaClass eventType = assertEventType(declaringClass, method);
@@ -419,11 +419,11 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
           final MetaClass declaringClass, final MetaMethod method, final String[] targetDataFieldNames,
           final MetaClass eventType, final FactoryController controller) {
     final String[] browserEventTypes = Optional
-      .ofNullable(method.getParameters()[0].getAnnotation(ForEvent.class))
+      .ofNullable(method.getParameters()[0].unsafeGetAnnotation(ForEvent.class))
       .map(anno -> anno.value())
       .filter(value -> value.length > 0)
       .orElseGet(() -> Optional
-                        .ofNullable(eventType.getAnnotation(BrowserEvent.class))
+                        .ofNullable(eventType.unsafeGetAnnotation(BrowserEvent.class))
                         .map(anno -> anno.value())
                         .orElseThrow(() ->
                           new GenerationException(
@@ -589,7 +589,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
     int eventsToSink =
         Event.FOCUSEVENTS | Event.GESTUREEVENTS | Event.KEYEVENTS | Event.MOUSEEVENTS | Event.TOUCHEVENTS;
     if (method.isAnnotationPresent(SinkNative.class)) {
-      eventsToSink = method.getAnnotation(SinkNative.class).value();
+      eventsToSink = method.unsafeGetAnnotation(SinkNative.class).value();
     }
 
     for (final String name : targetDataFieldNames) {
@@ -652,9 +652,9 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
         return eventType;
       }
       else if (isAnnotatedBrowserEvent(eventType)) {
-        final BrowserEvent eventTypeAnno = eventType.getAnnotation(BrowserEvent.class);
+        final BrowserEvent eventTypeAnno = eventType.unsafeGetAnnotation(BrowserEvent.class);
         final boolean eventTypeMatchesAll = eventTypeAnno.value().length == 0;
-        final Optional<ForEvent> oParamAnno = Optional.ofNullable(method.getParameters()[0].getAnnotation(ForEvent.class)).filter(anno -> anno.value().length > 0);
+        final Optional<ForEvent> oParamAnno = Optional.ofNullable(method.getParameters()[0].unsafeGetAnnotation(ForEvent.class)).filter(anno -> anno.value().length > 0);
         final boolean parameterDeclaresEvent = oParamAnno.isPresent();
 
         if (eventTypeMatchesAll && parameterDeclaresEvent
@@ -692,7 +692,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
 
   private boolean isNativeJsType(final MetaClass eventType) {
     return Optional
-            .ofNullable(eventType.getAnnotation(JsType.class)).filter(anno -> anno.isNative()).isPresent();
+            .ofNullable(eventType.unsafeGetAnnotation(JsType.class)).filter(anno -> anno.isNative()).isPresent();
   }
 
   private MetaClass getHandlerForEvent(final MetaClass eventType) {
@@ -893,7 +893,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
   }
 
   public static Optional<String> getTemplateStyleSheetPath(final MetaClass type) {
-    final Templated anno = type.getAnnotation(Templated.class);
+    final Templated anno = type.unsafeGetAnnotation(Templated.class);
 
     if (anno.stylesheet().isEmpty()) {
       return Optional.empty();
@@ -944,7 +944,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
     String resource = type.getFullyQualifiedName().replace('.', '/') + ".html";
 
     if (type.isAnnotationPresent(Templated.class)) {
-      final String source = canonicalizeTemplateSourceSyntax(type, type.getAnnotation(Templated.class).value());
+      final String source = canonicalizeTemplateSourceSyntax(type, type.unsafeGetAnnotation(Templated.class).value());
       final Matcher matcher = Pattern.compile("^([^#]+)#?.*$").matcher(source);
       if (matcher.matches()) {
         resource = (matcher.group(1) == null ? resource : matcher.group(1));
@@ -969,7 +969,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
     String resource = type.getFullyQualifiedName().replace('.', '/') + ".html";
 
     if (type.isAnnotationPresent(Templated.class)) {
-      final String source = canonicalizeTemplateSourceSyntax(type, type.getAnnotation(Templated.class).value());
+      final String source = canonicalizeTemplateSourceSyntax(type, type.unsafeGetAnnotation(Templated.class).value());
       final Matcher matcher = Pattern.compile("^([^#]+)#?.*$").matcher(source);
       if (matcher.matches()) {
         resource = (matcher.group(1) == null ? resource : matcher.group(1));
@@ -987,7 +987,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
     String fragment = "";
 
     if (type.isAnnotationPresent(Templated.class)) {
-      final String source = canonicalizeTemplateSourceSyntax(type, type.getAnnotation(Templated.class).value());
+      final String source = canonicalizeTemplateSourceSyntax(type, type.unsafeGetAnnotation(Templated.class).value());
       final Matcher matcher = Pattern.compile("^.*#([^#]+)$").matcher(source);
       if (matcher.matches()) {
         fragment = (matcher.group(1) == null ? fragment : matcher.group(1));

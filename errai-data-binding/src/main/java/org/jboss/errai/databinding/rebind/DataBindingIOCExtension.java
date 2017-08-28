@@ -89,7 +89,7 @@ public class DataBindingIOCExtension implements IOCExtensionConfigurator {
                 }
 
                 @Override
-                public Annotation[] getAnnotations() {
+                public Annotation[] unsafeGetAnnotations() {
                   return new Annotation[] {
                       anno
                   };
@@ -97,7 +97,7 @@ public class DataBindingIOCExtension implements IOCExtensionConfigurator {
 
                 @SuppressWarnings("unchecked")
                 @Override
-                public <A extends Annotation> A getAnnotation(Class<A> annotation) {
+                public <A extends Annotation> A unsafeGetAnnotation(Class<A> annotation) {
                   if (isAnnotationPresent(annotation)) {
                     return (A) anno;
                   }

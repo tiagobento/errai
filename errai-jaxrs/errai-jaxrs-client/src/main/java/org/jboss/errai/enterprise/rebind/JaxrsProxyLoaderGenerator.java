@@ -137,7 +137,7 @@ public class JaxrsProxyLoaderGenerator extends AbstractAsyncGenerator {
 
   @Override
   protected boolean isRelevantClass(final MetaClass clazz) {
-    for (final Annotation anno : clazz.getAnnotations()) {
+    for (final Annotation anno : clazz.unsafeGetAnnotations()) {
       if (anno.annotationType().equals(Path.class) || anno.annotationType().equals(FeatureInterceptor.class)
               || anno.annotationType().equals(InterceptsRemoteCall.class) || anno.annotationType().equals(Provider.class)) {
         return true;

@@ -286,7 +286,7 @@ public final class ClassScanner {
       }
     }
 
-    final Class<?> cls = root.asClass();
+    final Class<?> cls = root.unsafeAsClass();
     if (cls != null && !cls.equals(NullType.class)) {
       for (final Class<?> c : ScannerSingleton.getOrCreateInstance().getSubTypesOf(cls)) {
         if (!c.isAnonymousClass() && !c.isSynthetic()) {

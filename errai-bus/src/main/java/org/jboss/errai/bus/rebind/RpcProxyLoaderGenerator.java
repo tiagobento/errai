@@ -131,7 +131,7 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
 
   @Override
   protected boolean isRelevantClass(final MetaClass clazz) {
-    for (final Annotation annotation : clazz.getAnnotations()) {
+    for (final Annotation annotation : clazz.unsafeGetAnnotations()) {
       if (annotation.annotationType().equals(Remote.class) || annotation.annotationType()
               .equals(FeatureInterceptor.class) || annotation.annotationType().equals(InterceptsRemoteCall.class)) {
         return true;

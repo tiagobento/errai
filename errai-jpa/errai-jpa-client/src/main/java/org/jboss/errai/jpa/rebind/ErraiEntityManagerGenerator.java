@@ -373,7 +373,7 @@ public class ErraiEntityManagerGenerator extends AbstractAsyncGenerator {
       List<MetaClass> listenerClasses = new ArrayList<MetaClass>();
       listenerClasses.addAll(globalEntityListeners);
 
-      EntityListeners entityListeners = entityType.getAnnotation(EntityListeners.class);
+      EntityListeners entityListeners = entityType.unsafeGetAnnotation(EntityListeners.class);
       if (entityListeners != null) {
         for (Class<?> listenerClass : entityListeners.value()) {
           listenerClasses.add(MetaClassFactory.get(listenerClass));

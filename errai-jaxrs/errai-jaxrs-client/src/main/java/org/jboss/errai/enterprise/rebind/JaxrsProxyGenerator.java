@@ -65,7 +65,7 @@ public class JaxrsProxyGenerator {
     this.exceptionMappers = exceptionMappers;
     this.annoFilter = annoFilter;
     this.iocEnabled = iocEnabled;
-    this.rootResourcePath = remote.getAnnotation(Path.class).value();
+    this.rootResourcePath = remote.unsafeGetAnnotation(Path.class).value();
     this.headers = JaxrsHeaders.fromClass(remote);
     this.interceptorProvider = interceptorProvider;
   }

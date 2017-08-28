@@ -65,13 +65,13 @@ class HasNamedAnnotation implements HasAnnotations {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
+  public Annotation[] unsafeGetAnnotations() {
     return new Annotation[] { named };
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A extends Annotation> A getAnnotation(final Class<A> annotation) {
+  public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
     if (isAnnotationPresent(annotation)) {
       return (A) named;
     } else {

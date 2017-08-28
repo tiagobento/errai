@@ -69,8 +69,8 @@ public class InjectionSite implements HasAnnotations {
   }
 
   @Override
-  public Annotation[] getAnnotations() {
-    return annotated.getAnnotations();
+  public Annotation[] unsafeGetAnnotations() {
+    return annotated.unsafeGetAnnotations();
   }
 
   @Override
@@ -79,8 +79,8 @@ public class InjectionSite implements HasAnnotations {
   }
 
   @Override
-  public <A extends Annotation> A getAnnotation(final Class<A> annotation) {
-    return annotated.getAnnotation(annotation);
+  public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
+    return annotated.unsafeGetAnnotation(annotation);
   }
 
   /**

@@ -32,7 +32,7 @@ interface APTMember extends MetaClassMember, HasAnnotations {
   Element getMember();
 
   @Override
-  default Annotation[] getAnnotations() {
+  default Annotation[] unsafeGetAnnotations() {
     return APTClassUtil.getAnnotations(getMember());
   }
 
