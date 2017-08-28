@@ -35,14 +35,20 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
 
   private final RpcProxyLoaderGenerator rpcProxyLoaderGenerator;
 
+  // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public RpcProxyLoaderAptGenerator() {
     this.rpcProxyLoaderGenerator = new RpcProxyLoaderGenerator();
   }
 
   @Override
   public String generate() {
-    final Boolean iocEnabled = true; //FIXME: tiago:
-    return rpcProxyLoaderGenerator.generate(this::getMetaClasses, iocEnabled, this::annotationFilter, null);
+    return rpcProxyLoaderGenerator.generate(this::getMetaClasses, isIOCModuleInherited(), this::annotationFilter, null);
+  }
+
+  private Boolean isIOCModuleInherited() {
+  /* Ideally we would parse GWT Module files to check if the IOC Module is inherited,
+     but just 'true' does the job for now */
+    return true;
   }
 
   private Collection<MetaClass> getMetaClasses(final GeneratorContext context, Class<? extends Annotation> annotation) {
@@ -55,8 +61,10 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
   }
 
   private Annotation[] annotationFilter(final Annotation[] annotations) {
+    /* Ideally we would parse GWT Module files to check which classes are allowed
+       in client code, but this hack does the job for now. */
     return Arrays.stream(annotations)
-            .filter(s -> !s.annotationType().getPackage().getName().contains("server")) //FIXME: tiago:  is that it?
+            .filter(s -> !s.annotationType().getPackage().getName().contains("server"))
             .toArray(Annotation[]::new);
   }
 }

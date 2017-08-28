@@ -71,7 +71,8 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
       System.out.println("Generating files using Errai APT Generators..");
 
       APTClassUtil.init(processingEnv.getTypeUtils(), processingEnv.getElementUtils());
-      ErraiAptExportedTypes.init(processingEnv.getTypeUtils(), processingEnv.getElementUtils(), annotatedElementsFinder);
+      ErraiAptExportedTypes.init(processingEnv.getTypeUtils(), processingEnv.getElementUtils(),
+              annotatedElementsFinder);
 
       findGenerators(processingEnv.getElementUtils()).forEach(this::generateAndSaveSourceFile);
     }
@@ -88,9 +89,10 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   @SuppressWarnings("unchecked")
   private Class<? extends ErraiAptGenerator> loadClass(final Element element) {
     try {
+      // Because generators will always be pre-compiled, it's safe to get their classes using Class.forName
       return (Class<? extends ErraiAptGenerator>) Class.forName(element.asType().toString());
     } catch (final ClassNotFoundException e) {
-      throw new RuntimeException("Class " + element.asType().toString() + " is not an ErraiAptGenerator", e);
+      throw new RuntimeException(element.asType().toString() + " is not an ErraiAptGenerator", e);
     }
   }
 
