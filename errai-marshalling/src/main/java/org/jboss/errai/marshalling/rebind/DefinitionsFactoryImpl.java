@@ -16,23 +16,8 @@
 
 package org.jboss.errai.marshalling.rebind;
 
-import static org.jboss.errai.config.rebind.EnvUtil.getEnvironmentConfig;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.common.client.api.annotations.Portable;
@@ -91,8 +76,22 @@ import org.jboss.errai.marshalling.server.marshallers.ServerClassMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
+
+import static org.jboss.errai.config.rebind.EnvUtil.getEnvironmentConfig;
 
 /**
  * The default implementation of {@link DefinitionsFactory}. This implementation covers the detection and mapping of
@@ -340,7 +339,7 @@ public class DefinitionsFactoryImpl implements DefinitionsFactory {
 
     final List<MetaClass> exposedSuperTypes = exposedClasses
       .stream()
-      .filter(mc -> mc.isAnnotationPresent(Portable.class) && mc.unsafeGetAnnotation(Portable.class).mapSuperTypes())
+      .filter(mc -> mc.unsafeIsAnnotationPresent(Portable.class) && mc.unsafeGetAnnotation(Portable.class).mapSuperTypes())
       .flatMap(mc -> {
         final Builder<MetaClass> builder = Stream.builder();
         MetaClass cur = mc;

@@ -18,6 +18,8 @@ package org.jboss.errai.codegen.meta;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @author Mike Brock <cbrock@redhat.com>
@@ -31,7 +33,11 @@ public interface HasAnnotations {
   @Deprecated
   public Annotation[] unsafeGetAnnotations();
 
-  public default boolean isAnnotationPresent(final Class<? extends Annotation> annotation) {
+  /**
+   * @deprecated This method is not safe to use in APT environment.
+   */
+  @Deprecated
+  default boolean unsafeIsAnnotationPresent(final Class<? extends Annotation> annotation) {
     return unsafeGetAnnotation(annotation) != null;
   }
 
@@ -46,5 +52,19 @@ public interface HasAnnotations {
             .filter(a -> a.annotationType().equals(annotation))
             .findFirst()
             .orElse(null);
+  }
+
+  ///
+
+  default Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    throw new UnsupportedOperationException("getAnnotation(Class<? extends Annotation) is not implemented");
+  }
+
+  default boolean isAnnotationPresent(final MetaClass metaClass) {
+    throw new UnsupportedOperationException("isAnnotationPresent(MetaClass) is not implemented");
+  }
+
+  default Collection<MetaAnnotation> getAnnotations() {
+    throw new UnsupportedOperationException("getAnnotations() is not implemented");
   }
 }

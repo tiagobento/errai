@@ -16,10 +16,10 @@
 
 package org.jboss.errai.codegen.meta;
 
+import org.jboss.errai.codegen.util.GenUtil;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-
-import org.jboss.errai.codegen.util.GenUtil;
 
 public abstract class MetaField extends AbstractHasAnnotations implements MetaClassMember {
 
@@ -234,7 +234,7 @@ public abstract class MetaField extends AbstractHasAnnotations implements MetaCl
     }
 
     @Override
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
+    public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
       return false;
     }
 

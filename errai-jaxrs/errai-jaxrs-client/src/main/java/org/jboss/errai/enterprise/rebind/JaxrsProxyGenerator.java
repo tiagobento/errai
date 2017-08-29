@@ -16,12 +16,7 @@
 
 package org.jboss.errai.enterprise.rebind;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.function.Function;
-
-import javax.ws.rs.Path;
-
+import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.Parameter;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.Variable;
@@ -31,14 +26,17 @@ import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.util.EmptyStatement;
+import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.ProxyUtil;
-import org.jboss.errai.codegen.util.ProxyUtil.InterceptorProvider;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.AbstractJaxrsProxy;
 
-import com.google.common.collect.Multimap;
+import javax.ws.rs.Path;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * Generates a JAX-RS remote proxy.

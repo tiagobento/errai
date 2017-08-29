@@ -145,7 +145,7 @@ public class NavigationGraphGenerator extends AbstractAsyncGenerator {
         if (!(pageClass.isAssignableTo(IsWidget.class)
                 || pageClass.isAssignableTo(IsElement.class)
                 || pageClass.isAssignableTo(org.jboss.errai.common.client.api.elemental2.IsElement.class)
-                || pageClass.isAnnotationPresent(Templated.class))) {
+                || pageClass.unsafeIsAnnotationPresent(Templated.class))) {
           throw new GenerationException("Class " + pageClass.getFullyQualifiedName()
                   + " is annotated with @Page, so it must implement IsWidget or be @Templated");
         }
@@ -757,6 +757,6 @@ public class NavigationGraphGenerator extends AbstractAsyncGenerator {
 
   @Override
   protected boolean isRelevantClass(MetaClass clazz) {
-    return clazz.isAnnotationPresent(Page.class);
+    return clazz.unsafeIsAnnotationPresent(Page.class);
   }
 }

@@ -16,16 +16,18 @@
 
 package org.jboss.errai.common.apt.metaclass;
 
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
-
-import java.lang.annotation.Annotation;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.VariableElement;
-
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaField;
 import org.jboss.errai.codegen.meta.MetaType;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.VariableElement;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Optional;
+
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
 
 /**
  *
@@ -62,5 +64,15 @@ public class APTField extends MetaField implements APTMember {
   @Override
   public Annotation[] unsafeGetAnnotations() {
     return APTMember.super.unsafeGetAnnotations();
+  }
+
+  @Override
+  public Collection<MetaAnnotation> getAnnotations() {
+    return APTMember.super.getAnnotations();
+  }
+
+  @Override
+  public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    return APTMember.super.getAnnotation(annotationClass);
   }
 }

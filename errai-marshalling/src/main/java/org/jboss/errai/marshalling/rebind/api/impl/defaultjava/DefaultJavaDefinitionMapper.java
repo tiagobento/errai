@@ -176,7 +176,7 @@ public class DefaultJavaDefinitionMapper {
     }
 
     for (final MetaMethod method : toMap.getDeclaredMethods()) {
-      if (method.isAnnotationPresent(Key.class)) {
+      if (method.unsafeIsAnnotationPresent(Key.class)) {
         final String key = method.unsafeGetAnnotation(Key.class).value();
 
         if (method.getParameters().length == 0) {

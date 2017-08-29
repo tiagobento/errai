@@ -16,17 +16,18 @@
 
 package org.jboss.errai.common.apt.metaclass;
 
-import java.lang.annotation.Annotation;
-
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
-
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 import org.jboss.errai.codegen.meta.MetaParameter;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Optional;
+
 /**
- *
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public class APTParameter extends MetaParameter {
@@ -39,7 +40,7 @@ public class APTParameter extends MetaParameter {
 
   @Override
   public Annotation[] unsafeGetAnnotations() {
-    return APTClassUtil.getAnnotations(parameter);
+    return APTClassUtil.unsafeGetAnnotations(parameter);
   }
 
   @Override
@@ -57,4 +58,18 @@ public class APTParameter extends MetaParameter {
     return new APTMethod((ExecutableElement) parameter.getEnclosingElement());
   }
 
+  @Override
+  public Collection<MetaAnnotation> getAnnotations() {
+    return APTClassUtil.getAnnotations(parameter);
+  }
+
+  @Override
+  public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    return APTClassUtil.getAnnotation(parameter, annotationClass);
+  }
+
+  @Override
+  public boolean isAnnotationPresent(final MetaClass metaClass) {
+    return APTClassUtil.isAnnotationPresent(parameter, metaClass);
+  }
 }

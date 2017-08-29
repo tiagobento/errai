@@ -23,18 +23,18 @@ import java.util.List;
 /**
  * This class is used internally (in generated code for remote call interceptors) to store status information about an
  * interceptor's call context.
- * 
+ *
  * @author Christian Sadilek <csadilek@redhat.com>
  */
 public class CallContextStatus {
   private boolean proceeding = false;
   private boolean interceptorChainStarted = false;
-  private final List<Class<?>> interceptors;
-  
-  public CallContextStatus(final Class<?>... interceptors) {
-    this.interceptors = new ArrayList<Class<?>>(Arrays.asList(interceptors));
+  private final List<String> interceptors;
+
+  public CallContextStatus(final String... interceptorsCanonicalNames) {
+    this.interceptors = new ArrayList<>(Arrays.asList(interceptorsCanonicalNames));
   }
-    
+
   public void proceed() {
     this.proceeding = true;
     if (!interceptors.isEmpty()) {
@@ -50,12 +50,12 @@ public class CallContextStatus {
   public void setProceeding(final boolean proceeding) {
     this.proceeding = proceeding;
   }
-  
+
   public boolean isProceeding() {
     return proceeding;
   }
-  
-  public Class<?> getNextInterceptor() {
+
+  public String getNextInterceptor() {
     if (!interceptors.isEmpty()) {
       return interceptors.get(0);
     }

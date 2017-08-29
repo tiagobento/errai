@@ -139,7 +139,7 @@ public class Parameter extends AbstractStatement {
       }
 
       @Override
-      public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
+      public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
         return false;
       }
 

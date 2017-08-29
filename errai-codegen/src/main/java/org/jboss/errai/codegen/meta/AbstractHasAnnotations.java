@@ -16,11 +16,11 @@
 
 package org.jboss.errai.codegen.meta;
 
+import org.jboss.errai.common.client.api.Assert;
+
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.jboss.errai.common.client.api.Assert;
 
 /**
  * Contains shared functionality by all implementations of
@@ -41,7 +41,7 @@ public abstract class AbstractHasAnnotations implements HasAnnotations {
    * @return true if annotation is present, otherwise false.
    */
   @Override
-  public boolean isAnnotationPresent(final Class<? extends Annotation> annotation) {
+  public boolean unsafeIsAnnotationPresent(final Class<? extends Annotation> annotation) {
     Assert.notNull(annotation);
     if (annotationPresentCache == null) {
       annotationPresentCache = new HashSet<String>();

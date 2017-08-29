@@ -17,6 +17,7 @@
 package org.jboss.errai.common.apt.metaclass;
 
 import org.jboss.errai.codegen.meta.HasAnnotations;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 
@@ -24,6 +25,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @author Max Barkley <mbarkley@redhat.com>
@@ -33,7 +36,7 @@ interface APTMember extends MetaClassMember, HasAnnotations {
 
   @Override
   default Annotation[] unsafeGetAnnotations() {
-    return APTClassUtil.getAnnotations(getMember());
+    return APTClassUtil.unsafeGetAnnotations(getMember());
   }
 
   @Override
@@ -100,5 +103,20 @@ interface APTMember extends MetaClassMember, HasAnnotations {
   @Override
   default boolean isSynchronized() {
     return getMember().getModifiers().contains(Modifier.SYNCHRONIZED);
+  }
+
+  @Override
+  default Collection<MetaAnnotation> getAnnotations() {
+    return APTClassUtil.getAnnotations(getMember());
+  }
+
+  @Override
+  default Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    return APTClassUtil.getAnnotation(getMember(), annotationClass);
+  }
+
+  @Override
+  default boolean isAnnotationPresent(final MetaClass metaClass) {
+    return APTClassUtil.isAnnotationPresent(getMember(), metaClass);
   }
 }

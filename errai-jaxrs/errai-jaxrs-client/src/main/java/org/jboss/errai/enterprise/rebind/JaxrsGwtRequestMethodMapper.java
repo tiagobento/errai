@@ -16,9 +16,10 @@
 
 package org.jboss.errai.enterprise.rebind;
 
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gwt.http.client.RequestBuilder;
+import org.jboss.errai.codegen.Statement;
+import org.jboss.errai.codegen.meta.MetaMethod;
+import org.jboss.errai.codegen.util.Stmt;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,12 +27,9 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
-
-import org.jboss.errai.codegen.Statement;
-import org.jboss.errai.codegen.meta.MetaMethod;
-import org.jboss.errai.codegen.util.Stmt;
-
-import com.google.gwt.http.client.RequestBuilder;
+import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility to map a JAX-RS {@link HttpMethod} to the corresponding GWT RequestBuilder method.
@@ -62,7 +60,7 @@ public class JaxrsGwtRequestMethodMapper {
   public static Statement fromMethod(MetaMethod method) {
     Statement gwtRequestMethod = null;
     for (Class<? extends Annotation> jaxrsMethod : METHOD_MAP.keySet()) {
-      if (method.isAnnotationPresent(jaxrsMethod)) {
+      if (method.unsafeIsAnnotationPresent(jaxrsMethod)) {
         gwtRequestMethod = METHOD_MAP.get(jaxrsMethod);
         break;
       }

@@ -16,6 +16,7 @@
 
 package org.jboss.errai.common.apt.metaclass;
 
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaConstructor;
 import org.jboss.errai.codegen.meta.MetaField;
@@ -39,9 +40,12 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
+import static java.util.Collections.emptySet;
 import static org.jboss.errai.common.apt.metaclass.APTClassUtil.elements;
 import static org.jboss.errai.common.apt.metaclass.APTClassUtil.getSimpleName;
 import static org.jboss.errai.common.apt.metaclass.APTClassUtil.sameTypes;
@@ -108,7 +112,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case DECLARED:
     case TYPEVAR:
       final Element element = types.asElement(mirror);
-      return APTClassUtil.getAnnotations(element);
+      return APTClassUtil.unsafeGetAnnotations(element);
     case ARRAY:
     case BOOLEAN:
     case BYTE:
@@ -123,6 +127,11 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     default:
       return throwUnsupportedTypeError(mirror);
     }
+  }
+
+  @Override
+  public <A extends Annotation> A unsafeGetAnnotation(Class<A> annotation) {
+    return getEnclosedMetaObject().getAnnotation(annotation);
   }
 
   @Override
@@ -793,4 +802,38 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
       return super.unsafeAsClass();
     }
   }
+
+  @Override
+  public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    return APTClassUtil.getAnnotation(getEnclosedMetaObject(), annotationClass);
+  }
+
+  @Override
+  public boolean isAnnotationPresent(final MetaClass metaClass) {
+    return APTClassUtil.isAnnotationPresent(types.asElement(getEnclosedMetaObject()), metaClass);
+  }
+
+  @Override
+  public Collection<MetaAnnotation> getAnnotations() {
+    final TypeMirror mirror = getEnclosedMetaObject();
+    switch (mirror.getKind()) {
+    case DECLARED:
+    case TYPEVAR:
+      return APTClassUtil.getAnnotations(mirror);
+    case ARRAY:
+    case BOOLEAN:
+    case BYTE:
+    case CHAR:
+    case DOUBLE:
+    case FLOAT:
+    case INT:
+    case LONG:
+    case SHORT:
+      return emptySet();
+    case VOID:
+    default:
+      return throwUnsupportedTypeError(mirror);
+    }
+  }
+
 }

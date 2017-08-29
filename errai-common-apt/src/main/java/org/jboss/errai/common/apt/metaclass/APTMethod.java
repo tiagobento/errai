@@ -16,16 +16,20 @@
 
 package org.jboss.errai.common.apt.metaclass;
 
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Optional;
+
+import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
 
 /**
  *
@@ -74,10 +78,23 @@ public class APTMethod extends MetaMethod implements APTMember {
     return method.isVarArgs();
   }
 
-
   @Override
   public Element getMember() {
     return method;
   }
 
+  @Override
+  public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    return APTClassUtil.getAnnotation(method, annotationClass);
+  }
+
+  @Override
+  public Collection<MetaAnnotation> getAnnotations() {
+    return APTClassUtil.getAnnotations(method);
+  }
+
+  @Override
+  public boolean isAnnotationPresent(final MetaClass metaClass) {
+    return APTClassUtil.isAnnotationPresent(method, metaClass);
+  }
 }

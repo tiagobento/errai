@@ -16,12 +16,6 @@
 
 package org.jboss.errai.codegen.meta.impl.build;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.jboss.errai.codegen.BlockStatement;
 import org.jboss.errai.codegen.Comment;
 import org.jboss.errai.codegen.Context;
@@ -41,6 +35,12 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Mike Brock <cbrock@redhat.com>
@@ -139,7 +139,7 @@ public class BuildMetaMethod extends MetaMethod implements Builder {
           }
 
           @Override
-          public boolean isAnnotationPresent(final Class<? extends Annotation> annotation) {
+          public boolean unsafeIsAnnotationPresent(final Class<? extends Annotation> annotation) {
             return false;
           }
 

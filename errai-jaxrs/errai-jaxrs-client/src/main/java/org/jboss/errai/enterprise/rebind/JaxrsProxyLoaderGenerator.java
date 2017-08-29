@@ -16,14 +16,10 @@
 
 package org.jboss.errai.enterprise.rebind;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Set;
-import java.util.function.Function;
-
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
-
+import com.google.common.collect.Multimap;
+import com.google.gwt.core.ext.GeneratorContext;
+import com.google.gwt.core.ext.TreeLogger;
+import com.google.gwt.core.ext.UnableToCompleteException;
 import org.jboss.errai.codegen.InnerClass;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
@@ -31,7 +27,7 @@ import org.jboss.errai.codegen.builder.MethodBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.util.ProxyUtil.InterceptorProvider;
+import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.ProxyUtil;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.interceptor.FeatureInterceptor;
@@ -45,10 +41,12 @@ import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.enterprise.client.jaxrs.JaxrsProxyLoader;
 import org.jboss.errai.enterprise.shared.api.annotations.MapsFrom;
 
-import com.google.common.collect.Multimap;
-import com.google.gwt.core.ext.GeneratorContext;
-import com.google.gwt.core.ext.TreeLogger;
-import com.google.gwt.core.ext.UnableToCompleteException;
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Generates the JAX-RS proxy loader.

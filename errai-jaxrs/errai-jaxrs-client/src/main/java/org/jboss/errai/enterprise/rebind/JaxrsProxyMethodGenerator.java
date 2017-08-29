@@ -16,21 +16,9 @@
 
 package org.jboss.errai.enterprise.rebind;
 
-import static org.jboss.errai.codegen.util.Stmt.if_;
-import static org.jboss.errai.codegen.util.Stmt.load;
-import static org.jboss.errai.codegen.util.Stmt.loadVariable;
-import static org.jboss.errai.codegen.util.Stmt.nestedCall;
-import static org.jboss.errai.enterprise.rebind.TypeMarshaller.demarshal;
-import static org.jboss.errai.enterprise.rebind.TypeMarshaller.marshal;
-
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-
-import javax.ws.rs.QueryParam;
-
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import org.jboss.errai.codegen.BlockStatement;
 import org.jboss.errai.codegen.BooleanOperator;
 import org.jboss.errai.codegen.DefParameters;
@@ -49,8 +37,8 @@ import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
+import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.ProxyUtil;
-import org.jboss.errai.codegen.util.ProxyUtil.InterceptorProvider;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.framework.CallContextStatus;
 import org.jboss.errai.enterprise.client.jaxrs.ResponseDemarshallingCallback;
@@ -58,9 +46,19 @@ import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
 import org.jboss.errai.enterprise.client.jaxrs.api.interceptor.RestCallContext;
 import org.jboss.errai.enterprise.rebind.TypeMarshaller.PrimitiveTypeMarshaller;
 
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
+import javax.ws.rs.QueryParam;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+
+import static org.jboss.errai.codegen.util.Stmt.if_;
+import static org.jboss.errai.codegen.util.Stmt.load;
+import static org.jboss.errai.codegen.util.Stmt.loadVariable;
+import static org.jboss.errai.codegen.util.Stmt.nestedCall;
+import static org.jboss.errai.enterprise.rebind.TypeMarshaller.demarshal;
+import static org.jboss.errai.enterprise.rebind.TypeMarshaller.marshal;
 
 /**
  * Generates a JAX-RS remote proxy method.
@@ -111,7 +109,7 @@ public class JaxrsProxyMethodGenerator {
       methodBlock.append(generateRequestBuilder());
       methodBlock.append(generateHeaders(jaxrsParams));
 
-      final List<Class<?>> interceptors = interceptorProvider.getInterceptors(remote, resourceMethod.getMethod());
+      final List<MetaClass> interceptors = interceptorProvider.getInterceptors(remote, resourceMethod.getMethod());
       if (!interceptors.isEmpty()) {
         methodBlock.append(generateInterceptorLogic(interceptors));
       }
@@ -316,7 +314,7 @@ public class JaxrsProxyMethodGenerator {
    * @param interceptors
    * @return statement representing the interceptor logic.
    */
-  private Statement generateInterceptorLogic(final List<Class<?>> interceptors) {
+  private Statement generateInterceptorLogic(final List<MetaClass> interceptors) {
     final JaxrsResourceMethodParameters jaxrsParams =
         JaxrsResourceMethodParameters.fromMethod(resourceMethod.getMethod(), "parameters");
     final Statement callContext =
@@ -334,7 +332,8 @@ public class JaxrsProxyMethodGenerator {
     return Stmt.try_()
             .append(
                 Stmt.declareVariable(CallContextStatus.class).asFinal().named("status").initializeWith(
-                    Stmt.newObject(CallContextStatus.class).withParameters(interceptors.toArray())))
+                    Stmt.newObject(CallContextStatus.class).withParameters(interceptors.stream().map(
+                            MetaClass::getCanonicalName).toArray()))) //FIXME: tiago: check if works
             .append(
                 Stmt.declareVariable(RestCallContext.class).asFinal().named("callContext")
                     .initializeWith(callContext))

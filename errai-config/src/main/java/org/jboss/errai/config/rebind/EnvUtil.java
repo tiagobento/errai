@@ -384,7 +384,7 @@ public abstract class EnvUtil {
   }
 
   private static boolean isUserPortableType(final MetaClass mc) {
-    return mc.isAnnotationPresent(Portable.class) || getEnvironmentConfig().getExposedClasses().contains(mc)
+    return mc.unsafeIsAnnotationPresent(Portable.class) || getEnvironmentConfig().getExposedClasses().contains(mc)
         || getEnvironmentConfig().getPortableSuperTypes().contains(mc);
   }
 
@@ -401,7 +401,7 @@ public abstract class EnvUtil {
   }
 
   public static boolean isLocalEventType(final MetaClass cls) {
-    return cls.isAnnotationPresent(LocalEvent.class);
+    return cls.unsafeIsAnnotationPresent(LocalEvent.class);
   }
 
   public static Set<Class<?>> getAllPortableConcreteSubtypes(final Class<?> clazz) {
