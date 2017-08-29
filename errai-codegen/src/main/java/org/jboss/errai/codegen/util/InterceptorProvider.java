@@ -38,7 +38,6 @@ public class InterceptorProvider {
 
   // Maps a feature interceptor annotation (i.e. RequiredRoles, RestrictAccess) to a list of
   // interceptors that should be triggered when this annotation is present.
-  //FIXME: tiago: When representing classes as parameters to an annotation, javac uses ClassType instead of AnnotationMirror
   private final Multimap<MetaClass, MetaClass> featureInterceptors = ArrayListMultimap.create();
 
   // Maps a remote interface type to a list of interceptors that should be triggered for all
@@ -50,19 +49,19 @@ public class InterceptorProvider {
           final Collection<? extends MetaClass> standaloneInterceptors) {
 
     for (final MetaClass interceptorClass : standaloneInterceptors) {
-      final List<MetaClass> metaClasses = interceptorClass.getAnnotation(InterceptsRemoteCall.class)
+      interceptorClass.getAnnotation(InterceptsRemoteCall.class)
               .map(MetaAnnotation::value)
-              .map(value -> (List<MetaClass>) value) //Arrays are converted to List
-              .orElse(Collections.emptyList());
-      metaClasses.forEach(e -> this.standaloneInterceptors.put(e, interceptorClass));
+              .map(value -> (List<MetaClass>) value) //Arrays are converted to Lists
+              .orElse(Collections.emptyList())
+              .forEach(e -> this.standaloneInterceptors.put(e, interceptorClass));
     }
 
     for (final MetaClass featureInterceptor : featureInterceptors) {
-      final List<MetaClass> metaClasses = featureInterceptor.getAnnotation(FeatureInterceptor.class)
+      featureInterceptor.getAnnotation(FeatureInterceptor.class)
               .map(MetaAnnotation::value)
-              .map(value -> (List<MetaClass>) value) //Arrays are converted to List
-              .orElse(Collections.emptyList());
-      metaClasses.forEach(e -> this.featureInterceptors.put(e, featureInterceptor));
+              .map(value -> (List<MetaClass>) value) //Arrays are converted to Lists
+              .orElse(Collections.emptyList())
+              .forEach(e -> this.featureInterceptors.put(e, featureInterceptor));
     }
   }
 
@@ -86,8 +85,7 @@ public class InterceptorProvider {
     if (!interceptedCall.isPresent()) {
       interceptors.addAll(standaloneInterceptors.get(type));
     } else {
-      final List<MetaClass> value = (List<MetaClass>) interceptedCall.get().value(); //Arrays are converted to List
-      interceptors.addAll(value);
+      interceptors.addAll((List<MetaClass>) interceptedCall.get().value()); //Arrays are converted to Lists
     }
 
     for (final MetaClass annotation : featureInterceptors.keySet()) {
