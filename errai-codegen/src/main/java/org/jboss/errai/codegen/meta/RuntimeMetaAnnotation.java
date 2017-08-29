@@ -17,6 +17,8 @@
 package org.jboss.errai.codegen.meta;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -25,16 +27,27 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
 
   private final Annotation annotation;
 
-  public RuntimeMetaAnnotation(final Annotation annotation) {
+  RuntimeMetaAnnotation(final Annotation annotation) {
     this.annotation = annotation;
   }
 
   @Override
   public Object value(final String attributeName) {
     try {
-      return annotation.getClass().getMethod(attributeName).invoke(annotation);
+      final Object value = annotation.getClass().getMethod(attributeName).invoke(annotation);
+      return convertValue(value);
     } catch (Exception e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private Object convertValue(final Object value) {
+    if (value instanceof Class[]) {
+      return Arrays.stream((Class[]) value).map(MetaClassFactory::get).collect(Collectors.toList());
+    } else if (value instanceof Object[]) {
+      return Arrays.asList((Object[]) value);
+    } else {
+      return value;
     }
   }
 }

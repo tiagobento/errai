@@ -45,13 +45,14 @@ public class InterceptorProvider {
   // methods of this type.
   private final Multimap<MetaClass, MetaClass> standaloneInterceptors = ArrayListMultimap.create();
 
+  @SuppressWarnings("unchecked")
   public InterceptorProvider(final Collection<? extends MetaClass> featureInterceptors,
           final Collection<? extends MetaClass> standaloneInterceptors) {
 
     for (final MetaClass interceptorClass : standaloneInterceptors) {
       final List<MetaClass> metaClasses = interceptorClass.getAnnotation(InterceptsRemoteCall.class)
               .map(MetaAnnotation::value)
-              .map(value -> (List<MetaClass>) value)
+              .map(value -> (List<MetaClass>) value) //Arrays are converted to List
               .orElse(Collections.emptyList());
       metaClasses.forEach(e -> this.standaloneInterceptors.put(e, interceptorClass));
     }
@@ -59,7 +60,7 @@ public class InterceptorProvider {
     for (final MetaClass featureInterceptor : featureInterceptors) {
       final List<MetaClass> metaClasses = featureInterceptor.getAnnotation(FeatureInterceptor.class)
               .map(MetaAnnotation::value)
-              .map(value -> (List<MetaClass>) value)
+              .map(value -> (List<MetaClass>) value) //Arrays are converted to List
               .orElse(Collections.emptyList());
       metaClasses.forEach(e -> this.featureInterceptors.put(e, featureInterceptor));
     }
@@ -73,6 +74,7 @@ public class InterceptorProvider {
    * @return the list of interceptors that should be triggered when invoking the provided proxy
    * method on the provided type, never null.
    */
+  @SuppressWarnings("unchecked")
   public List<MetaClass> getInterceptors(final MetaClass type, final MetaMethod method) {
     final List<MetaClass> interceptors = new ArrayList<>();
 
@@ -84,7 +86,7 @@ public class InterceptorProvider {
     if (!interceptedCall.isPresent()) {
       interceptors.addAll(standaloneInterceptors.get(type));
     } else {
-      final List<MetaClass> value = (List<MetaClass>) interceptedCall.get().value();
+      final List<MetaClass> value = (List<MetaClass>) interceptedCall.get().value(); //Arrays are converted to List
       interceptors.addAll(value);
     }
 
