@@ -19,8 +19,13 @@ package org.jboss.errai.codegen.meta;
 import org.jboss.errai.common.client.api.Assert;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Contains shared functionality by all implementations of
@@ -28,7 +33,7 @@ import java.util.Set;
  * 
  * @author Christian Sadilek<csadilek@redhat.com>
  */
-public abstract class AbstractHasAnnotations implements HasAnnotations {
+public abstract class AbstractHasAnnotations implements HasAnnotations, HasMetaAnnotations {
 
   private Set<String> annotationPresentCache = null;
 
@@ -51,5 +56,20 @@ public abstract class AbstractHasAnnotations implements HasAnnotations {
     }
 
     return annotationPresentCache.contains(annotation.getName());
+  }
+
+  @Override
+  public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
+    return Optional.ofNullable(unsafeGetAnnotation(annotationClass)).map(RuntimeMetaAnnotation::new);
+  }
+
+  @Override
+  public boolean isAnnotationPresent(final MetaClass metaClass) {
+    return unsafeIsAnnotationPresent((Class<? extends Annotation>) metaClass.unsafeAsClass());
+  }
+
+  @Override
+  public Collection<MetaAnnotation> getAnnotations() {
+    return Arrays.stream(unsafeGetAnnotations()).map(RuntimeMetaAnnotation::new).collect(toList());
   }
 }

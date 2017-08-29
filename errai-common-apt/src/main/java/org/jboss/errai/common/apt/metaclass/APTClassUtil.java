@@ -325,6 +325,7 @@ public final class APTClassUtil {
   public static Optional<MetaAnnotation> getAnnotation(final Element element,
           final Class<? extends Annotation> annotationClass) {
 
+    //FIXME: tiago: comparing strings
     final TypeMirror annotationTypeMirror = ReflectionTypes.getInstance().typeElement(annotationClass).asType();
     return element.getAnnotationMirrors()
             .stream()
@@ -339,6 +340,8 @@ public final class APTClassUtil {
   }
 
   public static boolean isAnnotationPresent(final Element element, final MetaClass metaClass) {
+
+    //FIXME: tiago: comparing strings
     return element.getAnnotationMirrors()
             .stream()
             .map(annotationMirror -> annotationMirror.getAnnotationType().toString())

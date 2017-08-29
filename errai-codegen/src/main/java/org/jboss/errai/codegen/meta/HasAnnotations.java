@@ -46,25 +46,11 @@ public interface HasAnnotations {
    */
   @Deprecated
   @SuppressWarnings("unchecked")
-  public default <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
+  default <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
     // Please no hate or else null.
     return (A) Arrays.stream(unsafeGetAnnotations())
             .filter(a -> a.annotationType().equals(annotation))
             .findFirst()
             .orElse(null);
-  }
-
-  ///
-
-  default Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
-    throw new UnsupportedOperationException("getAnnotation(Class<? extends Annotation) is not implemented");
-  }
-
-  default boolean isAnnotationPresent(final MetaClass metaClass) {
-    throw new UnsupportedOperationException("isAnnotationPresent(MetaClass) is not implemented");
-  }
-
-  default Collection<MetaAnnotation> getAnnotations() {
-    throw new UnsupportedOperationException("getAnnotations() is not implemented");
   }
 }
