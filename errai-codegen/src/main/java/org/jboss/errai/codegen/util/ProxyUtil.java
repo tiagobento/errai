@@ -26,6 +26,7 @@ import org.jboss.errai.codegen.Variable;
 import org.jboss.errai.codegen.builder.AnonymousClassStructureBuilder;
 import org.jboss.errai.codegen.builder.ElseBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.BooleanExpressionBuilder;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
@@ -39,13 +40,10 @@ import org.jboss.errai.common.client.util.CreationalCallback;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Singleton;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Utilities to avoid redundant code for proxy generation.
@@ -80,6 +78,8 @@ public abstract class ProxyUtil {
           final AnnotationFilter annotationFilter,
           final boolean iocEnabled) {
 
+    final MetaAnnotation[] filteredAnnotations = annotationFilter.filter(method.getAnnotations()).toArray(new MetaAnnotation[0]);
+
     return Stmt.newObject(callContextType)
             .extend()
             .publicOverridesMethod("getMethodName")
@@ -89,10 +89,10 @@ public abstract class ProxyUtil {
             .append(Stmt.load(method.getReturnType()).returnValue())
             .finish()
             .publicOverridesMethod("getAnnotations")
-            .append(Stmt.load(annotationFilter.apply(method.unsafeGetAnnotations())).returnValue())
+            .append(Stmt.load(filteredAnnotations).returnValue())
             .finish()
             .publicOverridesMethod("getTypeAnnotations")
-            .append(Stmt.load(annotationFilter.apply(method.unsafeGetAnnotations())).returnValue())
+            .append(Stmt.load(filteredAnnotations).returnValue())
             .finish()
             .publicOverridesMethod("proceed")
             .append(generateInterceptorStackProceedMethod(callContextType, proceed, interceptors, iocEnabled))
@@ -225,8 +225,7 @@ public abstract class ProxyUtil {
    */
   private static boolean isManagedBean(final MetaClass interceptor) {
     return interceptor.getAnnotation(ApplicationScoped.class) != null
-            || interceptor.getAnnotation(Singleton.class) != null
-            || interceptor.getAnnotation(Dependent.class) != null;
+            || interceptor.getAnnotation(Singleton.class) != null || interceptor.getAnnotation(Dependent.class) != null;
   }
 
   public static boolean shouldProxyMethod(final MetaMethod method) {

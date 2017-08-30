@@ -26,8 +26,8 @@ import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
 import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,19 +49,15 @@ public class InterceptorProvider {
           final Collection<? extends MetaClass> standaloneInterceptors) {
 
     for (final MetaClass interceptorClass : standaloneInterceptors) {
-      interceptorClass.getAnnotation(InterceptsRemoteCall.class)
-              .map(MetaAnnotation::value)
-              .map(value -> (List<MetaClass>) value) //Arrays are converted to Lists
-              .orElse(Collections.emptyList())
-              .forEach(e -> this.standaloneInterceptors.put(e, interceptorClass));
+      Arrays.stream(interceptorClass.getAnnotation(InterceptsRemoteCall.class)
+              .map(metaAnnotation -> metaAnnotation.valueAsArray(MetaClass[].class))
+              .orElse(new MetaClass[] {})).forEach(e -> this.standaloneInterceptors.put(e, interceptorClass));
     }
 
     for (final MetaClass featureInterceptor : featureInterceptors) {
-      featureInterceptor.getAnnotation(FeatureInterceptor.class)
-              .map(MetaAnnotation::value)
-              .map(value -> (List<MetaClass>) value) //Arrays are converted to Lists
-              .orElse(Collections.emptyList())
-              .forEach(e -> this.featureInterceptors.put(e, featureInterceptor));
+      Arrays.stream(featureInterceptor.getAnnotation(FeatureInterceptor.class)
+              .map(metaAnnotation -> metaAnnotation.valueAsArray(MetaClass[].class))
+              .orElse(new MetaClass[] {})).forEach(e -> this.featureInterceptors.put(e, featureInterceptor));
     }
   }
 
@@ -85,7 +81,8 @@ public class InterceptorProvider {
     if (!interceptedCall.isPresent()) {
       interceptors.addAll(standaloneInterceptors.get(type));
     } else {
-      interceptors.addAll((List<MetaClass>) interceptedCall.get().value()); //Arrays are converted to Lists
+      final MetaClass[] value = interceptedCall.get().valueAsArray(MetaClass[].class);
+      interceptors.addAll(Arrays.asList(value));
     }
 
     for (final MetaClass annotation : featureInterceptors.keySet()) {

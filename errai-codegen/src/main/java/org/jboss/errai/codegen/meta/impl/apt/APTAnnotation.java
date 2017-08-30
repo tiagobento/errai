@@ -31,7 +31,6 @@ import javax.lang.model.type.TypeMirror;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
@@ -55,8 +54,9 @@ public class APTAnnotation extends MetaAnnotation {
   }
 
   @Override
-  public Object value(final String attributeName) {
-    return convertValue(values.get(attributeName));
+  @SuppressWarnings("unchecked")
+  public <V> V valueAsArray(final String attributeName, final Class<V> arrayTypeHint) {
+    return (V) convertValue(values.get(attributeName), arrayTypeHint);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class APTAnnotation extends MetaAnnotation {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private static Object convertValue(final Object value) {
+  private static Object convertValue(final Object value, final Class<?> arrayTypeHint) {
     if (value == null) {
       return null;
     } else if (value instanceof String) {
@@ -79,7 +79,7 @@ public class APTAnnotation extends MetaAnnotation {
     } else if (value instanceof AnnotationMirror) {
       return new APTAnnotation((AnnotationMirror) value);
     } else if (value instanceof List) {
-      return convertToArrayValue(value);
+      return convertToArrayValue(value, arrayTypeHint);
     } else if (ClassUtils.isPrimitiveWrapper(value.getClass())) {
       return value;
     } else {
@@ -88,13 +88,13 @@ public class APTAnnotation extends MetaAnnotation {
     }
   }
 
-  private static List<?> convertToArrayValue(final Object value) {
-    final List<?> list = (List<?>) value;
-    return list.stream()
+  private static Object convertToArrayValue(final Object value, final Class<?> arrayTypeHint) {
+    return ((List<?>) value).stream()
             .map(av -> ((AnnotationValue) av).getValue())
-            .map(APTAnnotation::convertValue)
-            .collect(Collectors.toList());
+            .map(v -> convertValue(v, null))
+            .toArray(n -> (Object[]) Array.newInstance(arrayTypeHint.getComponentType(), n));
   }
+
   @Deprecated
   private static Class<?> unsafeLoadClass(final TypeMirror value) {
     switch (value.getKind()) {
@@ -143,5 +143,9 @@ public class APTAnnotation extends MetaAnnotation {
 
   public AnnotationMirror annotationMirror() {
     return annotationMirror;
+  }
+
+  public Map<String, Object> getValues() {
+    return values;
   }
 }

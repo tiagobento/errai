@@ -18,7 +18,6 @@ package org.jboss.errai.codegen.meta;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -32,10 +31,11 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
   }
 
   @Override
-  public Object value(final String attributeName) {
+  @SuppressWarnings("unchecked")
+  public <V> V valueAsArray(final String attributeName, final Class<V> arrayClass) {
     try {
       final Object value = annotation.getClass().getMethod(attributeName).invoke(annotation);
-      return convertValue(value);
+      return (V) convertValue(value);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -43,9 +43,7 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
 
   private Object convertValue(final Object value) {
     if (value instanceof Class[]) {
-      return Arrays.stream((Class[]) value).map(MetaClassFactory::get).collect(Collectors.toList());
-    } else if (value instanceof Object[]) {
-      return Arrays.asList((Object[]) value);
+      return Arrays.stream((Class[]) value).map(MetaClassFactory::get).toArray(MetaClass[]::new);
     } else {
       return value;
     }

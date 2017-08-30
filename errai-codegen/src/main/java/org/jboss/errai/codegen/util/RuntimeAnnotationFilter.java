@@ -36,11 +36,19 @@ public class RuntimeAnnotationFilter implements AnnotationFilter {
   }
 
   @Override
-  public Annotation[] apply(final Annotation[] metaAnnotations) {
-    return packageFilter(translatablePackages, metaAnnotations);
+  public Collection<MetaAnnotation> apply(final Collection<MetaAnnotation> metaAnnotations) {
+    
+    final Annotation[] annotationsToBeFiltered = metaAnnotations.stream()
+            .map(s -> (RuntimeMetaAnnotation) s)
+            .map(RuntimeMetaAnnotation::getAnnotation)
+            .toArray(Annotation[]::new);
+
+    return Arrays.stream(packageFilter(translatablePackages, annotationsToBeFiltered))
+            .map(RuntimeMetaAnnotation::new)
+            .collect(Collectors.toList());
   }
 
-  private Annotation[] packageFilter(final Set<String> packages, final Annotation[] annotations) {
+  private Annotation[] packageFilter(final Set<String> packages, Annotation[] annotations) {
     final Annotation[] firstPass = new Annotation[annotations.length];
     int j = 0;
     for (int i = 0; i < annotations.length; i++) {
@@ -50,10 +58,7 @@ public class RuntimeAnnotationFilter implements AnnotationFilter {
     }
 
     final Annotation[] retVal = new Annotation[j];
-    for (int i = 0; i < j; i++) {
-      retVal[i] = firstPass[i];
-    }
-
+    System.arraycopy(firstPass, 0, retVal, 0, j);
     return retVal;
   }
 }

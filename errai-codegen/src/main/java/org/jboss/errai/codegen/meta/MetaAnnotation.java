@@ -21,11 +21,21 @@ package org.jboss.errai.codegen.meta;
  */
 public abstract class MetaAnnotation {
 
-  public Object value() {
-    return value("value");
-  };
+  public <V> V value() {
+    return (V) valueAsArray("value", Object[].class);
+  }
 
-  public abstract Object value(final String attributeName);
+  ;
+
+  public <V> V value(final String attributeName) {
+    return (V) valueAsArray(attributeName, Object[].class);
+  }
+
+  public <V> V valueAsArray(final Class<V> arrayClass) {
+    return valueAsArray("value", arrayClass);
+  }
+
+  public abstract <V> V valueAsArray(final String attributeName, final Class<V> arrayClass);
 
   public abstract MetaClass annotationType();
 }

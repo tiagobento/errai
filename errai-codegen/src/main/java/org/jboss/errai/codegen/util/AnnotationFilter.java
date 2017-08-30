@@ -25,8 +25,8 @@ import java.util.function.Function;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface AnnotationFilter extends Function<Annotation[], Annotation[]> {
-  default Annotation[] filter(final Annotation[] annotations) {
+public interface AnnotationFilter extends Function<Collection<MetaAnnotation>, Collection<MetaAnnotation>> {
+  default Collection<MetaAnnotation> filter(final Collection<MetaAnnotation> annotations) {
     return this.apply(annotations);
   }
 }

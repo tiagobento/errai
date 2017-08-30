@@ -18,6 +18,7 @@ package org.jboss.errai.apt.internal.generator;
 
 import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
@@ -25,6 +26,8 @@ import org.jboss.errai.common.apt.ErraiAptGenerator;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
@@ -51,12 +54,10 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
     return true;
   }
 
-  private Annotation[] annotationFilter(final Annotation[] annotations) {
+  private Collection<MetaAnnotation> annotationFilter(final Collection<MetaAnnotation> annotations) {
     /* Ideally we would parse GWT Module files to check which classes are allowed
        in client code, but this hack does the job for now. */
-    return Arrays.stream(annotations)
-            .filter(s -> !s.annotationType().getPackage().getName().contains("server"))
-            .toArray(Annotation[]::new);
+    return annotations.stream().filter(s -> !s.annotationType().getPackageName().contains("server")).collect(toList());
   }
 
   private Collection<MetaClass> getMetaClasses(final GeneratorContext context, Class<? extends Annotation> annotation) {
