@@ -78,7 +78,8 @@ public abstract class ProxyUtil {
           final AnnotationFilter annotationFilter,
           final boolean iocEnabled) {
 
-    final MetaAnnotation[] filteredAnnotations = annotationFilter.filter(method.getAnnotations()).toArray(new MetaAnnotation[0]);
+    final MetaAnnotation[] filteredAnnotations = annotationFilter.filter(method.getAnnotations())
+            .toArray(new MetaAnnotation[0]);
 
     return Stmt.newObject(callContextType)
             .extend()
@@ -165,8 +166,8 @@ public abstract class ProxyUtil {
             .finish();
 
     for (final MetaClass interceptor : interceptors) {
-      interceptorStack = interceptorStack.elseif_(
-              Bool.equals(Stmt.loadVariable("status").invoke("getNextInterceptor"), interceptor.getCanonicalName()))
+      interceptorStack = interceptorStack.elseif_(Stmt.load(interceptor.getCanonicalName())
+              .invoke("equals", Stmt.loadVariable("status").invoke("getNextInterceptor")))
               .append(Stmt.declareFinalVariable("ctx", callContextType, Stmt.loadVariable("this")))
               .append(Stmt.declareVariable(CreationalCallback.class)
                       .asFinal()
@@ -178,8 +179,9 @@ public abstract class ProxyUtil {
                               .append(Stmt.castTo(interceptor, Stmt.loadVariable("beanInstance"))
                                       .invoke("aroundInvoke", Variable.get("ctx")))
                               .append(If.cond(Bool.and(Bool.notExpr(Stmt.loadVariable("status").invoke("isProceeding")),
-                                      Bool.equals(Stmt.loadLiteral(interceptor.getCanonicalName()),
-                                              Stmt.loadVariable("status").invoke("getNextInterceptor"))))
+                                      Stmt.loadLiteral(interceptor.getCanonicalName())
+                                              .invoke("equals",
+                                                      Stmt.loadVariable("status").invoke("getNextInterceptor"))))
                                       .append(Stmt.loadVariable("remoteCallback")
                                               .invoke("callback", Stmt.loadVariable("ctx").invoke("getResult")))
                                       .finish())

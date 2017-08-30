@@ -91,6 +91,7 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     log.info("generating RPC proxy loader class...");
 
     ClassStructureBuilder<?> classBuilder = ClassBuilder.implement(RpcProxyLoader.class);
+
     final long time = System.currentTimeMillis();
     final MethodBlockBuilder<?> loadProxies = classBuilder.publicMethod(void.class, "loadProxies",
             Parameter.of(MessageBus.class, "bus", true));

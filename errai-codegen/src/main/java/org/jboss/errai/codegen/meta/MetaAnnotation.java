@@ -25,8 +25,6 @@ public abstract class MetaAnnotation {
     return (V) valueAsArray("value", Object[].class);
   }
 
-  ;
-
   public <V> V value(final String attributeName) {
     return (V) valueAsArray(attributeName, Object[].class);
   }
