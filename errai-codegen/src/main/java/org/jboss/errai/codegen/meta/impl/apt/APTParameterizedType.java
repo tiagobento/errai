@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.metaclass;
+package org.jboss.errai.codegen.meta.impl.apt;
 
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.fromTypeMirror;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;

@@ -27,7 +27,7 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
 
   private final Annotation annotation;
 
-  RuntimeMetaAnnotation(final Annotation annotation) {
+  public RuntimeMetaAnnotation(final Annotation annotation) {
     this.annotation = annotation;
   }
 
@@ -49,5 +49,14 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
     } else {
       return value;
     }
+  }
+
+  @Override
+  public MetaClass annotationType() {
+    return MetaClassFactory.get(annotation.annotationType());
+  }
+
+  public Annotation getAnnotation() {
+    return annotation;
   }
 }

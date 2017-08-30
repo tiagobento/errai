@@ -25,9 +25,11 @@ import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
+import org.jboss.errai.codegen.util.AnnotationFilter;
 import org.jboss.errai.codegen.util.EmptyStatement;
 import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.ProxyUtil;
+import org.jboss.errai.codegen.util.RuntimeAnnotationFilter;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
@@ -50,14 +52,14 @@ public class JaxrsProxyGenerator {
   private final String rootResourcePath;
   private final InterceptorProvider interceptorProvider;
   private final Multimap<MetaClass, MetaClass> exceptionMappers;
-  private final Function<Annotation[], Annotation[]> annoFilter;
+  private final AnnotationFilter annoFilter;
   private final boolean iocEnabled;
 
   public JaxrsProxyGenerator(
           final MetaClass remote,
           final InterceptorProvider interceptorProvider,
           final Multimap<MetaClass, MetaClass> exceptionMappers,
-          final Function<Annotation[], Annotation[]> annoFilter,
+          final AnnotationFilter annoFilter,
           final boolean iocEnabled) {
     this.remote = remote;
     this.exceptionMappers = exceptionMappers;

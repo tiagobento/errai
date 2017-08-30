@@ -77,7 +77,7 @@ public abstract class ProxyUtil {
           final MetaMethod method,
           final Statement proceed,
           final List<MetaClass> interceptors,
-          final Function<Annotation[], Annotation[]> annoFilter,
+          final AnnotationFilter annotationFilter,
           final boolean iocEnabled) {
 
     return Stmt.newObject(callContextType)
@@ -89,10 +89,10 @@ public abstract class ProxyUtil {
             .append(Stmt.load(method.getReturnType()).returnValue())
             .finish()
             .publicOverridesMethod("getAnnotations")
-            .append(Stmt.load(annoFilter.apply(method.unsafeGetAnnotations())).returnValue())
+            .append(Stmt.load(annotationFilter.apply(method.unsafeGetAnnotations())).returnValue())
             .finish()
             .publicOverridesMethod("getTypeAnnotations")
-            .append(Stmt.load(annoFilter.apply(method.getDeclaringClass().unsafeGetAnnotations())).returnValue())
+            .append(Stmt.load(annotationFilter.apply(method.unsafeGetAnnotations())).returnValue())
             .finish()
             .publicOverridesMethod("proceed")
             .append(generateInterceptorStackProceedMethod(callContextType, proceed, interceptors, iocEnabled))
@@ -305,26 +305,5 @@ public abstract class ProxyUtil {
       }
     }
     return returnStatement;
-  }
-
-  private static Annotation[] filter(final Annotation[] raw, final Set<String> packages) {
-    final Annotation[] firstPass = new Annotation[raw.length];
-    int j = 0;
-    for (int i = 0; i < raw.length; i++) {
-      if (packages.contains(raw[i].annotationType().getPackage().getName())) {
-        firstPass[j++] = raw[i];
-      }
-    }
-
-    final Annotation[] retVal = new Annotation[j];
-    for (int i = 0; i < j; i++) {
-      retVal[i] = firstPass[i];
-    }
-
-    return retVal;
-  }
-
-  public static Function<Annotation[], Annotation[]> packageFilter(final Set<String> packages) {
-    return annos -> filter(annos, packages);
   }
 }

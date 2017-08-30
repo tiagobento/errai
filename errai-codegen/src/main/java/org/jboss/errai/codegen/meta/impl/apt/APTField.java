@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.metaclass;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -27,7 +27,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.fromTypeMirror;
 
 /**
  *
@@ -62,11 +62,6 @@ public class APTField extends MetaField implements APTMember {
   }
 
   @Override
-  public Annotation[] unsafeGetAnnotations() {
-    return APTMember.super.unsafeGetAnnotations();
-  }
-
-  @Override
   public Collection<MetaAnnotation> getAnnotations() {
     return APTMember.super.getAnnotations();
   }
@@ -74,5 +69,20 @@ public class APTField extends MetaField implements APTMember {
   @Override
   public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
     return APTMember.super.getAnnotation(annotationClass);
+  }
+
+  @Override
+  public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
+    return APTClassUtil.unsafeIsAnnotationPresent();
+  }
+
+  @Override
+  public Annotation[] unsafeGetAnnotations() {
+    return APTClassUtil.unsafeGetAnnotations();
+  }
+
+  @Override
+  public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
+    return APTClassUtil.unsafeGetAnnotation();
   }
 }

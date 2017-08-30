@@ -20,7 +20,7 @@ import org.jboss.errai.common.apt.AnnotatedElementsFinder;
 import org.jboss.errai.common.apt.AptAnnotatedElementsFinder;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
-import org.jboss.errai.common.apt.metaclass.APTClassUtil;
+import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;

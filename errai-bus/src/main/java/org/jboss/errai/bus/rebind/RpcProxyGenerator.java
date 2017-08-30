@@ -32,6 +32,7 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.BooleanExpressionBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
+import org.jboss.errai.codegen.util.AnnotationFilter;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
@@ -131,7 +132,7 @@ public class RpcProxyGenerator {
                     .asFinal()
                     .named("status")
                     .initializeWith(Stmt.newObject(CallContextStatus.class).withParameters(interceptors.stream().map(
-                            MetaClass::getCanonicalName).toArray()))) //FIXME: tiago: check if works
+                            MetaClass::getCanonicalName).toArray())))
             .append(Stmt.declareVariable(RemoteCallContext.class)
                     .asFinal()
                     .named("callContext")

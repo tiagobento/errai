@@ -29,6 +29,7 @@ import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.ProxyUtil;
+import org.jboss.errai.codegen.util.RuntimeAnnotationFilter;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.interceptor.FeatureInterceptor;
 import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
@@ -81,11 +82,11 @@ public class JaxrsProxyLoaderGenerator extends AbstractAsyncGenerator {
     for (final MetaClass remote : remotes) {
       if (remote.isInterface()) {
         final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-        final Function<Annotation[], Annotation[]> annoFilter = ProxyUtil.packageFilter(translatablePackages);
+        RuntimeAnnotationFilter runtimeAnnotationFilter = new RuntimeAnnotationFilter(translatablePackages);
         final boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
         // create the remote proxy for this interface
         final ClassStructureBuilder<?> remoteProxy =
-            new JaxrsProxyGenerator(remote, interceptorProvider, exceptionMappers, annoFilter, iocEnabled).generate();
+            new JaxrsProxyGenerator(remote, interceptorProvider, exceptionMappers, runtimeAnnotationFilter, iocEnabled).generate();
         loadProxies.append(new InnerClass(remoteProxy.getClassDefinition()));
 
         // create the proxy provider

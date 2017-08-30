@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.bus.rebind;
+package org.jboss.errai.codegen.util;
+
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.function.Function;
 
 /**

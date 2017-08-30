@@ -18,7 +18,7 @@ package org.jboss.errai.common.apt;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.exportfile.ExportFileName;
-import org.jboss.errai.common.apt.metaclass.APTClass;
+import org.jboss.errai.codegen.meta.impl.apt.APTClass;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;

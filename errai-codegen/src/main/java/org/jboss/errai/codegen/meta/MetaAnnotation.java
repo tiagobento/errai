@@ -26,4 +26,6 @@ public abstract class MetaAnnotation {
   };
 
   public abstract Object value(final String attributeName);
+
+  public abstract MetaClass annotationType();
 }

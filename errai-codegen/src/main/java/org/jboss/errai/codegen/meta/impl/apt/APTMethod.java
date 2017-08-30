@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.metaclass;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -29,7 +29,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.fromTypeMirror;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.fromTypeMirror;
 
 /**
  *
@@ -96,5 +96,20 @@ public class APTMethod extends MetaMethod implements APTMember {
   @Override
   public boolean isAnnotationPresent(final MetaClass metaClass) {
     return APTClassUtil.isAnnotationPresent(method, metaClass);
+  }
+
+  @Override
+  public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
+    return APTClassUtil.unsafeIsAnnotationPresent();
+  }
+
+  @Override
+  public Annotation[] unsafeGetAnnotations() {
+    return APTClassUtil.unsafeGetAnnotations();
+  }
+
+  @Override
+  public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
+    return APTClassUtil.unsafeGetAnnotation();
   }
 }

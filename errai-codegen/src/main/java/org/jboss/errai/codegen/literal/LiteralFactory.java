@@ -16,13 +16,6 @@
 
 package org.jboss.errai.codegen.literal;
 
-import static org.jboss.errai.codegen.builder.callstack.LoadClassReference.getClassReference;
-
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.jboss.errai.codegen.AnnotationEncoder;
 import org.jboss.errai.codegen.Context;
 import org.jboss.errai.codegen.RenderCacheStore;
@@ -30,6 +23,15 @@ import org.jboss.errai.codegen.SnapshotMaker;
 import org.jboss.errai.codegen.exception.NotLiteralizableException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.RuntimeMetaAnnotation;
+import org.jboss.errai.codegen.meta.impl.apt.APTAnnotation;
+
+import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.jboss.errai.codegen.builder.callstack.LoadClassReference.getClassReference;
 
 /**
  * The literal factory provides a LiteralValue for the specified object (if possible).
@@ -104,24 +106,20 @@ public class LiteralFactory {
 
       if (o instanceof MetaClass) {
         result = new MetaClassLiteral((MetaClass) o);
-      }
-      else if (o instanceof Annotation) {
-        result = new LiteralValue<Annotation>((Annotation) o) {
-          @Override
-          public String getCanonicalString(final Context context) {
-            return AnnotationEncoder.encode((Annotation) o).generate(context);
-          }
-        };
-      }
-      else if (o instanceof Enum) {
+      } else if (o instanceof RuntimeMetaAnnotation) {
+        result = getLiteralValue(((RuntimeMetaAnnotation) o).getAnnotation());
+      } else if (o instanceof APTAnnotation) {
+        throw new UnsupportedOperationException("APTAnnotations are not yet supported.");
+      } else if (o instanceof Annotation) {
+        result = getLiteralValue((Annotation) o);
+      } else if (o instanceof Enum) {
         result = new LiteralValue<Enum>((Enum) o) {
           @Override
           public String getCanonicalString(final Context context) {
             return getClassReference(MetaClassFactory.get(o.getClass()), context) + "." + ((Enum) o).name();
           }
         };
-      }
-      else {
+      } else {
         result = _getLiteral(context, o, throwIfNotLiteralizable);
       }
 
@@ -132,6 +130,15 @@ public class LiteralFactory {
     }
 
     return result;
+  }
+
+  private static LiteralValue<Annotation> getLiteralValue(final Annotation o) {
+    return new LiteralValue<Annotation>(o) {
+      @Override
+      public String getCanonicalString(final Context context) {
+        return AnnotationEncoder.encode(o).generate(context);
+      }
+    };
   }
 
   private static LiteralValue<?> _getLiteral(final Context context,

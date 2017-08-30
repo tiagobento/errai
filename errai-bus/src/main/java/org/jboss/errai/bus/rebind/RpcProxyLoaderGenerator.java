@@ -29,9 +29,10 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.MethodBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
+import org.jboss.errai.codegen.util.AnnotationFilter;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.util.InterceptorProvider;
-import org.jboss.errai.codegen.util.ProxyUtil;
+import org.jboss.errai.codegen.util.RuntimeAnnotationFilter;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.interceptor.FeatureInterceptor;
 import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Generates the implementation of {@link RpcProxyLoader}.
@@ -76,8 +78,10 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   }
 
   private AnnotationFilter gwtAnnotationFilter(final GeneratorContext context) {
-    return (annotation) -> ProxyUtil.packageFilter(RebindUtils.findTranslatablePackages(context)).apply(annotation);
+    final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
+    return new RuntimeAnnotationFilter(translatablePackages);
   }
+
 
   public String generate(final MetaClassFinder metaClassFinder,
           final boolean iocEnabled,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.metaclass;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -46,11 +46,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptySet;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.elements;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.getSimpleName;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.sameTypes;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.throwUnsupportedTypeError;
-import static org.jboss.errai.common.apt.metaclass.APTClassUtil.types;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.elements;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.getSimpleName;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.sameTypes;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.throwUnsupportedTypeError;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.types;
 
 /**
  * @author Max Barkley <mbarkley@redhat.com>
@@ -103,35 +103,6 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     default:
       return throwUnsupportedTypeError(mirror);
     }
-  }
-
-  @Override
-  public Annotation[] unsafeGetAnnotations() {
-    final TypeMirror mirror = getEnclosedMetaObject();
-    switch (mirror.getKind()) {
-    case DECLARED:
-    case TYPEVAR:
-      final Element element = types.asElement(mirror);
-      return APTClassUtil.unsafeGetAnnotations(element);
-    case ARRAY:
-    case BOOLEAN:
-    case BYTE:
-    case CHAR:
-    case DOUBLE:
-    case FLOAT:
-    case INT:
-    case LONG:
-    case SHORT:
-      return new Annotation[0];
-    case VOID:
-    default:
-      return throwUnsupportedTypeError(mirror);
-    }
-  }
-
-  @Override
-  public <A extends Annotation> A unsafeGetAnnotation(Class<A> annotation) {
-    return getEnclosedMetaObject().getAnnotation(annotation);
   }
 
   @Override
@@ -795,15 +766,6 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
   }
 
   @Override
-  public synchronized Class<?> unsafeAsClass() {
-    try {
-      return Class.forName(getFullyQualifiedName());
-    } catch (final ClassNotFoundException e) {
-      return super.unsafeAsClass();
-    }
-  }
-
-  @Override
   public Optional<MetaAnnotation> getAnnotation(final Class<? extends Annotation> annotationClass) {
     return APTClassUtil.getAnnotation(getEnclosedMetaObject(), annotationClass);
   }
@@ -834,6 +796,28 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     default:
       return throwUnsupportedTypeError(mirror);
     }
+  }
+
+
+  @Override
+  public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
+    return APTClassUtil.unsafeIsAnnotationPresent();
+  }
+
+  @Override
+  public synchronized Class<?> unsafeAsClass() {
+    return APTClassUtil.unsafeAsClass();
+  }
+
+
+  @Override
+  public Annotation[] unsafeGetAnnotations() {
+    return APTClassUtil.unsafeGetAnnotations();
+  }
+
+  @Override
+  public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
+    return APTClassUtil.unsafeGetAnnotation();
   }
 
 }

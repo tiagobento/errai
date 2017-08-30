@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.metaclass;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 import org.jboss.errai.codegen.meta.HasMetaAnnotations;
 import org.jboss.errai.codegen.meta.HasAnnotations;
@@ -34,11 +34,6 @@ import java.util.Optional;
  */
 interface APTMember extends MetaClassMember, HasAnnotations, HasMetaAnnotations {
   Element getMember();
-
-  @Override
-  default Annotation[] unsafeGetAnnotations() {
-    return APTClassUtil.unsafeGetAnnotations(getMember());
-  }
 
   @Override
   default String getName() {
@@ -119,5 +114,20 @@ interface APTMember extends MetaClassMember, HasAnnotations, HasMetaAnnotations 
   @Override
   default boolean isAnnotationPresent(final MetaClass metaClass) {
     return APTClassUtil.isAnnotationPresent(getMember(), metaClass);
+  }
+
+  @Override
+  default boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
+    return APTClassUtil.unsafeIsAnnotationPresent();
+  }
+
+  @Override
+  default Annotation[] unsafeGetAnnotations() {
+    return APTClassUtil.unsafeGetAnnotations();
+  }
+
+  @Override
+  default <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
+    return APTClassUtil.unsafeGetAnnotation();
   }
 }

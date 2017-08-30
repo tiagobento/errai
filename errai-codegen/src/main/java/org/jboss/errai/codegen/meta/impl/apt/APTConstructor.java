@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.metaclass;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

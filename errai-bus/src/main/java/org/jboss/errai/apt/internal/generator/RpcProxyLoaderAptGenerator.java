@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * IMPORTANT: Do not move this class. ErraiAppGenerator depends on it being in this exact package.
+ * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
@@ -51,6 +51,14 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
     return true;
   }
 
+  private Annotation[] annotationFilter(final Annotation[] annotations) {
+    /* Ideally we would parse GWT Module files to check which classes are allowed
+       in client code, but this hack does the job for now. */
+    return Arrays.stream(annotations)
+            .filter(s -> !s.annotationType().getPackage().getName().contains("server"))
+            .toArray(Annotation[]::new);
+  }
+
   private Collection<MetaClass> getMetaClasses(final GeneratorContext context, Class<? extends Annotation> annotation) {
     return ErraiAptExportedTypes.getMetaClasses(annotation);
   }
@@ -58,13 +66,5 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
   @Override
   public String className() {
     return rpcProxyLoaderGenerator.getFullQualifiedClassName();
-  }
-
-  private Annotation[] annotationFilter(final Annotation[] annotations) {
-    /* Ideally we would parse GWT Module files to check which classes are allowed
-       in client code, but this hack does the job for now. */
-    return Arrays.stream(annotations)
-            .filter(s -> !s.annotationType().getPackage().getName().contains("server"))
-            .toArray(Annotation[]::new);
   }
 }
