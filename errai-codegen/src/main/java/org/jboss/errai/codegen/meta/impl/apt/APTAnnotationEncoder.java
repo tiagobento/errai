@@ -69,8 +69,8 @@ public class APTAnnotationEncoder {
         } else if (method.getName().equals("toString")) {
           return annotationMetaClass.toString();
         } else {
-          final Object value = metaAnnotation.value(method.getName());
-          return Stmt.castTo(method.getReturnType(), Stmt.load(value));
+          final Object value = metaAnnotation.value(method.getName(), method.getReturnType());
+          return Stmt.load(value);
         }
       }
 

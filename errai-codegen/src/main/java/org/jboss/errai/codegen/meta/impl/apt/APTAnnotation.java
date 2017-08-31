@@ -19,6 +19,7 @@ package org.jboss.errai.codegen.meta.impl.apt;
 import org.apache.commons.lang3.ClassUtils;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFactory;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -28,9 +29,12 @@ import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
@@ -41,6 +45,11 @@ import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.throwUnsupporte
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class APTAnnotation extends MetaAnnotation {
+
+  private static final Map<MetaClass, Class> ARRAY_TYPES_BY_ITS_COMPONENTS_META_CLASS = Stream.of(String[].class,
+          Enum[].class, Class[].class, Annotation[].class, byte[].class, short[].class, int[].class, long[].class,
+          float[].class, double[].class, char[].class, boolean[].class)
+          .collect(Collectors.toMap(clazz -> MetaClassFactory.get(clazz.getComponentType()), c -> c));
 
   private final Map<String, Object> values;
   private final AnnotationMirror annotationMirror;
@@ -59,13 +68,27 @@ public class APTAnnotation extends MetaAnnotation {
     return (V) convertValue(values.get(attributeName), arrayTypeHint);
   }
 
+  @SuppressWarnings("unchecked")
+  public <V> V value(final String attributeName, final MetaClass attributeMetaClass) {
+
+    if (attributeMetaClass.isArray()) {
+      return (V) valueAsArray(attributeName, arrayType(attributeMetaClass));
+    }
+
+    return (V) value(attributeName);
+  }
+
+  private Class arrayType(final MetaClass attributeMetaClass) {
+    return ARRAY_TYPES_BY_ITS_COMPONENTS_META_CLASS.get(attributeMetaClass.getComponentType().getErased());
+  }
+
   @Override
   public MetaClass annotationType() {
     return new APTClass(annotationMirror.getAnnotationType());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private static Object convertValue(final Object value, final Class<?> arrayTypeHint) {
+  private static Object convertValue(final Object value, final Class<?> arrayType) {
     if (value == null) {
       return null;
     } else if (value instanceof String) {
@@ -79,7 +102,7 @@ public class APTAnnotation extends MetaAnnotation {
     } else if (value instanceof AnnotationMirror) {
       return new APTAnnotation((AnnotationMirror) value);
     } else if (value instanceof List) {
-      return convertToArrayValue(value, arrayTypeHint);
+      return convertToArrayValue(value, arrayType);
     } else if (ClassUtils.isPrimitiveWrapper(value.getClass())) {
       return value;
     } else {
@@ -139,13 +162,5 @@ public class APTAnnotation extends MetaAnnotation {
     default:
       return throwUnsupportedTypeError(value);
     }
-  }
-
-  public AnnotationMirror annotationMirror() {
-    return annotationMirror;
-  }
-
-  public Map<String, Object> getValues() {
-    return values;
   }
 }
