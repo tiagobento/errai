@@ -29,10 +29,10 @@ import java.util.List;
 public class CallContextStatus {
   private boolean proceeding = false;
   private boolean interceptorChainStarted = false;
-  private final List<String> interceptors;
+  private final List<Class<?>> interceptors;
 
-  public CallContextStatus(final String... interceptorsCanonicalNames) {
-    this.interceptors = new ArrayList<>(Arrays.asList(interceptorsCanonicalNames));
+  public CallContextStatus(final Class<?>... interceptors) {
+    this.interceptors = new ArrayList<>(Arrays.asList(interceptors));
   }
 
   public void proceed() {
@@ -55,7 +55,7 @@ public class CallContextStatus {
     return proceeding;
   }
 
-  public String getNextInterceptor() {
+  public Class<?> getNextInterceptor() {
     if (!interceptors.isEmpty()) {
       return interceptors.get(0);
     }

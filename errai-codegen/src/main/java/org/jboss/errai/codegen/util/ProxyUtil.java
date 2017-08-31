@@ -166,8 +166,8 @@ public abstract class ProxyUtil {
             .finish();
 
     for (final MetaClass interceptor : interceptors) {
-      interceptorStack = interceptorStack.elseif_(Stmt.load(interceptor.getCanonicalName())
-              .invoke("equals", Stmt.loadVariable("status").invoke("getNextInterceptor")))
+      interceptorStack = interceptorStack.elseif_(
+              Stmt.load(interceptor).invoke("equals", Stmt.loadVariable("status").invoke("getNextInterceptor")))
               .append(Stmt.declareFinalVariable("ctx", callContextType, Stmt.loadVariable("this")))
               .append(Stmt.declareVariable(CreationalCallback.class)
                       .asFinal()
@@ -179,7 +179,7 @@ public abstract class ProxyUtil {
                               .append(Stmt.castTo(interceptor, Stmt.loadVariable("beanInstance"))
                                       .invoke("aroundInvoke", Variable.get("ctx")))
                               .append(If.cond(Bool.and(Bool.notExpr(Stmt.loadVariable("status").invoke("isProceeding")),
-                                      Stmt.loadLiteral(interceptor.getCanonicalName())
+                                      Stmt.loadLiteral(interceptor)
                                               .invoke("equals",
                                                       Stmt.loadVariable("status").invoke("getNextInterceptor"))))
                                       .append(Stmt.loadVariable("remoteCallback")

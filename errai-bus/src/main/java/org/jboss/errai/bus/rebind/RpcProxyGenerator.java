@@ -131,8 +131,7 @@ public class RpcProxyGenerator {
             .append(Stmt.declareVariable(CallContextStatus.class)
                     .asFinal()
                     .named("status")
-                    .initializeWith(Stmt.newObject(CallContextStatus.class).withParameters(interceptors.stream().map(
-                            MetaClass::getCanonicalName).toArray())))
+                    .initializeWith(Stmt.newObject(CallContextStatus.class).withParameters(interceptors.toArray())))
             .append(Stmt.declareVariable(RemoteCallContext.class)
                     .asFinal()
                     .named("callContext")

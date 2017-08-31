@@ -331,8 +331,7 @@ public class JaxrsProxyMethodGenerator {
     return Stmt.try_()
             .append(
                 Stmt.declareVariable(CallContextStatus.class).asFinal().named("status").initializeWith(
-                    Stmt.newObject(CallContextStatus.class).withParameters(interceptors.stream().map(
-                            MetaClass::getCanonicalName).toArray()))) //FIXME: tiago: check if works
+                    Stmt.newObject(CallContextStatus.class).withParameters(interceptors.toArray())))
             .append(
                 Stmt.declareVariable(RestCallContext.class).asFinal().named("callContext")
                     .initializeWith(callContext))
