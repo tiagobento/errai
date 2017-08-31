@@ -57,7 +57,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
     try {
       generateAndSaveSourceFiles(annotations, new AptAnnotatedElementsFinder(roundEnv));
     } catch (final Exception e) {
-      System.out.println("Error generating files");
+      System.out.println("Error generating files: " + e.getMessage());
       e.printStackTrace();
     }
 
@@ -75,6 +75,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
               annotatedElementsFinder);
 
       findGenerators(processingEnv.getElementUtils()).forEach(this::generateAndSaveSourceFile);
+      System.out.println("Successfully generated files using Errai APT Generators");
     }
   }
 
@@ -116,9 +117,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
         writer.write(generatedSourceCode);
       }
     } catch (final IOException e) {
-      //FIXME: tiago: see how errors work in apt
-      final Messager messager = processingEnv.getMessager();
-      messager.printMessage(ERROR, String.format("Unable to generate %s. Error: %s", fileName, e.getMessage()));
+      throw new RuntimeException("Could not write generated file", e);
     }
   }
 }

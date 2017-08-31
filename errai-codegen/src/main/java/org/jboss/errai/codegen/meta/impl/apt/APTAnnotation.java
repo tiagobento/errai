@@ -46,9 +46,9 @@ import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.throwUnsupporte
  */
 public class APTAnnotation extends MetaAnnotation {
 
-  private static final Map<MetaClass, Class> ARRAY_TYPES_BY_ITS_COMPONENTS_META_CLASS = Stream.of(String[].class,
-          Enum[].class, Class[].class, Annotation[].class, byte[].class, short[].class, int[].class, long[].class,
-          float[].class, double[].class, char[].class, boolean[].class)
+  private static final Map<MetaClass, Class> ANNOTATION_VALUE_POSSIBLE_ARRAY_TYPES_BY_ITS_COMPONENTS_META_CLASS = Stream
+          .of(String[].class, Enum[].class, Class[].class, Annotation[].class, byte[].class, short[].class, int[].class,
+                  long[].class, float[].class, double[].class, char[].class, boolean[].class)
           .collect(Collectors.toMap(clazz -> MetaClassFactory.get(clazz.getComponentType()), c -> c));
 
   private final Map<String, Object> values;
@@ -78,8 +78,9 @@ public class APTAnnotation extends MetaAnnotation {
     return (V) value(attributeName);
   }
 
-  private Class arrayType(final MetaClass attributeMetaClass) {
-    return ARRAY_TYPES_BY_ITS_COMPONENTS_META_CLASS.get(attributeMetaClass.getComponentType().getErased());
+  private Class<?> arrayType(final MetaClass attributeMetaClass) {
+    return ANNOTATION_VALUE_POSSIBLE_ARRAY_TYPES_BY_ITS_COMPONENTS_META_CLASS.get(
+            attributeMetaClass.getComponentType().getErased());
   }
 
   @Override
@@ -97,7 +98,7 @@ public class APTAnnotation extends MetaAnnotation {
       return new APTClass((TypeMirror) value);
     } else if (value instanceof VariableElement) {
       final VariableElement var = (VariableElement) value;
-      final Class<?> enumClass = unsafeLoadClass(var.asType()); //FIXME: tiago: remove this (MetaEnum?)
+      final Class<?> enumClass = unsafeLoadClass(var.asType()); //FIXME: remove this (MetaEnum?)
       return Enum.valueOf((Class) enumClass, var.getSimpleName().toString());
     } else if (value instanceof AnnotationMirror) {
       return new APTAnnotation((AnnotationMirror) value);

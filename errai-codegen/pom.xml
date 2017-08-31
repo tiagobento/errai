@@ -38,14 +38,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- FIXME: remove -->
-    <dependency>
-      <groupId>net.florianschoppmann.java</groupId>
-      <artifactId>java-types</artifactId>
-      <version>1.0.1</version>
-      <scope>compile</scope>
-    </dependency>
-
     <!-- NOTE: THIS IS IMPORTED JUST TO ALIGN VERSIONS WITH JDT -->
     <dependency>
       <groupId>com.google.gwt</groupId>

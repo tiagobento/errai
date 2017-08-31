@@ -16,7 +16,6 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
-import net.florianschoppmann.java.reflect.ReflectionTypes;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaParameter;
@@ -161,11 +160,9 @@ public final class APTClassUtil {
   public static Optional<MetaAnnotation> getAnnotation(final Element element,
           final Class<? extends Annotation> annotationClass) {
 
-    //FIXME: tiago: comparing strings
-    final TypeMirror annotationTypeMirror = ReflectionTypes.getInstance().typeElement(annotationClass).asType();
     return element.getAnnotationMirrors()
             .stream()
-            .filter(s -> s.getAnnotationType().toString().equals(annotationTypeMirror.toString()))
+            .filter(s -> s.getAnnotationType().toString().equals(annotationClass.getCanonicalName()))
             .map(annotationMirror -> (MetaAnnotation) new APTAnnotation(annotationMirror))
             .findFirst();
   }
@@ -175,13 +172,12 @@ public final class APTClassUtil {
     return getAnnotation(types.asElement(typeMirror), annotationClass);
   }
 
-  public static boolean isAnnotationPresent(final Element element, final MetaClass metaClass) {
-
-    //FIXME: tiago: comparing strings
+  public static boolean isAnnotationPresent(final Element element, final MetaClass annotationMetaClass) {
     return element.getAnnotationMirrors()
             .stream()
             .map(annotationMirror -> annotationMirror.getAnnotationType().toString())
-            .anyMatch(type -> type.equals(((AbstractMetaClass) metaClass).getEnclosedMetaObject().toString()));
+            .anyMatch(
+                    type -> type.equals(((AbstractMetaClass) annotationMetaClass).getEnclosedMetaObject().toString()));
   }
 
   @Deprecated

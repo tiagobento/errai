@@ -62,7 +62,7 @@ public final class ErraiAptExportedTypes {
     ErraiAptExportedTypes.elements = elements;
     ErraiAptExportedTypes.roundEnvironment = roundEnvironment;
 
-    // Loads all exported types from ErraiModuleExportFiles
+    // Loads all exported types from ExportFiles
     exportedClassesByAnnotationClassName = exportFilesPackageElement(ErraiAptExportedTypes.elements).map(
             p -> p.getEnclosedElements()
                     .stream()
@@ -80,8 +80,6 @@ public final class ErraiAptExportedTypes {
             .stream()
             .filter(s -> !s.getValue().isEmpty())
             .forEach(ErraiAptExportedTypes::addExportableLocalTypesToExportedTypes));
-
-    print();
   }
 
   private static void addExportableLocalTypesToExportedTypes(final Map.Entry<String, Set<TypeMirror>> entry) {
@@ -94,16 +92,6 @@ public final class ErraiAptExportedTypes {
   private static Stream<TypeMirror> exportableLocalTypes(final TypeMirror element) {
     final TypeElement annotation = (TypeElement) types.asElement(element);
     return roundEnvironment.getElementsAnnotatedWith(annotation).stream().map(Element::asType);
-  }
-
-  private static void print() {
-
-    if (exportedClassesByAnnotationClassName.isEmpty()) {
-      System.out.println("No exported types found");
-    }
-
-    exportedClassesByAnnotationClassName.forEach(
-            (annotationClassName, e) -> System.out.println(annotationClassName + ": " + e.size()));
   }
 
   private static String annotationName(final Element e) {

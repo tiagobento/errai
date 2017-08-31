@@ -27,7 +27,6 @@ import javax.ws.rs.ext.Provider;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-//FIXME: tiago: generate this file?
 public final class JaxrsExportedAnnotations {
 
   private JaxrsExportedAnnotations() {
