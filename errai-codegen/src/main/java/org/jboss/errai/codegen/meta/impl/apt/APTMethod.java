@@ -50,7 +50,7 @@ public class APTMethod extends MetaMethod implements APTMember {
 
   @Override
   public MetaClass getReturnType() {
-    return APTClassUtil.eraseOrReturn(method.getReturnType());
+    return new APTClass(method.getReturnType());
   }
 
   @Override

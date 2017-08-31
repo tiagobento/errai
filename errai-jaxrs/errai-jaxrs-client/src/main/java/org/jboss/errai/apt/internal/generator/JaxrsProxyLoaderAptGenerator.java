@@ -17,11 +17,11 @@
 package org.jboss.errai.apt.internal.generator;
 
 import com.google.gwt.core.ext.GeneratorContext;
-import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderGenerator;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -33,18 +33,18 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
+public final class JaxrsProxyLoaderAptGenerator implements ErraiAptGenerator {
 
-  private final RpcProxyLoaderGenerator rpcProxyLoaderGenerator;
+  private final JaxrsProxyLoaderGenerator jaxrsProxyLoaderGenerator;
 
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
-  public RpcProxyLoaderAptGenerator() {
-    this.rpcProxyLoaderGenerator = new RpcProxyLoaderGenerator();
+  public JaxrsProxyLoaderAptGenerator() {
+    this.jaxrsProxyLoaderGenerator = new JaxrsProxyLoaderGenerator();
   }
 
   @Override
   public String generate() {
-    return rpcProxyLoaderGenerator.generate(this::findMetaClasses, isIOCModuleInherited(), this::filterAnnotations,
+    return jaxrsProxyLoaderGenerator.generate(this::findMetaClasses, isIOCModuleInherited(), this::filterAnnotations,
             null);
   }
 
@@ -68,6 +68,6 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
 
   @Override
   public String className() {
-    return rpcProxyLoaderGenerator.getFullQualifiedClassName();
+    return jaxrsProxyLoaderGenerator.getFullQualifiedClassName();
   }
 }

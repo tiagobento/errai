@@ -29,8 +29,8 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.MethodBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
-import org.jboss.errai.codegen.util.AnnotationFilter;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.util.AnnotationFilter;
 import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.RuntimeAnnotationFilter;
 import org.jboss.errai.codegen.util.Stmt;
@@ -72,16 +72,12 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
-    final AnnotationFilter gwtAnnotationFilter = gwtAnnotationFilter(context);
-
-    return generate(this::getMetaClasses, iocEnabled, gwtAnnotationFilter, context);
-  }
-
-  private AnnotationFilter gwtAnnotationFilter(final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-    return new RuntimeAnnotationFilter(translatablePackages);
-  }
+    final AnnotationFilter gwtAnnotationFilter = new RuntimeAnnotationFilter(translatablePackages);
+    final MetaClassFinder metaClassFinder = (ctx, annotation) -> getMetaClasses(ctx, annotation, translatablePackages);
 
+    return generate(metaClassFinder, iocEnabled, gwtAnnotationFilter, context);
+  }
 
   public String generate(final MetaClassFinder metaClassFinder,
           final boolean iocEnabled,
@@ -136,6 +132,7 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
 
   @Override
   protected boolean isRelevantClass(final MetaClass clazz) {
+    // It's ok to use unsafe methods here because the APT environment doesn't call this method
     for (final Annotation annotation : clazz.unsafeGetAnnotations()) {
       if (annotation.annotationType().equals(Remote.class) || annotation.annotationType()
               .equals(FeatureInterceptor.class) || annotation.annotationType().equals(InterceptsRemoteCall.class)) {
@@ -147,8 +144,10 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   }
 
   private Collection<MetaClass> getMetaClasses(final GeneratorContext context,
-          final Class<? extends Annotation> annotation) {
-    return ClassScanner.getTypesAnnotatedWith(annotation, RebindUtils.findTranslatablePackages(context), context);
+          final Class<? extends Annotation> annotation,
+          final Set<String> translatablePackages) {
+
+    return ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context);
   }
 
   public String getFullQualifiedClassName() {

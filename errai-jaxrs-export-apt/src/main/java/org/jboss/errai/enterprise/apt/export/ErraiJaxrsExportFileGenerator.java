@@ -26,12 +26,13 @@ import static org.jboss.errai.enterprise.apt.export.SupportedAnnotationTypes.FEA
 import static org.jboss.errai.enterprise.apt.export.SupportedAnnotationTypes.INTERCEPTED_CALL;
 import static org.jboss.errai.enterprise.apt.export.SupportedAnnotationTypes.INTERCEPTS_REMOTE_CALL;
 import static org.jboss.errai.enterprise.apt.export.SupportedAnnotationTypes.PATH;
+import static org.jboss.errai.enterprise.apt.export.SupportedAnnotationTypes.PROVIDER;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({ PATH, INTERCEPTED_CALL, FEATURE_INTERCEPTOR, INTERCEPTS_REMOTE_CALL })
+@SupportedAnnotationTypes({ PATH, INTERCEPTED_CALL, FEATURE_INTERCEPTOR, INTERCEPTS_REMOTE_CALL, PROVIDER })
 public class ErraiJaxrsExportFileGenerator extends AbstractErraiModuleExportFileGenerator {
 
   @Override

@@ -46,6 +46,7 @@ public abstract class AbstractHasAnnotations implements HasAnnotations, HasMetaA
    * @return true if annotation is present, otherwise false.
    */
   @Override
+  @Deprecated
   public boolean unsafeIsAnnotationPresent(final Class<? extends Annotation> annotation) {
     Assert.notNull(annotation);
     if (annotationPresentCache == null) {
@@ -66,6 +67,10 @@ public abstract class AbstractHasAnnotations implements HasAnnotations, HasMetaA
   @Override
   public boolean isAnnotationPresent(final MetaClass metaClass) {
     return unsafeIsAnnotationPresent((Class<? extends Annotation>) metaClass.unsafeAsClass());
+  }
+
+  public boolean isAnnotationPresent(final Class<? extends Annotation> annotationClass) {
+    return getAnnotation(annotationClass).isPresent();
   }
 
   @Override

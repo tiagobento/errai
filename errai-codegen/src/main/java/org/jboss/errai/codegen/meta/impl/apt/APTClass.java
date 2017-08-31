@@ -742,6 +742,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     final TypeMirror mirror = getEnclosedMetaObject();
     switch (mirror.getKind()) {
     case DECLARED:
+    case ARRAY:
     case TYPEVAR:
       final TypeMirror erased = types.erasure(mirror);
       if (types.isSameType(erased, mirror)) {
@@ -757,7 +758,6 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case INT:
     case LONG:
     case SHORT:
-    case ARRAY:
     case VOID:
       return this;
     default:

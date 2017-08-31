@@ -18,6 +18,7 @@ package org.jboss.errai.enterprise.rebind;
 
 import com.google.gwt.http.client.RequestBuilder;
 import org.jboss.errai.codegen.Statement;
+import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.util.Stmt;
 
@@ -60,7 +61,7 @@ public class JaxrsGwtRequestMethodMapper {
   public static Statement fromMethod(MetaMethod method) {
     Statement gwtRequestMethod = null;
     for (Class<? extends Annotation> jaxrsMethod : METHOD_MAP.keySet()) {
-      if (method.unsafeIsAnnotationPresent(jaxrsMethod)) {
+      if (method.isAnnotationPresent(jaxrsMethod)) {
         gwtRequestMethod = METHOD_MAP.get(jaxrsMethod);
         break;
       }

@@ -20,6 +20,7 @@ import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
 import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAptExportedTypes depends on it being in this exact package.
@@ -33,6 +34,7 @@ public final class JaxrsExportedAnnotations {
   }
 
   private Path path;
+  private Provider provider;
   private InterceptedCall interceptedCall;
   private FeatureInterceptor featureInterceptor;
   private InterceptsRemoteCall interceptsRemoteCall;

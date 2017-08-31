@@ -22,6 +22,7 @@ import org.jboss.errai.codegen.meta.impl.apt.APTClass;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -116,6 +117,7 @@ public final class ErraiAptExportedTypes {
   public static Collection<MetaClass> getMetaClasses(final Class<? extends Annotation> annotation) {
     return exportedClassesByAnnotationClassName.getOrDefault(annotation.getName(), emptySet())
             .stream()
+            .filter(s -> s.getKind().equals(TypeKind.DECLARED))
             .map(APTClass::new)
             .collect(toSet());
   }

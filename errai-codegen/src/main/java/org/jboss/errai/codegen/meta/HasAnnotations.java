@@ -31,7 +31,7 @@ public interface HasAnnotations {
    * @deprecated This method is not safe to use in APT environment.
    */
   @Deprecated
-  public Annotation[] unsafeGetAnnotations();
+  Annotation[] unsafeGetAnnotations();
 
   /**
    * @deprecated This method is not safe to use in APT environment.

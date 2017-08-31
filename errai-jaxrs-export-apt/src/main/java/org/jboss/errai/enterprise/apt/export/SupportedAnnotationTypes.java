@@ -24,4 +24,5 @@ public interface SupportedAnnotationTypes {
   String FEATURE_INTERCEPTOR = "org.jboss.errai.common.client.api.interceptor.FeatureInterceptor";
   String INTERCEPTED_CALL = "org.jboss.errai.common.client.api.interceptor.InterceptedCall";
   String INTERCEPTS_REMOTE_CALL = "org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall";
+  String PROVIDER = "javax.ws.rs.ext.Provider";
 }
