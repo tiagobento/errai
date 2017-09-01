@@ -20,5 +20,14 @@ package org.jboss.errai.common.apt.generator;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @TestAnnotation
-class TestExportedType {
+public class TestExportableTypeWithFieldAnnotations {
+
+  @TestEnclosedElementAnnotation
+  String foo;
+
+  @TestEnclosedElementAnnotation
+  String bar() {
+    return "bar";
+  }
+
 }

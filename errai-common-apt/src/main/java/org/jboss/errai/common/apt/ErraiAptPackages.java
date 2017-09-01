@@ -48,7 +48,7 @@ public final class ErraiAptPackages {
     final PackageElement packageElement = elementUtils.getPackageElement(exportFilesPackagePath());
 
     if (packageElement == null) {
-      System.err.println("Export files package not found");
+      System.out.println("Export files package not found");
     }
 
     return Optional.ofNullable(packageElement);
@@ -58,7 +58,7 @@ public final class ErraiAptPackages {
     final PackageElement packageElement = elementUtils.getPackageElement(exportedAnnotationsPackagePath());
 
     if (packageElement == null) {
-      System.err.println("Exported annotations package not found");
+      System.out.println("Exported annotations package not found");
     }
 
     return Optional.ofNullable(packageElement);
@@ -68,7 +68,7 @@ public final class ErraiAptPackages {
     final PackageElement packageElement = elementUtils.getPackageElement(generatorsPackagePath());
 
     if (packageElement == null) {
-      System.err.println("Generators package not found");
+      System.out.println("Generators package not found");
     }
 
     return Optional.ofNullable(packageElement);

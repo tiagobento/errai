@@ -79,7 +79,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
     }
   }
 
-  private List<ErraiAptGenerator> findGenerators(final Elements elements) {
+  List<ErraiAptGenerator> findGenerators(final Elements elements) {
     return generatorsPackageElement(elements).map(this::newGenerators).orElseGet(ArrayList::new);
   }
 

@@ -14,26 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt;
-
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import java.util.Set;
+package org.jboss.errai.common.apt.generator;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class AptAnnotatedElementsFinder implements AnnotatedElementsFinder {
-
-  private RoundEnvironment roundEnvironment;
-
-  public AptAnnotatedElementsFinder(final RoundEnvironment roundEnvironment) {
-    this.roundEnvironment = roundEnvironment;
-  }
-
-  @Override
-  public Set<? extends Element> getElementsAnnotatedWith(final TypeElement typeElement) {
-    return roundEnvironment.getElementsAnnotatedWith(typeElement);
-  }
+@interface TestEnclosedElementAnnotation {
 }

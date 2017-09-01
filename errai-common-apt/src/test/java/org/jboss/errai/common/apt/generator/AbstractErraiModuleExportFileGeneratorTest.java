@@ -6,6 +6,7 @@ import org.jboss.errai.common.apt.test.ErraiAptTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class AbstractErraiModuleExportFileGeneratorTest extends ErraiAptTest {
   @Test
   public void testGenerateExportFilesForUsedAnnotation() {
     final TypeElement testAnnotation = getTypeElement(TestAnnotation.class);
-    final TypeElement testExportedType = getTypeElement(TestExportedType.class);
+    final TypeElement testExportedType = getTypeElement(TestExportableType.class);
 
     final Set<ExportFile> exportFiles = new TestGenerator().generateExportFiles(singleton(testAnnotation),
             new TestAnnotatedElementsFinder(testExportedType));
@@ -60,7 +61,25 @@ public class AbstractErraiModuleExportFileGeneratorTest extends ErraiAptTest {
   }
 
   @Test
-  public void testAnnotatedClassesAndInterfaces() {
-      //FIXME: tiago: implement
+  public void testAnnotatedClassesAndInterfacesForAnnotatedField() {
+    final Element[] testExportedType = getTypeElement(
+            TestExportableTypeWithFieldAnnotations.class).getEnclosedElements().toArray(new Element[0]);
+    final TypeElement TestEnclosedElementAnnotation = getTypeElement(TestEnclosedElementAnnotation.class);
+
+    final Set<? extends Element> elements = new TestGenerator().annotatedClassesAndInterfaces(
+            new TestAnnotatedElementsFinder(testExportedType), TestEnclosedElementAnnotation);
+
+    Assert.assertTrue(elements.isEmpty());
+  }
+
+  @Test
+  public void testAnnotatedClassesAndInterfacesForAnnotatedClass() {
+    final TypeElement testExportedType = getTypeElement(TestExportableTypeWithFieldAnnotations.class);
+    final TypeElement testAnnotation = getTypeElement(TestAnnotation.class);
+
+    final Set<? extends Element> elements = new TestGenerator().annotatedClassesAndInterfaces(
+            new TestAnnotatedElementsFinder(testExportedType), testAnnotation);
+
+    Assert.assertEquals(singleton(testExportedType), elements);
   }
 }

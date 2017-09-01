@@ -15,7 +15,8 @@ public class ErraiAppAptGeneratorTest {
   public void testExceptionDoesNotBreakIt() {
     Assert.assertFalse(new TestGenerator() {
       @Override
-      void generateAndSaveSourceFiles(Set<? extends TypeElement> annotations, AnnotatedElementsFinder annotatedElementsFinder) {
+      void generateAndSaveSourceFiles(Set<? extends TypeElement> annotations,
+              AnnotatedElementsFinder annotatedElementsFinder) {
         throw new TestException();
       }
     }.process(null, null));
@@ -24,5 +25,17 @@ public class ErraiAppAptGeneratorTest {
   @Test
   public void testProcessForEmptyAnnotationsSet() {
     Assert.assertFalse(new TestGenerator().process(emptySet(), null));
+  }
+
+  @Test
+  public void testFindGenerators() {
+
+    try {
+      new TestGenerator().findGenerators(null);
+    } catch (Exception e) {
+      return;
+    }
+
+    Assert.fail("Exception was not thrown");
   }
 }

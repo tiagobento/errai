@@ -44,8 +44,8 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
 
   @Override
   public String generate() {
-    return rpcProxyLoaderGenerator.generate(this::findMetaClasses, isIOCModuleInherited(), this::filterAnnotations,
-            null);
+    return rpcProxyLoaderGenerator.generate(this::findAnnotatedMetaClasses, isIOCModuleInherited(),
+            this::filterAnnotations, null);
   }
 
   private Boolean isIOCModuleInherited() {
@@ -60,10 +60,10 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
     return annotations.stream().filter(s -> !s.annotationType().getPackageName().contains("server")).collect(toList());
   }
 
-  private Collection<MetaClass> findMetaClasses(final GeneratorContext context,
+  private Collection<MetaClass> findAnnotatedMetaClasses(final GeneratorContext context,
           Class<? extends Annotation> annotation) {
 
-    return ErraiAptExportedTypes.getMetaClasses(annotation);
+    return ErraiAptExportedTypes.findAnnotatedMetaClasses(annotation);
   }
 
   @Override

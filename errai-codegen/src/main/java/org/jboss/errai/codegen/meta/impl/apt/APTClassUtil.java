@@ -111,11 +111,6 @@ public final class APTClassUtil {
     throw new UnsupportedOperationException(format("Unsupported TypeMirror %s [%s].", type.getKind(), type));
   }
 
-  static MetaClass eraseOrReturn(final TypeMirror type) {
-    final TypeMirror erased = APTClassUtil.types.erasure(type);
-    return new APTClass(erased);
-  }
-
   static boolean sameTypes(final Iterator<? extends TypeMirror> iter1, final Iterator<? extends TypeMirror> iter2) {
     while (iter1.hasNext() && iter2.hasNext()) {
       if (!APTClassUtil.types.isSameType(iter1.next(), iter2.next())) {
