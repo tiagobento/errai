@@ -57,7 +57,10 @@ public final class JaxrsProxyLoaderAptGenerator implements ErraiAptGenerator {
   private Collection<MetaAnnotation> filterAnnotations(final Collection<MetaAnnotation> annotations) {
     /* Ideally we would parse GWT Module files to check which classes are allowed
        in client code, but this hack does the job for now. */
-    return annotations.stream().filter(s -> !s.annotationType().getPackageName().contains("server")).collect(toList());
+    return annotations.stream().filter(s -> {
+      String packageName = s.annotationType().getPackageName();
+      return !packageName.contains("server");
+    }).collect(toList());
   }
 
   private Collection<MetaClass> findAnnotatedMetaClasses(final GeneratorContext context,

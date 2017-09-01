@@ -116,7 +116,17 @@ public class APTAnnotation extends MetaAnnotation {
     return ((List<?>) value).stream()
             .map(av -> ((AnnotationValue) av).getValue())
             .map(v -> convertValue(v, null))
-            .toArray(n -> (Object[]) Array.newInstance(arrayTypeHint.getComponentType(), n));
+            .toArray(n -> buildArray(arrayTypeHint, n));
+  }
+
+  private static Object[] buildArray(final Class<?> arrayTypeHint, int n) {
+    if (arrayTypeHint.equals(Class[].class)) {
+      return (Object[]) Array.newInstance(MetaClass.class, n);
+    } else if (arrayTypeHint.equals(Annotation[].class)) {
+      return (Object[]) Array.newInstance(MetaAnnotation.class, n);
+    } else {
+      return (Object[]) Array.newInstance(arrayTypeHint.getComponentType(), n);
+    }
   }
 
   @Deprecated

@@ -78,7 +78,10 @@ public abstract class ProxyUtil {
           final AnnotationFilter annotationFilter,
           final boolean iocEnabled) {
 
-    final MetaAnnotation[] filteredAnnotations = annotationFilter.filter(method.getAnnotations())
+    final MetaAnnotation[] methodFilteredAnnotations = annotationFilter.filter(method.getAnnotations())
+            .toArray(new MetaAnnotation[0]);
+
+    final MetaAnnotation[] methodsDeclaringClassAnnotations = annotationFilter.filter(method.getDeclaringClass().getAnnotations())
             .toArray(new MetaAnnotation[0]);
 
     return Stmt.newObject(callContextType)
@@ -90,10 +93,10 @@ public abstract class ProxyUtil {
             .append(Stmt.load(method.getReturnType()).returnValue())
             .finish()
             .publicOverridesMethod("getAnnotations")
-            .append(Stmt.load(filteredAnnotations).returnValue())
+            .append(Stmt.load(methodFilteredAnnotations).returnValue())
             .finish()
             .publicOverridesMethod("getTypeAnnotations")
-            .append(Stmt.load(filteredAnnotations).returnValue())
+            .append(Stmt.load(methodsDeclaringClassAnnotations).returnValue())
             .finish()
             .publicOverridesMethod("proceed")
             .append(generateInterceptorStackProceedMethod(callContextType, proceed, interceptors, iocEnabled))
