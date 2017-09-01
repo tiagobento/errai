@@ -14,12 +14,12 @@
   <set-property name="errai.jaxrs.useAptGenerators" value="false"/>
 
   <generate-with class="org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderGenerator">
-    <when-type-assignable class="org.jboss.errai.enterprise.client.jaxrs.JaxrsProxyLoader" />
+    <when-type-assignable class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoader" />
     <when-property-is name="errai.jaxrs.useAptGenerators" value="false" />
   </generate-with>
 
-  <replace-with class="org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderImpl">
-    <when-type-assignable class="org.jboss.errai.enterprise.client.jaxrs.JaxrsProxyLoader" />
+  <replace-with class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoader">
+    <when-type-assignable class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoader" />
     <when-property-is name="errai.jaxrs.useAptGenerators" value="true" />
   </replace-with>
 

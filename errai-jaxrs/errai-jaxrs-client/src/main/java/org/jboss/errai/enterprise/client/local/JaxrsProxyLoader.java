@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.enterprise.client.jaxrs;
+package org.jboss.errai.enterprise.client.local;
 
 /**
  * This interface, <tt>JaxrsProxyLoader</tt>, is used internally during compile time to produce the required proxies.

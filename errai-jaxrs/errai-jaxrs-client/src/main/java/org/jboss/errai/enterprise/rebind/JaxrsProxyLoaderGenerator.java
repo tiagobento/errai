@@ -39,7 +39,7 @@ import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
 import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
-import org.jboss.errai.enterprise.client.jaxrs.JaxrsProxyLoader;
+import org.jboss.errai.enterprise.client.local.JaxrsProxyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class JaxrsProxyLoaderGenerator extends AbstractAsyncGenerator {
   private static final String IOC_MODULE_NAME = "org.jboss.errai.ioc.Container";
   private static final Logger log = LoggerFactory.getLogger(JaxrsProxyLoaderGenerator.class);
 
-  private final String packageName = "org.jboss.errai.enterprise.client.jaxrs";
+  private final String packageName = "org.jboss.errai.enterprise.client.local";
   private final String classSimpleName = "JaxrsProxyLoaderImpl";
 
   @Override

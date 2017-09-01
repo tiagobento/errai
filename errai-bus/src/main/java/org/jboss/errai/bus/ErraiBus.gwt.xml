@@ -23,12 +23,12 @@
     <set-property name="errai.bus.useAptGenerators" value="false"/>
 
     <generate-with class="org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator">
-        <when-type-assignable class="org.jboss.errai.bus.client.framework.RpcProxyLoader"/>
+        <when-type-assignable class="org.jboss.errai.bus.client.local.RpcProxyLoader"/>
         <when-property-is name="errai.bus.useAptGenerators" value="false"/>
     </generate-with>
 
-    <replace-with class="org.jboss.errai.bus.client.framework.RpcProxyLoaderImpl">
-        <when-type-assignable class="org.jboss.errai.bus.client.framework.RpcProxyLoader"/>
+    <replace-with class="org.jboss.errai.bus.client.local.RpcProxyLoaderImpl">
+        <when-type-assignable class="org.jboss.errai.bus.client.local.RpcProxyLoader"/>
         <when-property-is name="errai.bus.useAptGenerators" value="true"/>
     </replace-with>
 </module>

@@ -20,7 +20,7 @@ import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
 import org.jboss.errai.bus.client.api.messaging.MessageBus;
-import org.jboss.errai.bus.client.framework.RpcProxyLoader;
+import org.jboss.errai.bus.client.local.RpcProxyLoader;
 import org.jboss.errai.bus.server.annotations.Remote;
 import org.jboss.errai.codegen.InnerClass;
 import org.jboss.errai.codegen.Parameter;
@@ -59,7 +59,7 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
   private static final String IOC_MODULE_NAME = "org.jboss.errai.ioc.Container";
   private static final Logger log = LoggerFactory.getLogger(RpcProxyLoaderGenerator.class);
 
-  private final String packageName = "org.jboss.errai.bus.client.framework";
+  private final String packageName = "org.jboss.errai.bus.client.local";
   private final String classSimpleName = "RpcProxyLoaderImpl";
 
   @Override

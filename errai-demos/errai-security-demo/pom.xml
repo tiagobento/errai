@@ -119,6 +119,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-javaee-all</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
       <version>${javaee.version}</version>
@@ -334,6 +338,20 @@
           <groupId>org.jboss.errai</groupId>
           <artifactId>errai-generators-apt</artifactId>
           <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-javaee-all</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.errai</groupId>
+                    <artifactId>errai-jpa-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.errai</groupId>
+                    <artifactId>errai-jpa-datasync</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
       </dependencies>
     </profile>

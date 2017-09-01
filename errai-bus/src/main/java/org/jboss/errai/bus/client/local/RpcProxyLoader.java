@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.bus.client.framework;
+package org.jboss.errai.bus.client.local;
 
 import org.jboss.errai.bus.client.api.messaging.MessageBus;
 
