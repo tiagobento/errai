@@ -5,22 +5,20 @@
   <inherits name="com.google.gwt.http.HTTP" />
   <inherits name="com.google.common.collect.Collect" />
   <inherits name="org.jboss.errai.common.ErraiCommon" />
+  <inherits name="org.jboss.errai.common.apt.ErraiCommonApt" />
   <inherits name="org.jboss.errai.marshalling.ErraiMarshalling" />
   <inherits name="javax.ws.rs.Annotations"/>
 
   <entry-point class='org.jboss.errai.enterprise.client.jaxrs.JaxrsModule' />
 
-  <define-property name="errai.jaxrs.useAptGenerators" values="false,true"/>
-  <set-property name="errai.jaxrs.useAptGenerators" value="false"/>
-
   <generate-with class="org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderGenerator">
     <when-type-assignable class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoader" />
-    <when-property-is name="errai.jaxrs.useAptGenerators" value="false" />
+    <when-property-is name="errai.useAptGenerators" value="false" />
   </generate-with>
 
-  <replace-with class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoader">
+  <replace-with class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoaderImpl">
     <when-type-assignable class="org.jboss.errai.enterprise.client.local.JaxrsProxyLoader" />
-    <when-property-is name="errai.jaxrs.useAptGenerators" value="true" />
+    <when-property-is name="errai.useAptGenerators" value="true" />
   </replace-with>
 
   <super-source path="compat" />
