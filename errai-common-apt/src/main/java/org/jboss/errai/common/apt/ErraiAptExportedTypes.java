@@ -86,6 +86,7 @@ public final class ErraiAptExportedTypes {
   }
 
   private static void addLocalExportableTypesWhichHaveNotBeenExported() {
+    System.out.println("Exporting local exportable types..");
     exportedAnnotationsPackageElement(elements).ifPresent(p -> getLocalExportableTypes(p).entrySet()
             .stream()
             .filter(s -> !s.getValue().isEmpty())

@@ -16,11 +16,11 @@
 
 package org.jboss.errai.common.apt.generator;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.errai.codegen.builder.ClassStructureBuilder;
+import org.jboss.errai.codegen.builder.impl.ClassBuilder;
+import org.jboss.errai.codegen.meta.impl.apt.APTClass;
+import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 import org.jboss.errai.common.apt.AnnotatedElementsFinder;
 import org.jboss.errai.common.apt.AptAnnotatedElementsFinder;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
@@ -29,18 +29,13 @@ import org.jboss.errai.common.apt.exportfile.ExportFileName;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
+import javax.tools.JavaFileObject;
 import java.io.IOException;
-import java.util.List;
+import java.io.Writer;
 import java.util.Set;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.PUBLIC;
 import static org.jboss.errai.common.apt.ErraiAptPackages.exportFilesPackagePath;
 
 /**
@@ -52,6 +47,7 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
     try {
+      APTClassUtil.init(processingEnv.getTypeUtils(), processingEnv.getElementUtils());
       generateAndSaveExportFiles(annotations, new AptAnnotatedElementsFinder(roundEnv));
     } catch (final Exception e) {
       System.out.println("Error generating export files");
@@ -64,18 +60,10 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
   void generateAndSaveExportFiles(final Set<? extends TypeElement> annotations,
           final AnnotatedElementsFinder annotatedElementsFinder) {
 
-    generateExportFilesTypeSpecs(annotations, annotatedElementsFinder).forEach(this::save);
+    buildExportFiles(annotations, annotatedElementsFinder).forEach(this::generateSourceAndSave);
   }
 
-  private Set<TypeSpec> generateExportFilesTypeSpecs(final Set<? extends TypeElement> annotations,
-          final AnnotatedElementsFinder annotatedElementsFinder) {
-
-    return generateExportFiles(annotations, annotatedElementsFinder).stream()
-            .map(this::newExportFileTypeSpec)
-            .collect(toSet());
-  }
-
-  Set<ExportFile> generateExportFiles(final Set<? extends TypeElement> annotations,
+  Set<ExportFile> buildExportFiles(final Set<? extends TypeElement> annotations,
           final AnnotatedElementsFinder annotatedElementsFinder) {
 
     return annotations.stream()
@@ -94,32 +82,28 @@ public abstract class AbstractErraiModuleExportFileGenerator extends AbstractPro
             .collect(toSet());
   }
 
-  private TypeSpec newExportFileTypeSpec(final ExportFile exportFile) {
-    return TypeSpec.classBuilder(ExportFileName.encodeAnnotationNameAsExportFileName(exportFile))
-            .addModifiers(PUBLIC, FINAL)
-            .addFields(buildFields(exportFile.exportedTypes))
-            .build();
-  }
+  private void generateSourceAndSave(final ExportFile exportFile) {
 
-  private List<FieldSpec> buildFields(final Set<? extends Element> exportedElements) {
-    return exportedElements.stream().map(this::newFieldSpec).collect(toList());
-  }
+    final Set<APTClass> exportedTypes = exportFile.exportedTypes.stream()
+            .map(s -> new APTClass(s.asType()))
+            .collect(toSet());
 
-  private FieldSpec newFieldSpec(final Element exportedElement) {
+    final String className = ExportFileName.encodeAnnotationNameAsExportFileName(exportFile);
+    final String fullClassName = exportFilesPackagePath() + "." + className;
+    final ClassStructureBuilder<?> classBuilder = ClassBuilder.define(fullClassName).publicScope().body();
 
-    final TypeElement typeElement = (TypeElement) exportedElement;
-    final QualifiedNameable enclosingElement = (QualifiedNameable) exportedElement.getEnclosingElement();
-    final String enclosingElementName = enclosingElement.getQualifiedName().toString();
-    final String classSimpleName = typeElement.getSimpleName().toString();
+    exportedTypes.forEach(
+            exportedType -> classBuilder.publicField(RandomStringUtils.randomAlphabetic(6), exportedType).finish());
 
-    return FieldSpec.builder(ClassName.get(enclosingElementName, classSimpleName),
-            RandomStringUtils.randomAlphabetic(6)).addModifiers(PUBLIC).build();
-  }
-
-  private void save(final TypeSpec exportFileTypeSpec) {
     try {
-      JavaFile.builder(exportFilesPackagePath(), exportFileTypeSpec).build().writeTo(processingEnv.getFiler());
-      System.out.println("Successfully generated export file [" + exportFileTypeSpec.name + "]");
+      final String generatedSource = classBuilder.toJavaString();
+      final Element[] originatingElements = exportFile.exportedTypes.toArray(new Element[0]);
+      final JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(fullClassName, originatingElements);
+
+      try (Writer writer = sourceFile.openWriter()) {
+        writer.write(generatedSource);
+      }
+      System.out.println("Successfully generated export file [" + className + "]");
     } catch (final IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
     }

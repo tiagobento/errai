@@ -16,13 +16,6 @@
             <artifactId>errai-codegen</artifactId>
         </dependency>
 
-        <!-- FIXME: remove -->
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-            <version>1.9.0</version>
-        </dependency>
-
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-codegen</artifactId>
