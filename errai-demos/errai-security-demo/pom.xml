@@ -63,6 +63,7 @@
     <errai.dev.context>${project.artifactId}</errai.dev.context>
     <maven.gwt.plugin.version>2.8.1</maven.gwt.plugin.version>
     <maven.deploy.plugin.version>2.7</maven.deploy.plugin.version>
+    <gwt.module.prefix> </gwt.module.prefix>
   </properties>
 
   <repositories>
@@ -306,6 +307,7 @@
           </execution>
         </executions>
         <configuration>
+          <module>org.jboss.errai.security.demo.${gwt.module.prefix}App</module>
           <strict>true</strict>
           <webappDirectory>src/main/webapp</webappDirectory>
           <logLevel>INFO</logLevel>
@@ -329,15 +331,23 @@
     </plugins>
   </build>
 
+
+
   <profiles>
 
     <profile>
       <id>apt-generators</id>
+
       <activation>
-      <property>
-        <name>apt-generators</name>
-      </property>
-    </activation>
+        <property>
+          <name>apt-generators</name>
+        </property>
+      </activation>
+
+      <properties>
+        <gwt.module.prefix>AptGenerators_</gwt.module.prefix>
+      </properties>
+
       <dependencies>
         <dependency>
           <groupId>org.jboss.errai</groupId>
