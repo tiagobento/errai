@@ -18,6 +18,7 @@ package org.jboss.errai.codegen.meta.impl.apt;
 
 import javax.lang.model.element.TypeParameterElement;
 
+import com.sun.tools.javac.code.Type;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
 
@@ -31,6 +32,10 @@ public class APTMetaTypeVariable implements MetaTypeVariable {
 
   public APTMetaTypeVariable(final TypeParameterElement typeParam) {
     this.typeParam = typeParam;
+  }
+
+  public APTMetaTypeVariable(final Type.TypeVar typeParam) {
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override

@@ -2,7 +2,7 @@ package org.jboss.errai.common.apt.generator;
 
 import org.jboss.errai.common.apt.AnnotatedElementsFinder;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
-import org.jboss.errai.common.apt.test.ErraiAptTest;
+import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.junit.Assert;
 import org.junit.Test;
 

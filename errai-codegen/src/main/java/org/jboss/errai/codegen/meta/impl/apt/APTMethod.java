@@ -16,31 +16,41 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
+import com.sun.tools.javac.code.Type;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
+import org.jboss.errai.codegen.meta.impl.AbstractMetaClass;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Optional;
 
 import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.fromTypeMirror;
+import static org.jboss.errai.codegen.meta.impl.apt.APTClassUtil.types;
 
 /**
- *
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public class APTMethod extends MetaMethod implements APTMember {
 
   private final ExecutableElement method;
+  private final DeclaredType enclosedMetaObject;
 
-  public APTMethod(final ExecutableElement method) {
+  @SuppressWarnings("unchecked")
+  public APTMethod(final ExecutableElement method, final MetaClass metaClass) {
     this.method = method;
+
+    //We know for sure that every MetaClass is an AbstractMetaClass
+    final AbstractMetaClass<TypeMirror> abstractMetaClass = (AbstractMetaClass<TypeMirror>) metaClass;
+    this.enclosedMetaObject = (DeclaredType) abstractMetaClass.getEnclosedMetaObject();
   }
 
   @Override
@@ -50,6 +60,13 @@ public class APTMethod extends MetaMethod implements APTMember {
 
   @Override
   public MetaClass getReturnType() {
+
+    final TypeMirror typeMirror = types.asMemberOf(enclosedMetaObject, method);
+
+    if (typeMirror instanceof Type.MethodType) {
+      return new APTClass(((Type.MethodType) typeMirror).getReturnType());
+    }
+
     return new APTClass(method.getReturnType());
   }
 
@@ -65,7 +82,7 @@ public class APTMethod extends MetaMethod implements APTMember {
 
   @Override
   public MetaParameter[] getParameters() {
-    return APTClassUtil.getParameters(method);
+    return APTClassUtil.getParameters(method, enclosedMetaObject);
   }
 
   @Override

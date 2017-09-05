@@ -16,13 +16,16 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
+import com.sun.tools.javac.code.Type;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 import org.jboss.errai.codegen.meta.MetaParameter;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Optional;
@@ -33,9 +36,11 @@ import java.util.Optional;
 public class APTParameter extends MetaParameter {
 
   private final VariableElement parameter;
+  private final TypeMirror actualParameterType;
 
-  public APTParameter(final VariableElement parameter) {
+  public APTParameter(final VariableElement parameter, final TypeMirror actualParameterType) {
     this.parameter = parameter;
+    this.actualParameterType = actualParameterType;
   }
 
   @Override
@@ -45,12 +50,13 @@ public class APTParameter extends MetaParameter {
 
   @Override
   public MetaClass getType() {
-    return new APTClass(parameter.asType());
+    return new APTClass(actualParameterType);
   }
 
   @Override
   public MetaClassMember getDeclaringMember() {
-    return new APTMethod((ExecutableElement) parameter.getEnclosingElement());
+    return new APTMethod((ExecutableElement) parameter.getEnclosingElement(),
+            new APTClass(parameter.getEnclosingElement().getEnclosingElement().asType()));
   }
 
   @Override
@@ -81,5 +87,9 @@ public class APTParameter extends MetaParameter {
   @Override
   public <A extends Annotation> A unsafeGetAnnotation(final Class<A> annotation) {
     return APTClassUtil.unsafeGetAnnotation();
+  }
+
+  public Element getParameter() {
+    return parameter;
   }
 }

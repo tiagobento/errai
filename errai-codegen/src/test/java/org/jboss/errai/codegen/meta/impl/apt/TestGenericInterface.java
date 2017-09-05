@@ -14,35 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.test;
-
-import com.google.testing.compile.CompilationRule;
-import org.junit.Before;
-import org.junit.Rule;
-
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public abstract class ErraiAptTest {
+interface TestGenericInterface<T> {
 
-  @Rule
-  public CompilationRule rule = new CompilationRule();
-
-  protected Elements elements;
-  protected Types types;
-
-  @Before
-  public void before() {
-    elements = rule.getElements();
-    types = rule.getTypes();
-  }
-
-  protected TypeElement getTypeElement(final Class<?> clazz) {
-    return elements.getTypeElement(clazz.getCanonicalName());
-  }
+  T foo();
 
 }

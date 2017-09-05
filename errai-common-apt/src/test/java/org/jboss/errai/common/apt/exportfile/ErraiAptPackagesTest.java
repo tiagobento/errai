@@ -4,7 +4,7 @@ import org.jboss.errai.apt.internal.export.annotation.ErraiCommonAptExportedAnno
 import org.jboss.errai.apt.internal.export.test_hYbKGF_ExportFile_org_jboss_errai_common_apt_test_TestAnnotation;
 import org.jboss.errai.apt.internal.generator.TestGenerator;
 import org.jboss.errai.common.apt.ErraiAptPackages;
-import org.jboss.errai.common.apt.test.ErraiAptTest;
+import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

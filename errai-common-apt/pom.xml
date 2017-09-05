@@ -11,6 +11,7 @@
     <description>Common for Errai Annotation Processors</description>
 
     <dependencies>
+
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-codegen</artifactId>
@@ -20,12 +21,6 @@
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-codegen</artifactId>
             <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.testing.compile</groupId>
-            <artifactId>compile-testing</artifactId>
             <scope>test</scope>
         </dependency>
 

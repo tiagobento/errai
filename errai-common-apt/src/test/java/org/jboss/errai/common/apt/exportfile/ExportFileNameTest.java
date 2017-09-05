@@ -1,6 +1,6 @@
 package org.jboss.errai.common.apt.exportfile;
 
-import org.jboss.errai.common.apt.test.ErraiAptTest;
+import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;

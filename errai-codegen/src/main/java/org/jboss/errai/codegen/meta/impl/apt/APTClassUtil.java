@@ -16,6 +16,8 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.util.List;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaParameter;
@@ -38,6 +40,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
@@ -91,8 +94,23 @@ public final class APTClassUtil {
     return target.getTypeParameters().stream().map(APTMetaTypeVariable::new).toArray(MetaTypeVariable[]::new);
   }
 
-  static MetaParameter[] getParameters(final ExecutableElement target) {
-    return target.getParameters().stream().map(APTParameter::new).toArray(MetaParameter[]::new);
+  static MetaParameter[] getParameters(final ExecutableElement target, DeclaredType enclosedMetaObject) {
+
+    final TypeMirror typeMirror = types.asMemberOf(enclosedMetaObject, target);
+
+    if (typeMirror instanceof Type.MethodType) {
+      final AtomicInteger i = new AtomicInteger(0);
+      final List<Type> parameterTypes = ((Type.MethodType) typeMirror).getParameterTypes();
+      return target.getParameters()
+              .stream()
+              .map(parameter -> new APTParameter(parameter, parameterTypes.get(i.getAndIncrement())))
+              .toArray(MetaParameter[]::new);
+    }
+
+    return target.getParameters()
+            .stream()
+            .map(parameter -> new APTParameter(parameter, parameter.asType()))
+            .toArray(MetaParameter[]::new);
   }
 
   static MetaType[] getGenericParameterTypes(final ExecutableElement target) {

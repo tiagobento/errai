@@ -16,6 +16,7 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
+import com.sun.tools.javac.code.Type;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaConstructor;
@@ -183,7 +184,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
       final List<ExecutableElement> methods = ElementFilter.methodsIn(elements.getAllMembers(element));
       return methods.stream()
               .filter(method -> !method.getModifiers().contains(Modifier.PRIVATE))
-              .map(APTMethod::new)
+              .map(method -> new APTMethod(method, this))
               .toArray(MetaMethod[]::new);
     case ARRAY:
     case BOOLEAN:
@@ -208,7 +209,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
       final List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
-      return methods.stream().map(APTMethod::new).toArray(MetaMethod[]::new);
+      return methods.stream().map(method -> new APTMethod(method, this)).toArray(MetaMethod[]::new);
     case ARRAY:
     case BOOLEAN:
     case BYTE:
@@ -338,10 +339,10 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case DECLARED:
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
-      final List<ExecutableElement> ctors = ElementFilter.constructorsIn(element.getEnclosedElements());
-      return ctors.stream()
+      final List<ExecutableElement> constructors = ElementFilter.constructorsIn(element.getEnclosedElements());
+      return constructors.stream()
               .filter(ctor -> ctor.getModifiers().contains(Modifier.PUBLIC))
-              .map(APTConstructor::new)
+              .map(ctor -> new APTConstructor(ctor, this))
               .toArray(MetaConstructor[]::new);
     case BOOLEAN:
     case BYTE:
@@ -365,8 +366,8 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case DECLARED:
     case TYPEVAR:
       final TypeElement element = (TypeElement) types.asElement(mirror);
-      final List<ExecutableElement> ctors = ElementFilter.constructorsIn(element.getEnclosedElements());
-      return ctors.stream().map(APTConstructor::new).toArray(MetaConstructor[]::new);
+      final List<ExecutableElement> constructors = ElementFilter.constructorsIn(element.getEnclosedElements());
+      return constructors.stream().map(ctor -> new APTConstructor(ctor, this)).toArray(MetaConstructor[]::new);
     case BOOLEAN:
     case BYTE:
     case CHAR:
@@ -456,6 +457,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case ARRAY:
       return null;
     case TYPEVAR:
+      return new APTClass(((Type.TypeVar) getEnclosedMetaObject()).getUpperBound());
     default:
       return throwUnsupportedTypeError(mirror);
     }
@@ -798,7 +800,6 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     }
   }
 
-
   @Override
   public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
     return APTClassUtil.unsafeIsAnnotationPresent();
@@ -808,7 +809,6 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
   public synchronized Class<?> unsafeAsClass() {
     return APTClassUtil.unsafeAsClass();
   }
-
 
   @Override
   public Annotation[] unsafeGetAnnotations() {
