@@ -59,6 +59,7 @@
     <maven.clean.plugin.version>2.4.1</maven.clean.plugin.version>
     <maven.deploy.plugin.version>2.7</maven.deploy.plugin.version>
     <maven.gwt.plugin.version>2.8.1</maven.gwt.plugin.version>
+    <gwt.module.prefix> </gwt.module.prefix>
   </properties>
 
   <repositories>
@@ -184,6 +185,7 @@
           <hostedWebapp>src/main/webapp/</hostedWebapp>
           <treeLogger>true</treeLogger>
           <strict>true</strict>
+          <module>org.errai.samples.stockdemo.${gwt.module.prefix}StockDemo</module>
         </configuration>
         <executions>
           <execution>
@@ -285,7 +287,19 @@
   <profiles>
 
     <profile>
+
       <id>apt-generators</id>
+
+      <activation>
+        <property>
+          <name>apt-generators</name>
+        </property>
+      </activation>
+
+      <properties>
+        <gwt.module.prefix>AptGenerators_</gwt.module.prefix>
+      </properties>
+
       <dependencies>
         <dependency>
           <groupId>org.jboss.errai</groupId>
@@ -293,6 +307,7 @@
           <scope>provided</scope>
         </dependency>
       </dependencies>
+
     </profile>
 
     <profile>
