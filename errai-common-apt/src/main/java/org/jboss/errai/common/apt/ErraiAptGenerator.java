@@ -23,5 +23,11 @@ public interface ErraiAptGenerator {
 
   String generate();
 
-  String className();
+  default String getFullQualifiedClassName() {
+    return getPackageName() + "." + getClassSimpleName();
+  }
+
+  String getPackageName();
+
+  String getClassSimpleName();
 }

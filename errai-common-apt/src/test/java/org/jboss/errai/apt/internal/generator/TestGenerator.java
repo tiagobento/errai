@@ -28,7 +28,12 @@ public class TestGenerator implements ErraiAptGenerator {
   }
 
   @Override
-  public String className() {
+  public String getPackageName() {
+    return "org.jboss.errai.apt.test";
+  }
+
+  @Override
+  public String getClassSimpleName() {
     return "TestGeneratedSourceImpl";
   }
 }

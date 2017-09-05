@@ -16,14 +16,13 @@
 
 package org.jboss.errai.apt;
 
+import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 import org.jboss.errai.common.apt.AnnotatedElementsFinder;
 import org.jboss.errai.common.apt.AptAnnotatedElementsFinder;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
-import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -32,7 +31,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.tools.JavaFileObject;
+import javax.tools.FileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
@@ -41,7 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
-import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.jboss.errai.common.apt.ErraiAptPackages.generatorsPackageElement;
 
 /**
@@ -109,10 +108,10 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
 
   private void generateAndSaveSourceFile(final ErraiAptGenerator generator) {
     final String generatedSourceCode = generator.generate();
-    final String fileName = generator.className();
 
     try {
-      final JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(fileName);
+      final FileObject sourceFile = processingEnv.getFiler()
+              .createResource(SOURCE_OUTPUT, generator.getPackageName(), generator.getClassSimpleName() + ".java");
       try (final Writer writer = sourceFile.openWriter()) {
         writer.write(generatedSourceCode);
       }

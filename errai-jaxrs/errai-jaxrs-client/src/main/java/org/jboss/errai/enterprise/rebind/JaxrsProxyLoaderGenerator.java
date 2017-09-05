@@ -153,7 +153,11 @@ public class JaxrsProxyLoaderGenerator extends AbstractAsyncGenerator {
     return ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context);
   }
 
-  public String getFullQualifiedClassName() {
-    return packageName + "." + classSimpleName;
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public String getClassSimpleName() {
+    return classSimpleName;
   }
 }

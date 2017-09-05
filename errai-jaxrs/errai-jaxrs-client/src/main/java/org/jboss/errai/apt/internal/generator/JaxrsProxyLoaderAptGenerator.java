@@ -44,8 +44,8 @@ public final class JaxrsProxyLoaderAptGenerator implements ErraiAptGenerator {
 
   @Override
   public String generate() {
-    return jaxrsProxyLoaderGenerator.generate(this::findAnnotatedMetaClasses, isIOCModuleInherited(), this::filterAnnotations,
-            null);
+    return jaxrsProxyLoaderGenerator.generate(this::findAnnotatedMetaClasses, isIOCModuleInherited(),
+            this::filterAnnotations, null);
   }
 
   private Boolean isIOCModuleInherited() {
@@ -70,7 +70,12 @@ public final class JaxrsProxyLoaderAptGenerator implements ErraiAptGenerator {
   }
 
   @Override
-  public String className() {
-    return jaxrsProxyLoaderGenerator.getFullQualifiedClassName();
+  public String getPackageName() {
+    return jaxrsProxyLoaderGenerator.getPackageName();
+  }
+
+  @Override
+  public String getClassSimpleName() {
+    return jaxrsProxyLoaderGenerator.getClassSimpleName();
   }
 }

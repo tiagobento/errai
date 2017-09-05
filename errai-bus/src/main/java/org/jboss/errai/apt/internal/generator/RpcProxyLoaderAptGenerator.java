@@ -67,7 +67,12 @@ public final class RpcProxyLoaderAptGenerator implements ErraiAptGenerator {
   }
 
   @Override
-  public String className() {
-    return rpcProxyLoaderGenerator.getFullQualifiedClassName();
+  public String getPackageName() {
+    return rpcProxyLoaderGenerator.getPackageName();
+  }
+
+  @Override
+  public String getClassSimpleName() {
+    return rpcProxyLoaderGenerator.getClassSimpleName();
   }
 }
