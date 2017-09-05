@@ -1,5 +1,6 @@
 package org.jboss.errai.apt;
 
+import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.common.apt.AnnotatedElementsFinder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 import static java.util.Collections.emptySet;
 
-public class ErraiAppAptGeneratorTest {
+public class ErraiAppAptGeneratorTest extends ErraiAptTest {
 
   @Test
   public void testExceptionDoesNotBreakIt() {

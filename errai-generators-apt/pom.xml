@@ -17,12 +17,12 @@
             <artifactId>errai-common-apt</artifactId>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.jboss.errai</groupId>-->
-            <!--<artifactId>errai-common-apt</artifactId>-->
-            <!--<type>test-jar</type>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-codegen</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
