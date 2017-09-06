@@ -14,30 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.generator;
-
-import org.jboss.errai.common.apt.AnnotatedElementsFinder;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import java.util.Arrays;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
+package org.jboss.errai.common.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-class TestAnnotatedElementsFinder implements AnnotatedElementsFinder {
-
-  private final Set<? extends Element> elements;
-
-  public TestAnnotatedElementsFinder(final Element... elements) {
-    this.elements = Arrays.stream(elements).collect(toSet());
-  }
-
-  @Override
-  public Set<? extends Element> getElementsAnnotatedWith(final TypeElement typeElement) {
-    return elements;
-  }
+public class ErraiAptExportedTypesTestExportedType {
 }

@@ -34,10 +34,6 @@ public class APTMetaTypeVariable implements MetaTypeVariable {
     this.typeParam = typeParam;
   }
 
-  public APTMetaTypeVariable(final Type.TypeVar typeParam) {
-    throw new RuntimeException("not yet implemented");
-  }
-
   @Override
   public String getName() {
     return typeParam.getSimpleName().toString();

@@ -88,7 +88,7 @@ public interface User extends Serializable {
    * @param name
    *          The name of a property to set.
    * @param value
-   *          The module to set. This will override any pre-existing module.
+   *          The value to set. This will override any pre-existing value.
    */
   void setProperty(final String name, final String value);
 

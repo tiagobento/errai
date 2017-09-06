@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt.internal.export.annotation;
-
-import org.jboss.errai.common.apt.generator.TestUnusedAnnotation;
+package org.jboss.errai.common.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiCommonAptExportedAnnotations {
+public @interface ErraiAptExportedTypesTestAnnotation {
 }

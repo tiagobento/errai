@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.codegen.meta;
+package org.jboss.errai.common.apt;
+
+import org.jboss.errai.common.apt.AnnotatedElementsFinder;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import java.util.Arrays;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public abstract class MetaAnnotation {
+public class TestAnnotatedElementsFinder implements AnnotatedElementsFinder {
 
-  @SuppressWarnings("unchecked")
-  public <V> V value() {
-    return (V) valueAsArray(Object[].class);
+  private final Set<? extends Element> elements;
+
+  public TestAnnotatedElementsFinder(final Element... elements) {
+    this.elements = Arrays.stream(elements).collect(toSet());
   }
 
-  @SuppressWarnings("unchecked")
-  public <V> V value(final String attributeName) {
-    return (V) valueAsArray(attributeName, Object[].class);
+  @Override
+  public Set<? extends Element> getElementsAnnotatedWith(final TypeElement typeElement) {
+    return elements;
   }
-
-  public <V> V valueAsArray(final Class<V> arrayClass) {
-    return valueAsArray("value", arrayClass);
-  }
-
-  public abstract <V> V valueAsArray(final String attributeName, final Class<V> arrayClass);
-
-  public abstract MetaClass annotationType();
 }
