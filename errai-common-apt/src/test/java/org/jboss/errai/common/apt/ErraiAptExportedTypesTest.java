@@ -29,6 +29,16 @@ import java.util.Collection;
 public class ErraiAptExportedTypesTest extends ErraiAptTest {
 
   @Test
+  public void testFindAnnotatedMetaClassesWithNoExportedOrLocallyExportableTypes() {
+    ErraiAptExportedTypes.init(types, elements, new TestAnnotatedElementsFinder());
+
+    Collection<MetaClass> annotatedMetaClasses = ErraiAptExportedTypes.findAnnotatedMetaClasses(
+            ErraiAptExportedTypesUnusedTestAnnotation.class);
+
+    Assert.assertEquals(0, annotatedMetaClasses.size());
+  }
+
+  @Test
   public void testFindAnnotatedMetaClassesWithNoLocallyExportableTypes() {
     ErraiAptExportedTypes.init(types, elements, new TestAnnotatedElementsFinder());
 
