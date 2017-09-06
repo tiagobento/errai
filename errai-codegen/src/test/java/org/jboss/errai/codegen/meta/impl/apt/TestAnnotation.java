@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt;
+package org.jboss.errai.codegen.meta.impl.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-class TestGenerator extends ErraiAppAptGenerator {
+@interface TestAnnotation {
 
+  String value() default "";
 }

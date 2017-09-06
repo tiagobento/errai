@@ -150,11 +150,16 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     final TypeMirror mirror = getEnclosedMetaObject();
     switch (mirror.getKind()) {
     case DECLARED:
-    case TYPEVAR:
+    case TYPEVAR: {
       final Element element = types.asElement(mirror);
       final PackageElement pkg = (PackageElement) element.getEnclosingElement();
       return pkg.getQualifiedName().toString();
-    case ARRAY:
+    }
+    case ARRAY: {
+      final Type.ArrayType arrayType = (Type.ArrayType) mirror;
+      final PackageElement pkg = (PackageElement) arrayType.getComponentType().asElement().getEnclosingElement();
+      return pkg.getQualifiedName().toString();
+    }
     case BOOLEAN:
     case BYTE:
     case CHAR:

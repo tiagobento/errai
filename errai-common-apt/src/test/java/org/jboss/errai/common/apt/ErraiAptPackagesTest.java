@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.exportfile;
+package org.jboss.errai.common.apt;
 
 import org.jboss.errai.apt.internal.export.annotation.TestExportedAnnotations;
 import org.jboss.errai.apt.internal.export.test_hYbKGF_ExportFile_org_jboss_errai_common_apt_exportfile_TestAnnotation;

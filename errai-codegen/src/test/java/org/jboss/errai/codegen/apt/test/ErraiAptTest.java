@@ -18,6 +18,7 @@ package org.jboss.errai.codegen.apt.test;
 
 import com.google.testing.compile.CompilationRule;
 import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
+import org.jboss.errai.codegen.test.AbstractCodegenTest;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -28,7 +29,7 @@ import javax.lang.model.util.Types;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public abstract class ErraiAptTest {
+public abstract class ErraiAptTest extends AbstractCodegenTest {
 
   @Rule
   public CompilationRule rule = new CompilationRule();

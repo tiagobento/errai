@@ -107,16 +107,22 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   }
 
   private void generateAndSaveSourceFile(final ErraiAptGenerator generator) {
-    final String generatedSourceCode = generator.generate();
-
     try {
-      final FileObject sourceFile = processingEnv.getFiler()
-              .createResource(SOURCE_OUTPUT, generator.getPackageName(), generator.getClassSimpleName() + ".java");
-      try (final Writer writer = sourceFile.openWriter()) {
-        writer.write(generatedSourceCode);
-      }
+      final String generatedSourceCode = generator.generate();
+      saveFile(generatedSourceCode, generator.getPackageName(), generator.getClassSimpleName() + ".java");
     } catch (final IOException e) {
       throw new RuntimeException("Could not write generated file", e);
+    }
+  }
+
+  private void saveFile(final String generatedSourceCode, final String pkg, final String fileName) throws IOException {
+    // By saving .java source files as resources we skip javac compilation. This behavior is desirable since all
+    // generated code is client code and will be compiled by the GWT/J2CL compiler.
+    // FIXME: errai-marshalling will generate server code too
+    final FileObject sourceFile = processingEnv.getFiler().createResource(SOURCE_OUTPUT, pkg, fileName);
+
+    try (final Writer writer = sourceFile.openWriter()) {
+      writer.write(generatedSourceCode);
     }
   }
 }
