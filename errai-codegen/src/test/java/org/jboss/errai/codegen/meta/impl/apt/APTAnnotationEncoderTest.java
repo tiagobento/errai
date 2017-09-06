@@ -35,12 +35,12 @@ public class APTAnnotationEncoderTest extends ErraiAptTest {
 
     Assert.assertTrue(annotation.isPresent());
 
-    final String expected = "new org.jboss.errai.codegen.test.meta.apt.TestAnnotation() {"
+    final String expected = "new org.jboss.errai.codegen.meta.impl.apt.TestAnnotation() {"
             + "  public Class annotationType() {"
-            + "    return org.jboss.errai.codegen.test.meta.apt.TestAnnotation.class;"
+            + "    return org.jboss.errai.codegen.meta.impl.apt.TestAnnotation.class;"
             + "  }"
             + "  public String toString() {"
-            + "    return \"org.jboss.errai.codegen.test.meta.apt.TestAnnotation\";"
+            + "    return \"org.jboss.errai.codegen.meta.impl.apt.TestAnnotation\";"
             + "  }"
             + "  public String value() {"
             + "    return \"\";"
@@ -57,12 +57,12 @@ public class APTAnnotationEncoderTest extends ErraiAptTest {
 
     Assert.assertTrue(annotation.isPresent());
 
-    final String expected = "new org.jboss.errai.codegen.test.meta.apt.TestAnnotation() {"
+    final String expected = "new org.jboss.errai.codegen.meta.impl.apt.TestAnnotation() {"
             + "  public Class annotationType() {"
-            + "    return org.jboss.errai.codegen.test.meta.apt.TestAnnotation.class;"
+            + "    return org.jboss.errai.codegen.meta.impl.apt.TestAnnotation.class;"
             + "  }"
             + "  public String toString() {"
-            + "    return \"org.jboss.errai.codegen.test.meta.apt.TestAnnotation\";"
+            + "    return \"org.jboss.errai.codegen.meta.impl.apt.TestAnnotation\";"
             + "  }"
             + "  public String value() {"
             + "    return \"foo\";"
@@ -79,15 +79,15 @@ public class APTAnnotationEncoderTest extends ErraiAptTest {
 
     Assert.assertTrue(annotation.isPresent());
 
-    final String expected = "new org.jboss.errai.codegen.test.meta.apt.TestAnnotationWithArrayProperties() {"
+    final String expected = "new org.jboss.errai.codegen.meta.impl.apt.TestAnnotationWithArrayProperties() {"
             + "  public Class annotationType() {"
-            + "    return org.jboss.errai.codegen.test.meta.apt.TestAnnotationWithArrayProperties.class;"
+            + "    return org.jboss.errai.codegen.meta.impl.apt.TestAnnotationWithArrayProperties.class;"
             + "  }"
             + "  public Class[] classes() {"
             + "    return new Class[] { String.class, Long.class };"
             + "  }"
             + "  public String toString() {"
-            + "    return \"org.jboss.errai.codegen.test.meta.apt.TestAnnotationWithArrayProperties\";"
+            + "    return \"org.jboss.errai.codegen.meta.impl.apt.TestAnnotationWithArrayProperties\";"
             + "  }"
             + "  public String[] value() {"
             + "    return new String[] { \"foo\" };"
