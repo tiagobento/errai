@@ -16,61 +16,33 @@
 
 package org.jboss.errai.common.apt.configuration;
 
-import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.common.configuration.ErraiModule;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toSet;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.BINDABLE_TYPES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.IOC_ALTERNATIVES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.IOC_BLACKLIST;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.NON_SERIALIZABLE_TYPES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.SERIALIZABLE_TYPES;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiModuleConfiguration {
+public interface ErraiModuleConfiguration {
 
-  private final Set<MetaAnnotation> erraiModules;
+  interface DataBinding {
 
-  public ErraiModuleConfiguration(final MetaClassFinder metaClassFinder) {
-    erraiModules = metaClassFinder.findAnnotatedWith(ErraiModule.class)
-            .stream()
-            .map(module -> module.getAnnotation(ErraiModule.class))
-            .map(Optional::get)
-            .collect(toSet());
+    Set<MetaClass> getBindableTypes();
   }
 
-  public Set<MetaClass> getBindableTypes() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(BINDABLE_TYPES, MetaClass[].class)));
+  interface Marshalling {
+
+    Set<MetaClass> getSerializableTypes();
+
+    Set<MetaClass> getNonSerializableTypes();
   }
 
-  public Set<MetaClass> getSerializableTypes() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(SERIALIZABLE_TYPES, MetaClass[].class)));
-  }
+  interface Ioc {
 
-  public Set<MetaClass> getNonSerializableTypes() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(NON_SERIALIZABLE_TYPES, MetaClass[].class)));
-  }
+    Set<MetaClass> getIocAlternatives();
 
-  public Set<MetaClass> getIocAlternatives() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(IOC_ALTERNATIVES, MetaClass[].class)));
-  }
+    Set<MetaClass> getIocBlacklist();
 
-  public Set<MetaClass> getIocBlacklist() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(IOC_BLACKLIST, MetaClass[].class)));
+    Set<MetaClass> getIocWhitelist();
   }
-
-  private <V> Set<V> getConfiguredArrayProperty(final Function<MetaAnnotation, Stream<V>> getter) {
-    return erraiModules.stream().flatMap(getter).collect(toSet());
-  }
-
 }

@@ -22,7 +22,9 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
+import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration;
 import org.jboss.errai.common.metadata.RebindUtils;
+import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.rebind.GenerateAsync;
@@ -32,6 +34,9 @@ import org.jboss.errai.ioc.client.container.IOCEnvironment;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * The main generator class for the Errai IOC framework.
@@ -63,20 +68,19 @@ public class IOCGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-    final MetaClassFinder metaClassFinder = ann -> ClassScanner.getTypesAnnotatedWith(ann, translatablePackages,
-            context);
+    final MetaClassFinder metaClassFinder = ann -> Stream.concat(
+            ClassScanner.getTypesAnnotatedWith(ann, translatablePackages, context).stream(),
+            ScannerSingleton.getOrCreateInstance().getTypesAnnotatedWith(ann).stream().map(MetaClassFactory::get))
+            .collect(toSet());
 
-    return generate(context, translatablePackages, metaClassFinder);
+    return generate(context, metaClassFinder, new ErraiAppPropertiesIocModuleConfiguration());
   }
 
   public String generate(final GeneratorContext context,
-          final Set<String> translatablePackages,
-          final MetaClassFinder metaClassFinder) {
+          final MetaClassFinder metaClassFinder,
+          final ErraiModuleConfiguration.Ioc iocModuleConfiguration) {
 
-    final IOCBootstrapGenerator iocBootstrapGenerator = new IOCBootstrapGenerator(metaClassFinder, context,
-            translatablePackages, false);
-
-    return iocBootstrapGenerator.generate(packageName, className);
+    return new IOCBootstrapGenerator(metaClassFinder, context, iocModuleConfiguration).generate(packageName, className);
   }
 
   @Override

@@ -16,7 +16,6 @@
 
 package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 
-import com.google.common.collect.Multimap;
 import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.codegen.Context;
 import org.jboss.errai.codegen.builder.BlockBuilder;
@@ -25,18 +24,17 @@ import org.jboss.errai.codegen.builder.impl.BlockBuilderImpl;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.codegen.util.Implementations;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration;
 import org.jboss.errai.common.client.api.annotations.IOCProducer;
-import org.jboss.errai.common.metadata.MetaDataScanner;
-import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.common.server.api.ErraiBootstrapFailure;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.api.EntryPoint;
 import org.jboss.errai.ioc.client.api.IOCBootstrapTask;
+import org.jboss.errai.ioc.client.api.IOCExtension;
 import org.jboss.errai.ioc.client.api.IOCProvider;
 import org.jboss.errai.ioc.client.api.SharedSingleton;
 import org.jboss.errai.ioc.client.api.TaskOrder;
@@ -45,7 +43,6 @@ import org.jboss.errai.ioc.rebind.ioc.extension.IOCDecoratorExtension;
 import org.jboss.errai.ioc.rebind.ioc.extension.IOCExtensionConfigurator;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.InjectionContext;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.WiringElementType;
-import org.jboss.errai.ioc.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +56,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
 import static org.jboss.errai.codegen.util.Stmt.loadVariable;
 
 /**
@@ -76,40 +71,21 @@ public class IOCBootstrapGenerator {
   private final MetaClassFinder metaClassFinder;
   private final GeneratorContext context;
 
-  private final Set<String> packages;
-  private final boolean useReflectionStubs;
-
   private final List<MetaClass> beforeTasks = new ArrayList<MetaClass>();
   private final List<MetaClass> afterTasks = new ArrayList<MetaClass>();
 
-  public static final String QUALIFYING_METADATA_FACTORY_PROPERTY = "errai.ioc.QualifyingMetaDataFactory";
-  public static final String ENABLED_ALTERNATIVES_PROPERTY = "errai.ioc.enabled.alternatives";
-  public static final String WHITELIST_PROPERTY = "errai.ioc.whitelist";
-  public static final String BLACKLIST_PROPERTY = "errai.ioc.blacklist";
-  public static final String EXPERIMENTAL_INFER_DEPENDENT_BY_REACHABILITY = "errai.ioc.experimental.infer_dependent_by_reachability";
+  private final ErraiModuleConfiguration.Ioc iocModuleConfiguration;
 
   private static final Logger log = LoggerFactory.getLogger(IOCBootstrapGenerator.class);
 
   private static final Object generatorLock = new Object();
 
-  private static Set<Class<?>> iocExtensions;
-
-  private static List<IOCExtensionConfigurator> extensionConfigurators;
-
-  private static Collection<MetaClass> bootstrapClassCollection;
-
-  @SuppressWarnings("rawtypes")
-  private static Map<Class<? extends IOCDecoratorExtension>, Class<? extends Annotation>> decoratorMap;
-
   public IOCBootstrapGenerator(final MetaClassFinder metaClassFinder,
           final GeneratorContext context,
-          final Set<String> packages,
-          final boolean useReflectionStubs) {
-
+          final ErraiModuleConfiguration.Ioc iocModuleConfiguration) {
     this.metaClassFinder = metaClassFinder;
     this.context = context;
-    this.packages = packages;
-    this.useReflectionStubs = useReflectionStubs;
+    this.iocModuleConfiguration = iocModuleConfiguration;
   }
 
   public String generate(final String packageName, final String className) {
@@ -123,7 +99,7 @@ public class IOCBootstrapGenerator {
 
       log.debug("setting up injection context...");
       final long injectionStart = System.currentTimeMillis();
-      final InjectionContext injectionContext = setupContexts(packageName, className);
+      final InjectionContext injectionContext = buildInjectContext(packageName, className);
       log.debug("injection context setup in " + (System.currentTimeMillis() - injectionStart) + "ms");
 
       gen = generateBootstrappingClassSource(injectionContext);
@@ -133,100 +109,80 @@ public class IOCBootstrapGenerator {
     }
   }
 
-  private InjectionContext setupContexts(final String packageName, final String className) {
-    final boolean asyncBootstrap;
-
-    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
-    asyncBootstrap = s != null && Boolean.parseBoolean(s);
+  private InjectionContext buildInjectContext(final String packageName, final String className) {
 
     final ClassStructureBuilder<?> classStructureBuilder = Implementations.implement(Bootstrapper.class, packageName,
             className);
 
     log.debug("Generating IOC Bootstrapper " + packageName + "." + className);
 
-    final BuildMetaClass bootStrapClass = classStructureBuilder.getClassDefinition();
-    final Context buildContext = bootStrapClass.getContext();
-
+    final Context buildContext = classStructureBuilder.getClassDefinition().getContext();
     buildContext.addInterningCallback(new BootstrapInterningCallback(classStructureBuilder, buildContext));
 
     final BlockBuilder<?> blockBuilder = classStructureBuilder.publicMethod(ContextManager.class, "bootstrapContainer")
             .methodComment("The main IOC bootstrap method.");
 
-    final IOCProcessingContext.Builder iocProcContextBuilder = IOCProcessingContext.Builder.create();
+    final IOCProcessingContext iocProcessingContext = IOCProcessingContext.Builder.create()
+            .blockBuilder(blockBuilder)
+            .generatorContext(context)
+            .metaClassFinder(metaClassFinder)
+            .bootstrapClassInstance(classStructureBuilder.getClassDefinition())
+            .bootstrapBuilder(classStructureBuilder)
+            .build();
 
-    iocProcContextBuilder.blockBuilder(blockBuilder);
-    iocProcContextBuilder.generatorContext(context);
-    iocProcContextBuilder.metaClassFinder(metaClassFinder);
-    iocProcContextBuilder.context(buildContext);
-    iocProcContextBuilder.bootstrapClassInstance(bootStrapClass);
-    iocProcContextBuilder.bootstrapBuilder(classStructureBuilder);
-    iocProcContextBuilder.gwtTarget(!useReflectionStubs);
+    return buildInjectionContext(iocProcessingContext);
+  }
 
-    final InjectionContext.Builder injectionContextBuilder = InjectionContext.Builder.create();
+  private InjectionContext buildInjectionContext(final IOCProcessingContext iocProcessingContext) {
+    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
+    final boolean asyncBootstrap = s != null && Boolean.parseBoolean(s);
 
-    final MetaDataScanner scanner = ScannerSingleton.getOrCreateInstance();
-    final Multimap<String, String> props = scanner.getErraiProperties();
+    final InjectionContext injectionContext = InjectionContext.Builder.create()
+            .processingContext(iocProcessingContext)
+            .enabledAlternatives(classNames(iocModuleConfiguration.getIocAlternatives()))
+            .addToWhitelist(classNames(iocModuleConfiguration.getIocWhitelist()))
+            .addToBlacklist(classNames(iocModuleConfiguration.getIocBlacklist()))
+            .asyncBootstrap(asyncBootstrap)
+            .build();
 
-    if (props != null) {
-      log.info("Checking ErraiApp.properties for configured types ...");
-
-      final Collection<String> qualifyingMetadataFactoryProperties = props.get(QUALIFYING_METADATA_FACTORY_PROPERTY);
-
-      if (qualifyingMetadataFactoryProperties.size() > 1) {
-        throw new RuntimeException(
-                "the property '" + QUALIFYING_METADATA_FACTORY_PROPERTY + "' is set in more than one place");
-      }
-
-      final Collection<String> alternatives = PropertiesUtil.getPropertyValues(ENABLED_ALTERNATIVES_PROPERTY, "\\s");
-      for (final String alternative : alternatives) {
-        injectionContextBuilder.enabledAlternative(alternative.trim());
-      }
-
-      final Collection<String> whitelistItems = PropertiesUtil.getPropertyValues(WHITELIST_PROPERTY, "\\s");
-      for (final String item : whitelistItems) {
-        injectionContextBuilder.addToWhitelist(item.trim());
-      }
-
-      final Collection<String> blacklistItems = PropertiesUtil.getPropertyValues(BLACKLIST_PROPERTY, "\\s");
-      for (final String type : blacklistItems) {
-        injectionContextBuilder.addToBlacklist(type.trim());
-      }
-    }
-
-    iocProcContextBuilder.packages(packages);
-
-    final IOCProcessingContext processingContext = iocProcContextBuilder.build();
-
-    injectionContextBuilder.processingContext(processingContext);
-    injectionContextBuilder.asyncBootstrap(asyncBootstrap);
-
-    final InjectionContext injectionContext = injectionContextBuilder.build();
-
-    defaultConfigureProcessor(injectionContext);
+    injectionContext.mapElementType(WiringElementType.PseudoScopedBean, Singleton.class);
+    injectionContext.mapElementType(WiringElementType.NormalScopedBean, ApplicationScoped.class);
+    injectionContext.mapElementType(WiringElementType.NormalScopedBean, SharedSingleton.class);
+    injectionContext.mapElementType(WiringElementType.PseudoScopedBean, EntryPoint.class);
+    injectionContext.mapElementType(WiringElementType.ProducerElement, IOCProducer.class);
+    injectionContext.mapElementType(WiringElementType.DependentBean, Dependent.class);
+    injectionContext.mapElementType(WiringElementType.Provider, IOCProvider.class);
+    injectionContext.mapElementType(WiringElementType.InjectionPoint, Inject.class);
+    injectionContext.mapElementType(WiringElementType.InjectionPoint, com.google.inject.Inject.class);
+    injectionContext.mapElementType(WiringElementType.AlternativeBean, Alternative.class);
 
     return injectionContext;
   }
 
+  private Collection<String> classNames(final Set<MetaClass> metaClasses) {
+    return metaClasses.stream().map(MetaClass::getCanonicalName).collect(toList());
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private String generateBootstrappingClassSource(final InjectionContext injectionContext) {
 
     log.debug("Processing IOC extensions...");
     long start = System.currentTimeMillis();
-    processExtensions(metaClassFinder, injectionContext, beforeTasks, afterTasks);
+    processExtensions(injectionContext);
     log.debug("Extensions processed in {}ms", (System.currentTimeMillis() - start));
 
-    final IOCProcessor processorFactory = new IOCProcessor(injectionContext);
-    final IOCProcessingContext processingContext = injectionContext.getProcessingContext();
-    final ClassStructureBuilder<?> classBuilder = processingContext.getBootstrapBuilder();
-    final BlockBuilder<?> blockBuilder = processingContext.getBlockBuilder();
+    final IOCProcessor iocProcessor = new IOCProcessor(injectionContext);
+    final IOCProcessingContext iocProcessingContext = injectionContext.getProcessingContext();
 
-    @SuppressWarnings({ "unchecked", "rawtypes" }) final BlockBuilder builder = new BlockBuilderImpl(
-            classBuilder.getClassDefinition().getInstanceInitializer(), null);
+    final ClassStructureBuilder<?> classBuilder = iocProcessingContext.getBootstrapBuilder();
+    final BlockBuilder<?> blockBuilder = iocProcessingContext.getBlockBuilder();
+    final BlockBuilder builder = new BlockBuilderImpl(classBuilder.getClassDefinition().getInstanceInitializer(), null);
 
     doBeforeRunnables(builder);
 
     log.debug("Process dependency graph...");
     start = System.currentTimeMillis();
-    processorFactory.process(processingContext);
+    iocProcessor.process(iocProcessingContext);
     log.debug("Processed dependency graph in {}ms", System.currentTimeMillis() - start);
 
     doAfterRunnbales(blockBuilder);
@@ -268,129 +224,91 @@ public class IOCBootstrapGenerator {
     }
   }
 
-  public static void processExtensions(final MetaClassFinder metaClassFinder,
-          final InjectionContext injectionContext,
-          final List<MetaClass> beforeTasks,
-          final List<MetaClass> afterTasks) {
+  @SuppressWarnings("rawtypes")
+  public void processExtensions(final InjectionContext injectionContext) {
 
-    final MetaDataScanner scanner = ScannerSingleton.getOrCreateInstance();
-    maybeLoadExtensionConfigurators(scanner); //FIXME: tiago: what to do?
+    //Configure IocExtensions
+    final List<IOCExtensionConfigurator> extensionConfigurators = metaClassFinder.findAnnotatedWith(IOCExtension.class)
+            .stream()
+            .map(this::newIocExtension)
+            .peek(extension -> configureIocExtension(extension, injectionContext))
+            .collect(toList());
+
+    //Configure IocBootstrapTasks
+    for (final MetaClass metaClass : metaClassFinder.findAnnotatedWith(IOCBootstrapTask.class)) {
+      final MetaAnnotation task = metaClass.getAnnotation(IOCBootstrapTask.class).get();
+      if (task.value() == TaskOrder.Before) {
+        beforeTasks.add(metaClass);
+      } else {
+        afterTasks.add(metaClass);
+      }
+    }
+
+    //Configure CodeDecorators
+    metaClassFinder.findAnnotatedWith(CodeDecorator.class).forEach(c -> {
+      final Class<? extends IOCDecoratorExtension> decoratorClass = getIocDecoratorClass(c);
+      final Class<? extends Annotation> annotationType = getAnnotationType(decoratorClass);
+      injectionContext.registerDecorator(getIocExtension(decoratorClass, annotationType));
+    });
+
+    extensionConfigurators.forEach(extensionConfigurator -> {
+      extensionConfigurator.afterInitialization(injectionContext.getProcessingContext(), injectionContext);
+    });
+  }
+
+  private IOCDecoratorExtension<?> getIocExtension(final Class<? extends IOCDecoratorExtension> key,
+          final Class<? extends Annotation> value) {
 
     try {
-      for (final IOCExtensionConfigurator configurator : extensionConfigurators) {
-        configurator.configure(injectionContext.getProcessingContext(), injectionContext);
-      }
+      return key.getConstructor(new Class[] { Class.class }).newInstance(value);
     } catch (Exception e) {
-      throw new ErraiBootstrapFailure("Unable to run IOC Extension Configurator: " + e.getMessage(), e);
+      throw new ErraiBootstrapFailure("unable to load code decorator: " + e.getMessage(), e);
+    }
+  }
+
+  private Class<? extends Annotation> getAnnotationType(final Class<? extends IOCDecoratorExtension> decoratorClass) {
+
+    Class<? extends Annotation> annoType = null;
+    final Type t = decoratorClass.getGenericSuperclass();
+    if (!(t instanceof ParameterizedType)) {
+      throw new ErraiBootstrapFailure("code decorator must extend IOCDecoratorExtension<@AnnotationType>");
     }
 
-    maybeLoadBootstrapClassCollection(metaClassFinder);
-    for (final MetaClass clazz : bootstrapClassCollection) {
-      final MetaAnnotation task = clazz.getAnnotation(IOCBootstrapTask.class).get();
-      if (task.value() == TaskOrder.Before) {
-        beforeTasks.add(clazz);
-      } else {
-        afterTasks.add(clazz);
+    final ParameterizedType pType = (ParameterizedType) t;
+    if (IOCDecoratorExtension.class.equals(pType.getRawType())) {
+      if (pType.getActualTypeArguments().length == 0 || !Annotation.class.isAssignableFrom(
+              (Class<?>) pType.getActualTypeArguments()[0])) {
+        throw new ErraiBootstrapFailure("code decorator must extend IOCDecoratorExtension<@AnnotationType>");
       }
-    }
 
-//     maybeValidateDecorators(scanner); //FIXME: tiago: what to do?
-//
-//    try {
-//      for (@SuppressWarnings("rawtypes") final Entry<Class<? extends IOCDecoratorExtension>, Class<? extends Annotation>> entry : decoratorMap
-//              .entrySet()) {
-//        injectionContext.registerDecorator(
-//                entry.getKey().getConstructor(new Class[] { Class.class }).newInstance(entry.getValue()));
-//      }
-//    } catch (Exception e) {
-//      throw new ErraiBootstrapFailure("unable to load code decorator: " + e.getMessage(), e);
-//    }
-//
-//    for (final IOCExtensionConfigurator extensionConfigurator : extensionConfigurators) {
-//      extensionConfigurator.afterInitialization(injectionContext.getProcessingContext(), injectionContext);
-//    }
+      // noinspection unchecked
+      annoType = ((Class<?>) pType.getActualTypeArguments()[0]).asSubclass(Annotation.class);
+    }
+    return annoType;
   }
 
-  @SuppressWarnings("rawtypes")
-  private static void maybeValidateDecorators(final MetaDataScanner scanner) {
-    if (decoratorMap == null || EnvUtil.isJUnitTest()) {
-      decoratorMap = new HashMap<>();
-      final Set<Class<?>> decorators = scanner.getTypesAnnotatedWith(CodeDecorator.class);
-      try {
-        for (final Class<?> clazz : decorators) {
-          final Class<? extends IOCDecoratorExtension> decoratorClass = clazz.asSubclass(IOCDecoratorExtension.class);
+  private void configureIocExtension(final IOCExtensionConfigurator extension,
+          final InjectionContext injectionContext) {
+    extension.configure(injectionContext.getProcessingContext(), injectionContext);
+  }
 
-          Class<? extends Annotation> annoType = null;
-          final Type t = decoratorClass.getGenericSuperclass();
-          if (!(t instanceof ParameterizedType)) {
-            throw new ErraiBootstrapFailure("code decorator must extend IOCDecoratorExtension<@AnnotationType>");
-          }
-
-          final ParameterizedType pType = (ParameterizedType) t;
-          if (IOCDecoratorExtension.class.equals(pType.getRawType())) {
-            if (pType.getActualTypeArguments().length == 0 || !Annotation.class.isAssignableFrom(
-                    (Class<?>) pType.getActualTypeArguments()[0])) {
-              throw new ErraiBootstrapFailure("code decorator must extend IOCDecoratorExtension<@AnnotationType>");
-            }
-
-            // noinspection unchecked
-            annoType = ((Class<?>) pType.getActualTypeArguments()[0]).asSubclass(Annotation.class);
-          }
-
-          decoratorMap.put(decoratorClass, annoType);
-
-        }
-      } catch (Exception e) {
-        throw new ErraiBootstrapFailure("unable to load code decorator: " + e.getMessage(), e);
-      }
+  private IOCExtensionConfigurator newIocExtension(final MetaClass metaClass) {
+    try {
+      // Because we're sure all IOCExtensions will be precompiled when generating code for a @ErraiApp,
+      // it's safe to run a Class.forName on the APT environment too
+      return Class.forName(metaClass.getCanonicalName()).asSubclass(IOCExtensionConfigurator.class).newInstance();
+    } catch (final Exception e) {
+      throw new ErraiBootstrapFailure("unable to load IOC Extension Configurator: " + e.getMessage(), e);
     }
   }
 
-  private static void maybeLoadBootstrapClassCollection(final MetaClassFinder metaClassFinder) {
-    if (bootstrapClassCollection == null || EnvUtil.isJUnitTest()) {
-      bootstrapClassCollection = metaClassFinder.findAnnotatedWith(IOCBootstrapTask.class);
+  private Class<? extends IOCDecoratorExtension> getIocDecoratorClass(final MetaClass metaClass) {
+    try {
+      // Because we're sure all IOCDecoratorExtensions will be precompiled when generating code for a @ErraiApp,
+      // it's safe to run a Class.forName on the APT environment too
+      return Class.forName(metaClass.getCanonicalName()).asSubclass(IOCDecoratorExtension.class);
+    } catch (final Exception e) {
+      throw new ErraiBootstrapFailure("unable to load IOC Extension Configurator: " + e.getMessage(), e);
     }
   }
-
-  private static void maybeLoadExtensionConfigurators(final MetaDataScanner scanner) {
-    if (iocExtensions == null || extensionConfigurators == null || EnvUtil.isJUnitTest()) {
-      iocExtensions = scanner.getTypesAnnotatedWith(org.jboss.errai.ioc.client.api.IOCExtension.class);
-      extensionConfigurators = new ArrayList<>();
-
-      try {
-        for (final Class<?> clazz : iocExtensions) {
-          final Class<? extends IOCExtensionConfigurator> configuratorClass = clazz.asSubclass(
-                  IOCExtensionConfigurator.class);
-
-          final IOCExtensionConfigurator configurator = configuratorClass.newInstance();
-          extensionConfigurators.add(configurator);
-
-        }
-      } catch (Exception e) {
-        throw new ErraiBootstrapFailure("unable to load IOC Extension Configurator: " + e.getMessage(), e);
-      }
-    }
-  }
-
-  /**
-   * @param injectionContext an instance of the injection context
-   */
-  private static void defaultConfigureProcessor(final InjectionContext injectionContext) {
-    injectionContext.mapElementType(WiringElementType.PseudoScopedBean, Singleton.class);
-    injectionContext.mapElementType(WiringElementType.NormalScopedBean, ApplicationScoped.class);
-    injectionContext.mapElementType(WiringElementType.NormalScopedBean, SharedSingleton.class);
-    injectionContext.mapElementType(WiringElementType.PseudoScopedBean, EntryPoint.class);
-
-    injectionContext.mapElementType(WiringElementType.ProducerElement, IOCProducer.class);
-
-    injectionContext.mapElementType(WiringElementType.DependentBean, Dependent.class);
-
-    injectionContext.mapElementType(WiringElementType.Provider, IOCProvider.class);
-
-    injectionContext.mapElementType(WiringElementType.InjectionPoint, Inject.class);
-    injectionContext.mapElementType(WiringElementType.InjectionPoint, com.google.inject.Inject.class);
-
-    injectionContext.mapElementType(WiringElementType.AlternativeBean, Alternative.class);
-  }
-
 }

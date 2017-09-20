@@ -28,6 +28,7 @@ import org.jboss.errai.codegen.builder.impl.StatementBuilder;
 import org.jboss.errai.codegen.exception.GenerationException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.common.client.dom.Anchor;
 import org.jboss.errai.common.client.dom.Event;
 import org.jboss.errai.common.client.dom.EventListener;
@@ -121,21 +122,20 @@ public class TransitionProviderIOCExtension implements IOCExtensionConfigurator 
     final InjectableHandle transitionToRoleHandle = new InjectableHandle(MetaClassFactory.get(Anchor.class),
             qualifierFactory.forSource(() -> new Annotation[] { TRANSITION_TO_ROLE }));
 
-    scanForUniquePageRoles(context.getGeneratorContext());
+    scanForUniquePageRoles(context.metaClassFinder());
     registerProvider(injectionContext, transitionToHandle);
     registerProvider(injectionContext, transitionToRoleHandle);
   }
 
-  private void scanForUniquePageRoles(final GeneratorContext generatorContext) {
-    final Collection<MetaClass> pages = ClassScanner.getTypesAnnotatedWith(Page.class, generatorContext);
+  private void scanForUniquePageRoles(final MetaClassFinder metaClassFinder) {
+    final Collection<MetaClass> pages = metaClassFinder.findAnnotatedWith(Page.class);
     pages
       .stream()
       .filter(type -> type.unsafeGetAnnotation(Page.class).role().length > 0)
       .forEach(type -> {
-        final Page anno = type.unsafeGetAnnotation(Page.class);
         Arrays
-          .stream(anno.role())
-          .filter(role -> UniquePageRole.class.isAssignableFrom(role))
+          .stream(type.unsafeGetAnnotation(Page.class).role())
+          .filter(UniquePageRole.class::isAssignableFrom)
           .map(role -> role.<UniquePageRole>asSubclass(UniquePageRole.class))
           .forEach(role -> pagesByRole.put(role, type));
       });

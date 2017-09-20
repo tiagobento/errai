@@ -16,7 +16,10 @@
 
 package org.jboss.errai.apt.internal.export.annotation;
 
+import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.api.IOCBootstrapTask;
+import org.jboss.errai.ioc.client.api.IOCExtension;
+import org.jboss.errai.ioc.client.api.ScopeContext;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -26,4 +29,7 @@ public final class ErraiIocExportedAnnotations {
   }
 
   private IOCBootstrapTask iocBootstrapTask;
+  private IOCExtension iocExtension;
+  private CodeDecorator codeDecorator;
+  private ScopeContext scopeContext;
 }

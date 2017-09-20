@@ -69,7 +69,7 @@ public class GenUtil {
   }
 
   public static Statement[] generateCallParameters(final Context context, final Object... parameters) {
-    return Arrays.stream(parameters).map(p -> generate(context, p)).toArray(s -> new Statement[s]);
+    return Arrays.stream(parameters).map(p -> generate(context, p)).toArray(Statement[]::new);
   }
 
   public static Statement[] generateCallParameters(final MetaMethod method,
@@ -89,12 +89,13 @@ public class GenUtil {
         }
       }
       try {
-        if (method.isVarArgs()) {
+        if (method.isVarArgs() && i == methodParameters.length - 1) {
           final MetaClass varArgsType = methodParameters[methodParameters.length - 1].getType().getComponentType();
           statements[i] = convert(context, parameter, varArgsType);
           i++;
         } else {
-          statements[i] = convert(context, parameter, methodParameters[i++].getType());
+          statements[i] = convert(context, parameter, methodParameters[i].getType());
+          i++;
         }
       }
       catch (final GenerationException t) {

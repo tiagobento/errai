@@ -20,6 +20,8 @@ import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.meta.HasAnnotations;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.common.apt.configuration.ErraiAptModuleConfiguration;
+import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.ioc.client.api.IOCExtension;
 import org.jboss.errai.ioc.client.container.RefHolder;
@@ -70,7 +72,10 @@ public class DataBindingIOCExtension implements IOCExtensionConfigurator {
   @Override
   public void afterInitialization(final IOCProcessingContext context, final InjectionContext injectionContext) {
 
-    final Collection<MetaClass> allBindableTypes = DataBindingUtil.getAllBindableTypes(context.getGeneratorContext());
+    //FIXME: tiago: duplicated logic
+    final Collection<MetaClass> allBindableTypes = context.metaClassFinder().findAnnotatedWith(Bindable.class);
+    allBindableTypes.addAll(new ErraiAptModuleConfiguration(context.metaClassFinder()).getBindableTypes());
+
     final Model anno = new Model() {
       @Override
       public Class<? extends Annotation> annotationType() {
@@ -112,7 +117,7 @@ public class DataBindingIOCExtension implements IOCExtensionConfigurator {
 
         @Override
         public CustomFactoryInjectable getInjectable(final InjectionSite injectionSite, final FactoryNameGenerator nameGenerator) {
-          if (injectionSite.unsafeIsAnnotationPresent(Model.class)) {
+          if (injectionSite.isAnnotationPresent(Model.class)) {
             if (provided == null) {
               final FactoryBodyGenerator generator = new AbstractBodyGenerator() {
 
