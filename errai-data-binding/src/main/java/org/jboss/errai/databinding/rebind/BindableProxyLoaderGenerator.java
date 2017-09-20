@@ -30,7 +30,7 @@ import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.codegen.meta.GWTCompatibleMetaClassFinder;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.util.Stmt;
@@ -75,15 +75,15 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-    return generate((ctx, annotation) -> findAnnotatedElements(context, translatablePackages, annotation), context);
+    return generate((annotation) -> findAnnotatedElements(context, translatablePackages, annotation));
   }
 
-  public String generate(final GWTCompatibleMetaClassFinder metaClassFinder, final GeneratorContext context) {
+  public String generate(final MetaClassFinder metaClassFinder) {
 
-    final Collection<MetaClass> defaultConverters = metaClassFinder.find(context, DefaultConverter.class);
+    final Collection<MetaClass> defaultConverters = metaClassFinder.findAnnotatedWith(DefaultConverter.class);
     addCacheRelevantClasses(defaultConverters);
 
-    final Collection<MetaClass> bindableTypes = metaClassFinder.find(context, Bindable.class);
+    final Collection<MetaClass> bindableTypes = metaClassFinder.findAnnotatedWith(Bindable.class);
     addCacheRelevantClasses(bindableTypes);
 
     ClassStructureBuilder<?> classBuilder = ClassBuilder.implement(BindableProxyLoader.class);

@@ -16,7 +16,6 @@
 
 package org.jboss.errai.apt.internal.generator;
 
-import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
@@ -46,7 +45,7 @@ public class BindableProxyLoaderAptGenerator extends ErraiAptGenerator {
 
   @Override
   public String generate() {
-    return bindableProxyLoaderGenerator.generate(this::findAnnotatedMetaClasses, null);
+    return bindableProxyLoaderGenerator.generate(this::findAnnotatedMetaClasses);
   }
 
   @Override
@@ -59,10 +58,10 @@ public class BindableProxyLoaderAptGenerator extends ErraiAptGenerator {
     return bindableProxyLoaderGenerator.getClassSimpleName();
   }
 
-  private Collection<MetaClass> findAnnotatedMetaClasses(final GeneratorContext context,
-          final Class<? extends Annotation> annotation) {
+  @Override
+  public Collection<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
 
-    final Collection<MetaClass> annotatedMetaClasses = findAnnotatedMetaClasses(annotation);
+    final Collection<MetaClass> annotatedMetaClasses = super.findAnnotatedMetaClasses(annotation);
 
     if (annotation.equals(Bindable.class)) {
       annotatedMetaClasses.addAll(erraiModuleConfiguration.getBindableTypes());

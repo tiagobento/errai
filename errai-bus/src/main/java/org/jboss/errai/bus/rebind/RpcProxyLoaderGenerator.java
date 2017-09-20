@@ -30,7 +30,7 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.MethodBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
-import org.jboss.errai.codegen.meta.GWTCompatibleMetaClassFinder;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.util.AnnotationFilter;
 import org.jboss.errai.codegen.util.InterceptorProvider;
@@ -76,16 +76,15 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     final Boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
     final AnnotationFilter gwtAnnotationFilter = new RuntimeAnnotationFilter(translatablePackages);
-    final GWTCompatibleMetaClassFinder metaClassFinder = (ctx, annotation) -> getMetaClasses(ctx, annotation,
+    final MetaClassFinder metaClassFinder = annotation -> getMetaClasses(context, annotation,
             translatablePackages);
 
-    return generate(metaClassFinder, iocEnabled, gwtAnnotationFilter, context);
+    return generate(metaClassFinder, iocEnabled, gwtAnnotationFilter);
   }
 
-  public String generate(final GWTCompatibleMetaClassFinder metaClassFinder,
+  public String generate(final MetaClassFinder metaClassFinder,
           final boolean iocEnabled,
-          final AnnotationFilter annotationFilter,
-          final GeneratorContext context) {
+          final AnnotationFilter annotationFilter) {
 
     log.info("generating RPC proxy loader class...");
 
@@ -95,13 +94,13 @@ public class RpcProxyLoaderGenerator extends AbstractAsyncGenerator {
     final MethodBlockBuilder<?> loadProxies = classBuilder.publicMethod(void.class, "loadProxies",
             Parameter.of(MessageBus.class, "bus", true));
 
-    final Collection<MetaClass> remotes = metaClassFinder.find(context, Remote.class);
+    final Collection<MetaClass> remotes = metaClassFinder.findAnnotatedWith(Remote.class);
     addCacheRelevantClasses(remotes);
 
-    final Collection<MetaClass> featureInterceptors = metaClassFinder.find(context, FeatureInterceptor.class);
+    final Collection<MetaClass> featureInterceptors = metaClassFinder.findAnnotatedWith(FeatureInterceptor.class);
     addCacheRelevantClasses(featureInterceptors);
 
-    final Collection<MetaClass> standaloneInterceptors = metaClassFinder.find(context, InterceptsRemoteCall.class);
+    final Collection<MetaClass> standaloneInterceptors = metaClassFinder.findAnnotatedWith(InterceptsRemoteCall.class);
     addCacheRelevantClasses(standaloneInterceptors);
 
     final InterceptorProvider interceptorProvider = new InterceptorProvider(featureInterceptors,

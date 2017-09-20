@@ -16,30 +16,12 @@
 
 package org.jboss.errai.ioc.rebind.ioc.injector.api;
 
-import static java.util.Collections.unmodifiableCollection;
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.enterprise.context.NormalScope;
-import javax.enterprise.inject.Stereotype;
-import javax.inject.Qualifier;
-import javax.inject.Scope;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import org.jboss.errai.codegen.meta.HasAnnotations;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.client.api.Assert;
-import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryBodyGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCProcessingContext;
@@ -54,9 +36,24 @@ import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
+import javax.enterprise.context.NormalScope;
+import javax.enterprise.inject.Stereotype;
+import javax.inject.Qualifier;
+import javax.inject.Scope;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Collections.unmodifiableCollection;
 
 /**
  * At every rebind phase, a single {@link InjectionContext} is used. It contains
@@ -258,8 +255,7 @@ public class InjectionContext {
           // type is a meta-annotation. so we need to map all annotations with this
           // meta-annotation to the decorator extension.
 
-          for (final MetaClass annotationClazz : ClassScanner.getTypesAnnotatedWith(annotation,
-                  processingContext.getGeneratorContext())) {
+          for (final MetaClass annotationClazz : processingContext.metaClassFinder().findAnnotatedWith(annotation)) {
             if (Annotation.class.isAssignableFrom(annotationClazz.unsafeAsClass())) {
               final Class<? extends Annotation> javaAnnoCls = annotationClazz.unsafeAsClass().asSubclass(Annotation.class);
               decorators.get(javaAnnoCls).add(iocExtension);

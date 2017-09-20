@@ -27,6 +27,7 @@ import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.common.client.api.Assert;
 
@@ -48,17 +49,17 @@ public class IOCProcessingContext {
   protected final List<Statement> appendToEnd;
   protected final Set<MetaClass> discovered = new HashSet<MetaClass>();
 
-  protected final TreeLogger treeLogger;
   protected final GeneratorContext generatorContext;
 
   protected final boolean gwtTarget;
+  protected final MetaClassFinder metaClassFinder;
 
   private IOCProcessingContext(final Builder builder) {
-    this.treeLogger = builder.treeLogger;
     this.generatorContext = builder.generatorContext;
     this.context = builder.context;
     this.bootstrapClass = builder.bootstrapClassInstance;
     this.bootstrapBuilder = builder.bootstrapBuilder;
+    this.metaClassFinder = builder.metaClassFinder;
 
     this.blockBuilder = new Stack<BlockBuilder<?>>();
     this.blockBuilder.push(builder.blockBuilder);
@@ -69,7 +70,6 @@ public class IOCProcessingContext {
   }
 
   public static class Builder {
-    private TreeLogger treeLogger;
     private GeneratorContext generatorContext;
     private Context context;
     private BuildMetaClass bootstrapClassInstance;
@@ -77,18 +77,19 @@ public class IOCProcessingContext {
     private BlockBuilder<?> blockBuilder;
     private Set<String> packages;
     private boolean gwtTarget;
+    public MetaClassFinder metaClassFinder;
 
     public static Builder create() {
       return new Builder();
     }
 
-    public Builder logger(final TreeLogger treeLogger) {
-      this.treeLogger = treeLogger;
+    public Builder generatorContext(final GeneratorContext generatorContext) {
+      this.generatorContext = generatorContext;
       return this;
     }
 
-    public Builder generatorContext(final GeneratorContext generatorContext) {
-      this.generatorContext = generatorContext;
+    public Builder metaClassFinder(final MetaClassFinder metaClassFinder) {
+      this.metaClassFinder = metaClassFinder;
       return this;
     }
 
@@ -123,13 +124,13 @@ public class IOCProcessingContext {
     }
 
     public IOCProcessingContext build() {
-      Assert.notNull("treeLogger cannot be null", treeLogger);
+      // Assert.notNull("treeLogger cannot be null", treeLogger);
       // Assert.notNull("sourceWriter cannot be null", sourceWriter);
-      Assert.notNull("context cannot be null", context);
+      // Assert.notNull("context cannot be null", context);
+      // Assert.notNull("packages cannot be null", packages);
       Assert.notNull("bootstrapClassInstance cannot be null", bootstrapClassInstance);
       Assert.notNull("bootstrapBuilder cannot be null", bootstrapBuilder);
       Assert.notNull("blockBuilder cannot be null", blockBuilder);
-      Assert.notNull("packages cannot be null", packages);
 
       return new IOCProcessingContext(this);
     }
@@ -180,13 +181,12 @@ public class IOCProcessingContext {
     return context;
   }
 
-  public Set<String> getPackages() {
-    return packages;
+  public MetaClassFinder metaClassFinder() {
+    return metaClassFinder;
   }
 
-  @SuppressWarnings("UnusedDeclaration")
-  public TreeLogger getTreeLogger() {
-    return treeLogger;
+  public Set<String> getPackages() {
+    return packages;
   }
 
   public GeneratorContext getGeneratorContext() {

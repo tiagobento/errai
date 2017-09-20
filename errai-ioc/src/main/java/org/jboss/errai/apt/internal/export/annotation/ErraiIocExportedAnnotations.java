@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.codegen.meta;
+package org.jboss.errai.apt.internal.export.annotation;
 
-import com.google.gwt.core.ext.GeneratorContext;
-
-import java.lang.annotation.Annotation;
-import java.util.Collection;
+import org.jboss.errai.ioc.client.api.IOCBootstrapTask;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@FunctionalInterface
-public interface GWTCompatibleMetaClassFinder extends MetaClassFinder {
-
-  Collection<MetaClass> find(final GeneratorContext context, final Class<? extends Annotation> annotationClass);
-
-  @Override
-  default Collection<MetaClass> findAnnotatedWith(final Class<? extends Annotation> annotationClass) {
-    return find(null, annotationClass);
+public final class ErraiIocExportedAnnotations {
+  private ErraiIocExportedAnnotations() {
   }
+
+  private IOCBootstrapTask iocBootstrapTask;
 }

@@ -14,32 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt;
-
-import org.jboss.errai.codegen.meta.MetaClass;
-
-import java.lang.annotation.Annotation;
-import java.util.Collection;
+package org.jboss.errai.ioc.apt.export;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public abstract class ErraiAptGenerator {
+interface SupportedAnnotationTypes {
 
-  private final ErraiAptExportedTypes exportedTypes;
-
-  public ErraiAptGenerator(final ErraiAptExportedTypes exportedTypes) {
-    this.exportedTypes = exportedTypes;
-  }
-
-  public abstract String generate();
-
-  public abstract String getPackageName();
-
-  public abstract String getClassSimpleName();
-
-  protected Collection<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
-    return exportedTypes.findAnnotatedMetaClasses(annotation);
-  }
-
+  String IOC_BOOTSTRAP_TASK = "org.jboss.errai.ioc.client.api.IOCBootstrapTask";
+  String IOC_EXTENSION = "org.jboss.errai.ioc.client.api.IOCExtension";
 }
