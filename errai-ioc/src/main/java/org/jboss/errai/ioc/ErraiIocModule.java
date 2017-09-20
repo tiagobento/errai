@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.apt.export;
+package org.jboss.errai.ioc;
+
+import org.jboss.errai.common.configuration.ErraiModule;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-interface SupportedAnnotationTypes {
-
-  String IOC_BOOTSTRAP_TASK = "org.jboss.errai.ioc.client.api.IOCBootstrapTask";
-  String IOC_EXTENSION = "org.jboss.errai.ioc.client.api.IOCExtension";
-  String CODE_DECORATOR = "org.jboss.errai.ioc.client.api.CodeDecorator";
-  String SCOPE_CONTEXT = "org.jboss.errai.ioc.client.api.ScopeContext";
+@ErraiModule
+public class ErraiIocModule {
 }

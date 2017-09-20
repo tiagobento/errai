@@ -18,6 +18,7 @@ package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.codegen.meta.TestMetaClassFinder;
+import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocWhitelisted1;
 import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocAlternative2;
 import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.Serializable2;
 import org.junit.Assert;
@@ -33,6 +34,7 @@ import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.No
 import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.Serializable1;
 import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.Bindable2;
 import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocBlacklisted2;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocWhitelisted2;
 import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.NonSerializable2;
 import static org.junit.Assert.assertTrue;
 
@@ -44,11 +46,12 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
   @Test
   public void testGetAllPropertiesWithDefaultValues() {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiDefaultTestModule.class));
-    final ErraiModuleConfiguration config = new ErraiModuleConfiguration(metaClassFinder);
+    final ErraiAptModuleConfiguration config = new ErraiAptModuleConfiguration(metaClassFinder);
 
     assertTrue(config.getBindableTypes().isEmpty());
     assertTrue(config.getIocAlternatives().isEmpty());
     assertTrue(config.getIocBlacklist().isEmpty());
+    assertTrue(config.getIocWhitelist().isEmpty());
     assertTrue(config.getSerializableTypes().isEmpty());
     assertTrue(config.getNonSerializableTypes().isEmpty());
     assertTrue(config.getNonSerializableTypes().isEmpty());
@@ -58,11 +61,12 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
   @Test
   public void testGetAllPropertiesWithCustomValues() {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiTestCustomModule1.class));
-    final ErraiModuleConfiguration config = new ErraiModuleConfiguration(metaClassFinder);
+    final ErraiAptModuleConfiguration config = new ErraiAptModuleConfiguration(metaClassFinder);
 
     assertContainsOnly(config.getBindableTypes(), aptClass(Bindable1.class));
     assertContainsOnly(config.getIocAlternatives(), aptClass(IocAlternative1.class));
     assertContainsOnly(config.getIocBlacklist(), aptClass(IocBlacklisted1.class));
+    assertContainsOnly(config.getIocWhitelist(), aptClass(IocWhitelisted1.class));
     assertContainsOnly(config.getSerializableTypes(), aptClass(Serializable1.class));
     assertContainsOnly(config.getNonSerializableTypes(), aptClass(NonSerializable1.class));
   }
@@ -73,11 +77,12 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiTestCustomModule1.class),
             aptClass(ErraiTestCustomModule2.class));
 
-    final ErraiModuleConfiguration config = new ErraiModuleConfiguration(metaClassFinder);
+    final ErraiAptModuleConfiguration config = new ErraiAptModuleConfiguration(metaClassFinder);
 
     assertContainsOnly(config.getBindableTypes(), aptClass(Bindable1.class), aptClass(Bindable2.class));
     assertContainsOnly(config.getIocAlternatives(), aptClass(IocAlternative1.class), aptClass(IocAlternative2.class));
     assertContainsOnly(config.getIocBlacklist(), aptClass(IocBlacklisted1.class), aptClass(IocBlacklisted2.class));
+    assertContainsOnly(config.getIocWhitelist(), aptClass(IocWhitelisted1.class), aptClass(IocWhitelisted2.class));
     assertContainsOnly(config.getSerializableTypes(), aptClass(Serializable1.class), aptClass(Serializable2.class));
     assertContainsOnly(config.getNonSerializableTypes(), aptClass(NonSerializable1.class),
             aptClass(NonSerializable2.class));

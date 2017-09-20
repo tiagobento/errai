@@ -22,14 +22,16 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 
+import static org.jboss.errai.ioc.apt.export.SupportedAnnotationTypes.CODE_DECORATOR;
 import static org.jboss.errai.ioc.apt.export.SupportedAnnotationTypes.IOC_BOOTSTRAP_TASK;
 import static org.jboss.errai.ioc.apt.export.SupportedAnnotationTypes.IOC_EXTENSION;
+import static org.jboss.errai.ioc.apt.export.SupportedAnnotationTypes.SCOPE_CONTEXT;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({ IOC_BOOTSTRAP_TASK, IOC_EXTENSION })
+@SupportedAnnotationTypes({ IOC_BOOTSTRAP_TASK, IOC_EXTENSION, CODE_DECORATOR, SCOPE_CONTEXT})
 public class ErraiIocExportFileGenerator extends AbstractErraiModuleExportFileGenerator {
 
   @Override

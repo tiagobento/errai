@@ -24,6 +24,7 @@ import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
+import org.jboss.errai.ioc.rebind.ioc.bootstrapper.ErraiAppPropertiesIocModuleConfiguration;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCBootstrapGenerator;
 
 import java.io.File;
@@ -49,8 +50,8 @@ public class MockIOCGenerator {
     final GeneratorContext context = GeneratorContextBuilder.newCoreBasedBuilder().buildGeneratorContext();
 
     final IOCBootstrapGenerator bootstrapGenerator = new IOCBootstrapGenerator(
-            ann -> ClassScanner.getTypesAnnotatedWith(ann, packages, context), context, packages, true);
-
+            ann -> ClassScanner.getTypesAnnotatedWith(ann, packages, context), context,
+            new ErraiAppPropertiesIocModuleConfiguration());
 
     final String classStr = bootstrapGenerator.generate(packageName, className);
 

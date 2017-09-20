@@ -38,46 +38,31 @@ import com.google.gwt.core.ext.TreeLogger;
  * @author Mike Brock <cbrock@redhat.com>
  */
 public class IOCProcessingContext {
-  protected final Set<String> packages;
-
-  protected final Context context;
   protected final BuildMetaClass bootstrapClass;
   protected final ClassStructureBuilder bootstrapBuilder;
 
   protected final Stack<BlockBuilder<?>> blockBuilder;
 
-  protected final List<Statement> appendToEnd;
-  protected final Set<MetaClass> discovered = new HashSet<MetaClass>();
-
   protected final GeneratorContext generatorContext;
 
-  protected final boolean gwtTarget;
   protected final MetaClassFinder metaClassFinder;
 
   private IOCProcessingContext(final Builder builder) {
     this.generatorContext = builder.generatorContext;
-    this.context = builder.context;
     this.bootstrapClass = builder.bootstrapClassInstance;
     this.bootstrapBuilder = builder.bootstrapBuilder;
     this.metaClassFinder = builder.metaClassFinder;
 
-    this.blockBuilder = new Stack<BlockBuilder<?>>();
+    this.blockBuilder = new Stack<>();
     this.blockBuilder.push(builder.blockBuilder);
-
-    this.appendToEnd = new ArrayList<Statement>();
-    this.packages = builder.packages;
-    this.gwtTarget = builder.gwtTarget;
   }
 
   public static class Builder {
     private GeneratorContext generatorContext;
-    private Context context;
     private BuildMetaClass bootstrapClassInstance;
     private ClassStructureBuilder bootstrapBuilder;
+    private MetaClassFinder metaClassFinder;
     private BlockBuilder<?> blockBuilder;
-    private Set<String> packages;
-    private boolean gwtTarget;
-    public MetaClassFinder metaClassFinder;
 
     public static Builder create() {
       return new Builder();
@@ -93,10 +78,6 @@ public class IOCProcessingContext {
       return this;
     }
 
-    public Builder context(final Context context) {
-      this.context = context;
-      return this;
-    }
 
     public Builder bootstrapClassInstance(final BuildMetaClass bootstrapClassInstance) {
       this.bootstrapClassInstance = bootstrapClassInstance;
@@ -113,24 +94,11 @@ public class IOCProcessingContext {
       return this;
     }
 
-    public Builder packages(final Set<String> packages) {
-      this.packages = packages;
-      return this;
-    }
-
-    public Builder gwtTarget(final boolean gwtTarget) {
-      this.gwtTarget = gwtTarget;
-      return this;
-    }
-
     public IOCProcessingContext build() {
-      // Assert.notNull("treeLogger cannot be null", treeLogger);
-      // Assert.notNull("sourceWriter cannot be null", sourceWriter);
-      // Assert.notNull("context cannot be null", context);
-      // Assert.notNull("packages cannot be null", packages);
       Assert.notNull("bootstrapClassInstance cannot be null", bootstrapClassInstance);
       Assert.notNull("bootstrapBuilder cannot be null", bootstrapBuilder);
       Assert.notNull("blockBuilder cannot be null", blockBuilder);
+      Assert.notNull("metaClassFinder cannot be null", metaClassFinder);
 
       return new IOCProcessingContext(this);
     }
@@ -148,27 +116,6 @@ public class IOCProcessingContext {
      getBlockBuilder().insertBefore(statement);
   }
 
-
-  public void pushBlockBuilder(final BlockBuilder<?> blockBuilder) {
-    this.blockBuilder.push(blockBuilder);
-  }
-
-  public void popBlockBuilder() {
-    this.blockBuilder.pop();
-
-    if (this.blockBuilder.size() == 0) {
-      throw new AssertionError("block builder was over popped! something is wrong.");
-    }
-  }
-
-  public void appendToEnd(final Statement statement) {
-    appendToEnd.add(statement);
-  }
-
-  public List<Statement> getAppendToEnd() {
-    return appendToEnd;
-  }
-
   public BuildMetaClass getBootstrapClass() {
     return bootstrapClass;
   }
@@ -177,23 +124,11 @@ public class IOCProcessingContext {
     return bootstrapBuilder;
   }
 
-  public Context getContext() {
-    return context;
-  }
-
   public MetaClassFinder metaClassFinder() {
     return metaClassFinder;
   }
 
-  public Set<String> getPackages() {
-    return packages;
-  }
-
   public GeneratorContext getGeneratorContext() {
     return generatorContext;
-  }
-
-  public boolean isGwtTarget() {
-    return gwtTarget;
   }
 }

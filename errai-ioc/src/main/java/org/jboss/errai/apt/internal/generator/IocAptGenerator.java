@@ -18,15 +18,19 @@ package org.jboss.errai.apt.internal.generator;
 
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.common.apt.configuration.ErraiAptModuleConfiguration;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
 
 /**
+ * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
+ *
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class IocAptGenerator extends ErraiAptGenerator {
 
   private final IOCGenerator iocGenerator;
 
+  // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public IocAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
     this.iocGenerator = new IOCGenerator();
@@ -34,7 +38,11 @@ public class IocAptGenerator extends ErraiAptGenerator {
 
   @Override
   public String generate() {
-    return iocGenerator.generate(null, null, this::findAnnotatedMetaClasses);
+    return iocGenerator.generate(null, this::findAnnotatedMetaClasses, getIocModuleConfiguration());
+  }
+
+  private ErraiAptModuleConfiguration getIocModuleConfiguration() {
+    return new ErraiAptModuleConfiguration(this::findAnnotatedMetaClasses);
   }
 
   @Override

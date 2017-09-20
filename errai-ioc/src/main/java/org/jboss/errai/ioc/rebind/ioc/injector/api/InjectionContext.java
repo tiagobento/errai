@@ -128,18 +128,18 @@ public class InjectionContext {
       return this;
     }
 
-    public Builder enabledAlternative(final String fqcn) {
-      enabledAlternatives.add(fqcn);
+    public Builder enabledAlternatives(final Collection<String> fqcn) {
+      enabledAlternatives.addAll(fqcn);
       return this;
     }
 
-    public Builder addToWhitelist(final String item) {
-      whitelist.add(item);
+    public Builder addToWhitelist(final Collection<String> items) {
+      whitelist.addAll(items);
       return this;
     }
 
-    public Builder addToBlacklist(final String item) {
-      blacklist.add(item);
+    public Builder addToBlacklist(final Collection<String> items) {
+      blacklist.addAll(items);
       return this;
     }
 

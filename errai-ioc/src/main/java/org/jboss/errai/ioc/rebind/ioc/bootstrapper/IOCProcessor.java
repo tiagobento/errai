@@ -33,6 +33,7 @@ import org.jboss.errai.codegen.builder.impl.ArithmeticExpressionBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.meta.HasAnnotations;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassMember;
@@ -272,9 +273,9 @@ public class IOCProcessor {
 
   private void runExtensionCallbacks(final Collection<MetaClass> allMetaClasses) {
     final Collection<ExtensionTypeCallback> extensionCallbacks = injectionContext.getExtensionTypeCallbacks();
-    extensionCallbacks.forEach(cb -> cb.init());
+    extensionCallbacks.forEach(ExtensionTypeCallback::init);
     allMetaClasses.forEach(mc -> extensionCallbacks.forEach(cb -> cb.callback(mc)));
-    extensionCallbacks.forEach(cb -> cb.finish());
+    extensionCallbacks.forEach(ExtensionTypeCallback::finish);
   }
 
   private void callFinishInitOnContextManager(final String contextManagerFieldName, final BlockBuilder<?> methodBody) {
@@ -551,16 +552,16 @@ public class IOCProcessor {
   }
 
   private Map<Class<? extends Annotation>, MetaClass> findScopeContexts(final IOCProcessingContext processingContext) {
-    final Collection<MetaClass> scopeContexts = ClassScanner.getTypesAnnotatedWith(ScopeContext.class);
+    final Collection<MetaClass> scopeContexts = processingContext.metaClassFinder().findAnnotatedWith(ScopeContext.class);
     final Map<Class<? extends Annotation>, MetaClass> annoToContextImpl = new HashMap<>();
     for (final MetaClass scopeContext : scopeContexts) {
       if (!scopeContext.isAssignableTo(Context.class)) {
         throw new RuntimeException("They type " + scopeContext.getFullyQualifiedName()
                 + " was annotated with @ScopeContext but does not implement " + Context.class.getName());
       }
-      final ScopeContext anno = scopeContext.unsafeGetAnnotation(ScopeContext.class);
-      for (final Class<? extends Annotation> scope : anno.value()) {
-        annoToContextImpl.put(scope, scopeContext);
+      final MetaAnnotation anno = scopeContext.getAnnotation(ScopeContext.class).get();
+      for (final MetaClass scope : anno.valueAsArray(MetaClass[].class)) {
+        annoToContextImpl.put(getScopeClass(scope), scopeContext);
       }
     }
     final MetaClass depContextImpl = MetaClassFactory.get(DependentScopeContext.class);
@@ -571,7 +572,19 @@ public class IOCProcessor {
     return annoToContextImpl;
   }
 
+  @SuppressWarnings("unchecked")
+  private Class<? extends Annotation> getScopeClass(final MetaClass scope) {
+    try {
+      // Because we're sure all scope classes will be precompiled when generating code for a @ErraiApp,
+      // it's safe to run a Class.forName on the APT environment too
+      return (Class<? extends Annotation>) Class.forName(scope.getCanonicalName());
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private Collection<MetaClass> findRelevantClasses(final IOCProcessingContext processingContext) {
+
     final Collection<MetaClass> allMetaClasses = new HashSet<>();
     allMetaClasses.addAll(MetaClassFactory.getAllCachedClasses());
     allMetaClasses.remove(MetaClassFactory.get(Object.class));
