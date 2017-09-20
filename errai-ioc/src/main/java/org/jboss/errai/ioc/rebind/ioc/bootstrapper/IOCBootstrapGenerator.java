@@ -134,6 +134,7 @@ public class IOCBootstrapGenerator {
   }
 
   private InjectionContext buildInjectionContext(final IOCProcessingContext iocProcessingContext) {
+    //FIXME: tiago: reflection scanning happening at this line
     final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
     final boolean asyncBootstrap = s != null && Boolean.parseBoolean(s);
 
