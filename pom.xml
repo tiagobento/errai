@@ -111,6 +111,7 @@
     <module>errai-common-apt</module>
     <module>errai-jaxrs-export-apt</module>
     <module>errai-data-binding-export-apt</module>
+    <module>errai-ioc-export-apt</module>
   </modules>
 
   <repositories>

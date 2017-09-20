@@ -16,21 +16,22 @@
 
 package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 
-import java.util.Collection;
-import java.util.Set;
-
+import com.google.gwt.core.ext.GeneratorContext;
+import com.google.gwt.core.ext.TreeLogger;
+import com.google.gwt.core.ext.UnableToCompleteException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.rebind.GenerateAsync;
+import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 
-import com.google.gwt.core.ext.GeneratorContext;
-import com.google.gwt.core.ext.TreeLogger;
-import com.google.gwt.core.ext.UnableToCompleteException;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * The main generator class for the Errai IOC framework.
@@ -44,30 +45,36 @@ import com.google.gwt.core.ext.UnableToCompleteException;
  */
 @GenerateAsync(Bootstrapper.class)
 public class IOCGenerator extends AbstractAsyncGenerator {
-  private final String className = Bootstrapper.class.getSimpleName() + "Impl";
-  private final String packageName = Bootstrapper.class.getPackage().getName();
 
-  public static final boolean isTestMode = EnvUtil.isJUnitTest();
+  private final String packageName = "org.jboss.errai.ioc.client";
+  private final String className = "BootstrapperImpl";
 
   public IOCGenerator() {
   }
 
   @Override
-  public String generate(final TreeLogger logger,
-                         final GeneratorContext context,
-                         final String typeName)
-      throws UnableToCompleteException {
+  public String generate(final TreeLogger logger, final GeneratorContext context, final String typeName)
+          throws UnableToCompleteException {
 
     logger.log(TreeLogger.INFO, "generating ioc bootstrapping code...");
     return startAsyncGeneratorsAndWaitFor(Bootstrapper.class, context, logger, packageName, className);
   }
 
   @Override
-  protected String generate(TreeLogger logger, GeneratorContext context) {
+  protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
+    final MetaClassFinder metaClassFinder = ann -> ClassScanner.getTypesAnnotatedWith(ann, translatablePackages,
+            context);
 
-    final IOCBootstrapGenerator iocBootstrapGenerator = new IOCBootstrapGenerator(context, logger,
-        translatablePackages, false);
+    return generate(context, translatablePackages, metaClassFinder);
+  }
+
+  public String generate(final GeneratorContext context,
+          final Set<String> translatablePackages,
+          final MetaClassFinder metaClassFinder) {
+
+    final IOCBootstrapGenerator iocBootstrapGenerator = new IOCBootstrapGenerator(metaClassFinder, context,
+            translatablePackages, false);
 
     return iocBootstrapGenerator.generate(packageName, className);
   }
@@ -86,8 +93,16 @@ public class IOCGenerator extends AbstractAsyncGenerator {
       }
     }
 
-    boolean hasAnyChanges =  !newOrUpdated.isEmpty() || !MetaClassFactory.getAllDeletedClasses().isEmpty();
+    boolean hasAnyChanges = !newOrUpdated.isEmpty() || !MetaClassFactory.getAllDeletedClasses().isEmpty();
     return hasGenerationCache() && (EnvUtil.isProdMode() || !hasAnyChanges);
+  }
+
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public String getClassName() {
+    return className;
   }
 
 }
