@@ -76,6 +76,7 @@ public class IOCEnvironmentGenerator extends Generator {
 
     final boolean asyncBootstrap;
 
+    //FIXME: tiago: reflection scanning happening at this line
     final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
     asyncBootstrap = s != null && Boolean.parseBoolean(s);
 
