@@ -145,10 +145,10 @@ public class IOCProcessor {
   private static final Logger log = LoggerFactory.getLogger(IOCProcessor.class);
 
   public static final Predicate<List<InjectableHandle>> ANY = handle -> true;
-  public static final Predicate<List<InjectableHandle>> EXACT_TYPE = IOCProcessor::exactTypePredicate;
+  private static final Predicate<List<InjectableHandle>> EXACT_TYPE = IOCProcessor::exactTypePredicate;
 
-  public static final String REACHABILITY_PROPERTY = "errai.ioc.reachability";
-  public static final String PLUGIN_PROPERTY = "errai.ioc.jsinterop.support";
+  private static final String REACHABILITY_PROPERTY = "errai.ioc.reachability";
+  private static final String PLUGIN_PROPERTY = "errai.ioc.jsinterop.support";
 
   public static boolean isJsInteropSupportEnabled() {
     return Boolean.getBoolean(PLUGIN_PROPERTY);
@@ -568,7 +568,7 @@ public class IOCProcessor {
   @SuppressWarnings("unchecked")
   private Class<? extends Annotation> getScopeClass(final MetaClass scope) {
     try {
-      // Because we're sure all scope classes will be precompiled when generating code for a @ErraiApp,
+      // Because we're sure all scope classes will be precompiled when generating code for an @ErraiApp,
       // it's safe to run a Class.forName on the APT environment too
       return (Class<? extends Annotation>) Class.forName(scope.getCanonicalName());
     } catch (final Exception e) {

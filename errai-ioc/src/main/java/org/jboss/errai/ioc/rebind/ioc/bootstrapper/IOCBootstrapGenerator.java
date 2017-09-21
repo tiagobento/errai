@@ -292,7 +292,7 @@ public class IOCBootstrapGenerator {
 
   private IOCExtensionConfigurator newIocExtension(final MetaClass metaClass) {
     try {
-      // Because we're sure all IOCExtensions will be precompiled when generating code for a @ErraiApp,
+      // Because we're sure all IOCExtensions will be precompiled when generating code for an @ErraiApp,
       // it's safe to run a Class.forName on the APT environment too
       return Class.forName(metaClass.getCanonicalName()).asSubclass(IOCExtensionConfigurator.class).newInstance();
     } catch (final Exception e) {
@@ -302,7 +302,7 @@ public class IOCBootstrapGenerator {
 
   private Class<? extends IOCDecoratorExtension> getIocDecoratorClass(final MetaClass metaClass) {
     try {
-      // Because we're sure all IOCDecoratorExtensions will be precompiled when generating code for a @ErraiApp,
+      // Because we're sure all IOCDecoratorExtensions will be precompiled when generating code for an @ErraiApp,
       // it's safe to run a Class.forName on the APT environment too
       return Class.forName(metaClass.getCanonicalName()).asSubclass(IOCDecoratorExtension.class);
     } catch (final Exception e) {
