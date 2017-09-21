@@ -89,14 +89,7 @@ public class GenUtil {
         }
       }
       try {
-        if (method.isVarArgs() && i == methodParameters.length - 1 && !parameter.getClass().isArray()) {
-          final MetaClass varArgsType = methodParameters[methodParameters.length - 1].getType().getComponentType();
-          statements[i] = convert(context, parameter, varArgsType);
-          i++;
-        } else {
-          statements[i] = convert(context, parameter, methodParameters[i].getType());
-          i++;
-        }
+        statements[i] = convert(context, parameter, methodParameters[i++].getType());
       }
       catch (final GenerationException t) {
         t.appendFailureInfo("in method call: "
