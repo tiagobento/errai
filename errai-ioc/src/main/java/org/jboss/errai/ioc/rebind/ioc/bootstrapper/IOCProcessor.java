@@ -50,7 +50,6 @@ import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.config.rebind.EnvUtil;
-import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.JsArray;
 import org.jboss.errai.ioc.client.WindowInjectionContext;
@@ -180,20 +179,21 @@ public class IOCProcessor {
    * Process the dependency graph and generate code in BoostrapperImpl to declare and create factories for all {@link Injectable injectables}.
    *
    * @param processingContext
+   * @param relevantClasses
    */
-  public void process(final IOCProcessingContext processingContext) {
+  public void process(final IOCProcessingContext processingContext, final Collection<MetaClass> relevantClasses) {
     long start = System.currentTimeMillis();
 
-    final Collection<MetaClass> allMetaClasses = findRelevantClasses(processingContext);
-    log.debug("Found {} classes", allMetaClasses.size());
+    log.debug("Found {} classes", relevantClasses.size());
     final DependencyGraphBuilder graphBuilder = new DependencyGraphBuilderImpl(qualFactory, injectionContext.isAsync());
 
-    runExtensionCallbacks(allMetaClasses);
-    log.debug("Ran {} extension callbacks on all types {} types.", injectionContext.getExtensionTypeCallbacks().size(), allMetaClasses.size());
+    runExtensionCallbacks(relevantClasses);
+    log.debug("Ran {} extension callbacks on all types {} types.", injectionContext.getExtensionTypeCallbacks().size(), relevantClasses
+            .size());
 
     addAllInjectableProviders(graphBuilder);
-    processDependencies(allMetaClasses, graphBuilder);
-    log.debug("Added {} classes to dependency graph in {}ms", allMetaClasses.size(), System.currentTimeMillis() - start);
+    processDependencies(relevantClasses, graphBuilder);
+    log.debug("Added {} classes to dependency graph in {}ms", relevantClasses.size(), System.currentTimeMillis() - start);
 
     start = System.currentTimeMillis();
     final DependencyGraph dependencyGraph = graphBuilder.createGraph(getReachabilityStrategy());
@@ -390,22 +390,16 @@ public class IOCProcessor {
             .publicOverridesMethod("onSuccess").append(loadVariable("callback").invoke("callback",
                     castTo(Factory.class, invokeStatic(GWT.class, "create", loadLiteral(factoryClass)))))
             .finish().finish();
-    final Class<?> fragmentId = getAsyncFragmentId(injectable);
-    final Object[] runAsyncParams = (fragmentId.equals(LoadAsync.NO_FRAGMENT.class) ? new Object[] { runAsyncCallback }
-            : new Object[] { fragmentId, runAsyncCallback });
+
+    final Object[] runAsyncParams = injectable.getInjectedType()
+            .getAnnotation(LoadAsync.class)
+            .map(MetaAnnotation::<MetaClass>value)
+            .map(runAsyncValue -> new Object[] { runAsyncValue, runAsyncCallback })
+            .orElse(new Object[] { runAsyncCallback });
 
     return ObjectBuilder.newInstanceOf(FactoryLoader.class).extend()
             .publicOverridesMethod("call", finalOf(FactoryLoaderCallback.class, "callback"))
             .append(invokeStatic(GWT.class, "runAsync", runAsyncParams)).finish().finish();
-  }
-
-  private Class<?> getAsyncFragmentId(final Injectable injectable) {
-    final LoadAsync loadAsync = injectable.getInjectedType().unsafeGetAnnotation(LoadAsync.class);
-    if (loadAsync == null) {
-      return LoadAsync.NO_FRAGMENT.class;
-    } else {
-      return loadAsync.value();
-    }
   }
 
   private Statement generateFactoryHandle(final Injectable injectable,
@@ -442,7 +436,7 @@ public class IOCProcessor {
               injectable.getInjectedType().getFullyQualifiedName(), createJsTypeProviderFor(injectable)));
       for (final MetaClass mc : injectable.getInjectedType().getAllSuperTypesAndInterfaces()) {
         if (mc.isPublic() && !mc.equals(injectable.getInjectedType())
-                && !mc.getFullyQualifiedName().equals("java.lang.Object") && mc.unsafeIsAnnotationPresent(JsType.class)) {
+                && !mc.getFullyQualifiedName().equals("java.lang.Object") && mc.isAnnotationPresent(JsType.class)) {
           stmts.add(loadVariable("windowContext").invoke("addSuperTypeAlias",
                   mc.getFullyQualifiedName(), injectable.getInjectedType().getFullyQualifiedName()));
         }
@@ -483,8 +477,7 @@ public class IOCProcessor {
   }
 
   private String getBeanName(final Injectable injectable) {
-    final Named named = injectable.getInjectedType().unsafeGetAnnotation(Named.class);
-    return (named != null) ? named.value() : null;
+    return injectable.getInjectedType().getAnnotation(Named.class).map(MetaAnnotation::<String>value).orElse(null);
   }
 
   @SuppressWarnings("rawtypes")
@@ -583,15 +576,6 @@ public class IOCProcessor {
     }
   }
 
-  private Collection<MetaClass> findRelevantClasses(final IOCProcessingContext processingContext) {
-
-    final Collection<MetaClass> allMetaClasses = new HashSet<>();
-    allMetaClasses.addAll(MetaClassFactory.getAllCachedClasses());
-    allMetaClasses.remove(MetaClassFactory.get(Object.class));
-
-    return allMetaClasses;
-  }
-
   private MetaClass addFactoryDeclaration(final Injectable injectable, final IOCProcessingContext processingContext) {
     final String factoryName = injectable.getFactoryName();
     final MetaClass typeCreatedByFactory = injectable.getInjectedType();
@@ -666,7 +650,7 @@ public class IOCProcessor {
           maybeProcessAsStaticOnlyProducer(builder, type, problems);
         }
         if (isPublishableJsType(type)) {
-          final WiringElementType scopeWiringType = (type.unsafeIsAnnotationPresent(SharedSingleton.class)
+          final WiringElementType scopeWiringType = (type.isAnnotationPresent(SharedSingleton.class)
                   ? WiringElementType.SharedSingleton : WiringElementType.DependentBean);
           builder.addInjectable(type, qualFactory.forUniversallyQualified(), ANY, Dependent.class, InjectableType.JsType, scopeWiringType);
         }
@@ -677,8 +661,9 @@ public class IOCProcessor {
   }
 
   private Predicate<List<InjectableHandle>> getPathPredicate(final HasAnnotations annotated, final List<String> problems) {
-    if (annotated.unsafeIsAnnotationPresent(Typed.class)) {
-      final Class<?>[] beanTypes = annotated.unsafeGetAnnotation(Typed.class).value();
+    final Optional<MetaAnnotation> typedAnnotation = annotated.getAnnotation(Typed.class);
+    if (typedAnnotation.isPresent()) {
+      final MetaClass[] beanTypes = typedAnnotation.get().valueAsArray(MetaClass[].class);
       validateAssignableTypes(annotated, beanTypes, problems);
       return path -> Object.class.getName().equals(path.get(0)) || Arrays.stream(beanTypes)
               .anyMatch(beanType -> path.get(0).getType().getFullyQualifiedName().equals(beanType.getName()));
@@ -688,7 +673,7 @@ public class IOCProcessor {
     }
   }
 
-  private void validateAssignableTypes(final HasAnnotations annotated, final Class<?>[] beanTypes, final List<String> problems) {
+  private void validateAssignableTypes(final HasAnnotations annotated, final MetaClass[] beanTypes, final List<String> problems) {
     MetaClass actualRawType;
     if (annotated instanceof MetaClass) {
       actualRawType = ((MetaClass) annotated).getErased();
@@ -707,13 +692,13 @@ public class IOCProcessor {
             actualRawType
             .getAllSuperTypesAndInterfaces()
             .stream()
-            .map(type -> type.getFullyQualifiedName())
+            .map(MetaClass::getFullyQualifiedName)
             .collect(Collectors.toSet());
 
     final Optional<String> unassignableTypes =
             Arrays
             .stream(beanTypes)
-            .map(Class::getName)
+            .map(MetaClass::getName)
             .filter(name -> !assignableTypeNames.contains(name))
             .reduce((s1, s2) -> s1 + "\n" + s2);
 
@@ -727,13 +712,11 @@ public class IOCProcessor {
   }
 
   private boolean isPublishableJsType(final MetaClass type) {
-    final JsType jsType = type.unsafeGetAnnotation(JsType.class);
-
-    return jsType != null && !jsType.isNative();
+    return type.getAnnotation(JsType.class).map(a -> !a.<Boolean>value("isNative")).orElse(false);
   }
 
   private boolean isTypeAccessible(final MetaClass type) {
-    return type.isPublic() && (isTopLevel(type) || (type.isStatic() && isEnclosingTypeAccessible(type)));
+    return type.isPublic() && (true || (type.isStatic() && isEnclosingTypeAccessible(type)));
   }
 
   /**
@@ -747,36 +730,14 @@ public class IOCProcessor {
     processProducerFields(typeInjectable, producerType, builder, disposesMethods, enabled, problems);
   }
 
-  private boolean isTopLevel(final MetaClass type) {
-    boolean isTopLevel;
-    // Workaround for http://bugs.java.com/view_bug.do?bug_id=2210448
-    try {
-      isTopLevel = (type.unsafeAsClass() == null || type.unsafeAsClass().getDeclaringClass() == null);
-    } catch (final IncompatibleClassChangeError ex) {
-      isTopLevel = false;
-    }
-    return isTopLevel;
-  }
-
   private boolean isEnclosingTypeAccessible(final MetaClass type) {
-    boolean hasEnclosingClass = false;
-    Class<?> enclosing;
-    // Workaround for http://bugs.java.com/view_bug.do?bug_id=2210448
-    try {
-      enclosing = (type.unsafeAsClass() == null ? null : type.unsafeAsClass().getDeclaringClass());
-      hasEnclosingClass = true;
-    } catch (final IncompatibleClassChangeError ex) {
-      enclosing = null;
-      hasEnclosingClass = true;
-    }
-
-    // Assume that the enclosing class is inaccessible if we can't access it because of an IncomaptibleClassChangeError
-    return !hasEnclosingClass || (enclosing != null && isTypeAccessible(MetaClassFactory.get(enclosing)));
+    return isTypeAccessible(type);
   }
 
   private boolean isSimpleton(final MetaClass type) {
-    for (final Annotation anno : type.unsafeGetAnnotations()) {
-      if (nonSimpletonTypeAnnotations.contains(anno.annotationType())
+
+    for (final MetaAnnotation anno : type.getAnnotations()) {
+      if (nonSimpletonTypeAnnotations.stream().anyMatch(anno::instanceOf)
               || isStereotype(anno)
               || isNonNativeJsTypeAnnotation(anno)) {
         return false;
@@ -814,11 +775,11 @@ public class IOCProcessor {
     return noArgConstructor != null && (noArgConstructor.isPublic() || !isJavaScriptObject(type));
   }
 
-  private boolean isNonNativeJsTypeAnnotation(final Annotation anno) {
-    return JsType.class.equals(anno.annotationType()) && !((JsType) anno).isNative();
+  private boolean isNonNativeJsTypeAnnotation(final MetaAnnotation anno) {
+    return anno.instanceOf(JsType.class) && !anno.<Boolean>value("isNative");
   }
 
-  private boolean isStereotype(final Annotation anno) {
+  private boolean isStereotype(final MetaAnnotation anno) {
     return anno.annotationType().isAnnotationPresent(Stereotype.class);
   }
 
@@ -826,22 +787,22 @@ public class IOCProcessor {
     final List<WiringElementType> wiringTypes = new ArrayList<>();
     wiringTypes.addAll(getWiringTypesForScopeAnnotation(directScope));
 
-    if (type.unsafeIsAnnotationPresent(Alternative.class)) {
+    if (type.isAnnotationPresent(Alternative.class)) {
       wiringTypes.add(WiringElementType.AlternativeBean);
     }
 
     if (isPublishableJsType(type)) {
       wiringTypes.add(WiringElementType.JsType);
     }
-    if (type.unsafeIsAnnotationPresent(SharedSingleton.class)) {
+    if (type.isAnnotationPresent(SharedSingleton.class)) {
       wiringTypes.add(WiringElementType.SharedSingleton);
     }
 
-    if (type.unsafeIsAnnotationPresent(Specializes.class)) {
+    if (type.isAnnotationPresent(Specializes.class)) {
       wiringTypes.add(WiringElementType.Specialization);
     }
 
-    if (type.unsafeIsAnnotationPresent(LoadAsync.class)) {
+    if (type.isAnnotationPresent(LoadAsync.class)) {
       wiringTypes.add(WiringElementType.LoadAsync);
     }
 
@@ -854,7 +815,7 @@ public class IOCProcessor {
     final Collection<Class<? extends Annotation>> providerAnnotations = injectionContext
             .getAnnotationsForElementType(WiringElementType.Provider);
     for (final Class<? extends Annotation> anno : providerAnnotations) {
-      if (type.unsafeIsAnnotationPresent(anno)) {
+      if (type.isAnnotationPresent(anno)) {
         if (type.isAssignableTo(Provider.class)) {
           addProviderInjectable(typeInjectable, builder, enabled);
         }
@@ -906,10 +867,8 @@ public class IOCProcessor {
 
     final Predicate<Class<? extends Annotation>> isExplicitScope =
             type -> Arrays.stream(type.getAnnotations())
-                          .map(a -> a.annotationType())
-                          .filter(aType -> NormalScope.class.equals(aType) || Scope.class.equals(aType))
-                          .findAny()
-                          .isPresent();
+                          .map(Annotation::annotationType)
+                          .anyMatch(aType -> NormalScope.class.equals(aType) || Scope.class.equals(aType));
 
     final PriorityQueue<Class<? extends Annotation>> pq = new PriorityQueue<>((o1, o2) -> {
       final int score1, score2;
@@ -1022,10 +981,10 @@ public class IOCProcessor {
     final List<WiringElementType> wiringTypes = new ArrayList<>();
 
     wiringTypes.addAll(getWiringTypesForScopeAnnotation(directScope));
-    if (annotated.unsafeIsAnnotationPresent(Specializes.class)) {
+    if (annotated.isAnnotationPresent(Specializes.class)) {
       wiringTypes.add(WiringElementType.Specialization);
     }
-    if (enclosingClass.unsafeIsAnnotationPresent(LoadAsync.class)) {
+    if (enclosingClass.isAnnotationPresent(LoadAsync.class)) {
       wiringTypes.add(WiringElementType.LoadAsync);
     }
 
@@ -1081,7 +1040,7 @@ public class IOCProcessor {
 
   private void addDisposerDependencies(final Injectable producedInjectable, final MetaMethod disposer, final DependencyGraphBuilder builder) {
     for (final MetaParameter param : disposer.getParameters()) {
-      if (param.unsafeIsAnnotationPresent(Disposes.class)) {
+      if (param.isAnnotationPresent(Disposes.class)) {
         builder.addDisposesMethodDependency(producedInjectable, disposer.getDeclaringClass(), qualFactory.forSink(disposer.getDeclaringClass()), disposer);
       } else {
         builder.addDisposesParamDependency(producedInjectable, param.getType(), qualFactory.forSink(param), param.getIndex(), param);
@@ -1204,7 +1163,7 @@ public class IOCProcessor {
     final Collection<Class<? extends Annotation>> injectAnnotations = injectionContext.getAnnotationsForElementType(WiringElementType.InjectionPoint);
     for (final MetaConstructor con : type.getConstructors()) {
       for (final Class<? extends Annotation> anno : injectAnnotations) {
-        if (con.unsafeIsAnnotationPresent(anno)) {
+        if (con.isAnnotationPresent(anno)) {
           return con;
         }
       }
@@ -1271,8 +1230,7 @@ public class IOCProcessor {
   }
 
   private boolean isNativeJSType(final MetaClass type) {
-    final JsType anno = type.unsafeGetAnnotation(JsType.class);
-    return type.unsafeGetAnnotation(JsType.class) != null && anno.isNative();
+    return type.getAnnotation(JsType.class).map(a -> a.<Boolean>value("isNative")).orElse(false);
   }
 
   private boolean scopeDoesNotRequireProxy(final MetaClass type) {
@@ -1286,7 +1244,7 @@ public class IOCProcessor {
     final List<MetaConstructor> cons = new ArrayList<>();
     for (final MetaConstructor con : type.getConstructors()) {
       for (final Class<? extends Annotation> anno : injectAnnotations) {
-        if (con.unsafeIsAnnotationPresent(anno)) {
+        if (con.isAnnotationPresent(anno)) {
           cons.add(con);
         }
       }
@@ -1303,7 +1261,7 @@ public class IOCProcessor {
   }
 
   private boolean isActive(final MetaClass type) {
-    if (type.unsafeIsAnnotationPresent(Alternative.class)) {
+    if (type.isAnnotationPresent(Alternative.class)) {
       return isAlternativeEnabled(type);
     } else {
       return true;
@@ -1324,12 +1282,14 @@ public class IOCProcessor {
   }
 
   private boolean isEnabledByProperty(final MetaClass type) {
-    final EnabledByProperty anno = type.unsafeGetAnnotation(EnabledByProperty.class);
-    final boolean propValue = getPropertyValue(anno.value(),
-                                               anno.matchValue(),
-                                               anno.matchByDefault(),
-                                               anno.caseSensitive());
-    final boolean negated = anno.negated();
+    MetaAnnotation annotation = type.getAnnotation(EnabledByProperty.class).get();
+
+    final boolean propValue = getPropertyValue(annotation.value(),
+            annotation.value("matchValue"),
+            annotation.value("matchByDefault"),
+            annotation.value("caseSensitive"));
+
+    final boolean negated = annotation.value("negated");
 
     return propValue ^ negated;
   }
@@ -1347,12 +1307,11 @@ public class IOCProcessor {
   }
 
   private boolean hasEnablingProperty(final MetaClass type) {
-    return type.unsafeIsAnnotationPresent(EnabledByProperty.class);
+    return type.isAnnotationPresent(EnabledByProperty.class);
   }
 
   private static boolean exactTypePredicate(final List<InjectableHandle> path) {
     final int pathLength = path.size() - 1;
     return pathLength == 0 || path.get(0).getType().getFullyQualifiedName().equals(path.get(pathLength).getType().getFullyQualifiedName());
   }
-
 }

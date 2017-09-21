@@ -79,14 +79,17 @@ public class IOCBootstrapGenerator {
   private static final Logger log = LoggerFactory.getLogger(IOCBootstrapGenerator.class);
 
   private static final Object generatorLock = new Object();
+  private final Collection<MetaClass> relevantClasses;
 
   public IOCBootstrapGenerator(final MetaClassFinder metaClassFinder,
           final GeneratorContext context,
-          final ErraiConfiguration erraiConfiguration) {
+          final ErraiConfiguration erraiConfiguration,
+          final Collection<MetaClass> relevantClasses) {
 
     this.metaClassFinder = metaClassFinder;
     this.context = context;
     this.erraiConfiguration = erraiConfiguration;
+    this.relevantClasses = relevantClasses;
   }
 
   public String generate(final String packageName, final String className) {
@@ -175,7 +178,8 @@ public class IOCBootstrapGenerator {
 
     log.debug("Process dependency graph...");
     start = System.currentTimeMillis();
-    iocProcessor.process(iocProcessingContext);
+
+    iocProcessor.process(iocProcessingContext, relevantClasses);
     log.debug("Processed dependency graph in {}ms", System.currentTimeMillis() - start);
 
     doAfterRunnbales(blockBuilder);

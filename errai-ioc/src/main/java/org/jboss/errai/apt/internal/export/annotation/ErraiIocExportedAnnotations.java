@@ -21,10 +21,13 @@ import org.jboss.errai.ioc.client.api.IOCBootstrapTask;
 import org.jboss.errai.ioc.client.api.IOCExtension;
 import org.jboss.errai.ioc.client.api.ScopeContext;
 
+import javax.inject.Inject;
+
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public final class ErraiIocExportedAnnotations {
+
   private ErraiIocExportedAnnotations() {
   }
 
@@ -32,4 +35,6 @@ public final class ErraiIocExportedAnnotations {
   private IOCExtension iocExtension;
   private CodeDecorator codeDecorator;
   private ScopeContext scopeContext;
+  private Inject javaxInject;
+  private com.google.inject.Inject googleInject;
 }
