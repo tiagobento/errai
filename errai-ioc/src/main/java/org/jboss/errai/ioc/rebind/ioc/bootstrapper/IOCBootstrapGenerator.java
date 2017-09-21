@@ -93,8 +93,6 @@ public class IOCBootstrapGenerator {
     synchronized (generatorLock) {
       EnvUtil.recordEnvironmentState();
 
-      final String gen;
-
       log.info("generating IOC bootstrapping class...");
       final long st = System.currentTimeMillis();
 
@@ -103,7 +101,7 @@ public class IOCBootstrapGenerator {
       final InjectionContext injectionContext = buildInjectContext(packageName, className);
       log.debug("injection context setup in " + (System.currentTimeMillis() - injectionStart) + "ms");
 
-      gen = generateBootstrappingClassSource(injectionContext);
+      final String gen = generateBootstrappingClassSource(injectionContext);
       log.info("generated IOC bootstrapping class in " + (System.currentTimeMillis() - st) + "ms ");
 
       return gen;
