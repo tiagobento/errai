@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.mdoule2;
+package org.jboss.errai.common.apt.configuration.module2;
 
 import org.jboss.errai.common.apt.configuration.module.TestAnnotation;
 

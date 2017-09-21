@@ -94,7 +94,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
   @SuppressWarnings("unchecked")
   private Class<? extends ErraiAptGenerator> loadClass(final Element element) {
     try {
-      // Because generators will always be pre-compiled, it's safe to get their classes using Class.forName
+      // Because we're sure generators will always be pre-compiled, it's safe to get their classes using Class.forName
       return (Class<? extends ErraiAptGenerator>) Class.forName(element.asType().toString());
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException(element.asType().toString() + " is not an ErraiAptGenerator", e);

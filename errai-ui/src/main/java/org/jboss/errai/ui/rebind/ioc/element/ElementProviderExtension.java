@@ -210,7 +210,8 @@ public class ElementProviderExtension implements IOCExtensionConfigurator {
       @Override
       public Class<? extends Annotation> annotationType() {
         try {
-          //FIXME: tiago:
+          // Because obviously the Property annotation will be precompiled when generating code for an @ErraiApp,
+          // it's safe to run a Class.forName on the APT environment too
           return (Class<? extends Annotation>) Class.forName(m.annotationType().getCanonicalName());
         } catch (Exception e) {
           throw new RuntimeException(e);
