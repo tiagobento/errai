@@ -20,6 +20,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.jboss.errai.codegen.meta.HasAnnotations;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryBodyGenerator;
@@ -343,7 +344,7 @@ public class InjectionContext {
   }
 
   public boolean isElementType(final WiringElementType type, final HasAnnotations hasAnnotations) {
-    final Annotation matchingAnnotation = getMatchingAnnotationForElementType(type, hasAnnotations);
+    final MetaAnnotation matchingAnnotation = getMatchingAnnotationForElementType(type, hasAnnotations);
     if (matchingAnnotation != null && type == WiringElementType.NotSupported) {
       log.error(hasAnnotations + " was annotated with " + matchingAnnotation.annotationType().getName()
           + " which is not supported in client-side Errai code!");
@@ -375,38 +376,37 @@ public class InjectionContext {
     return false;
   }
 
-  public Annotation getMatchingAnnotationForElementType(final WiringElementType type,
+  public MetaAnnotation getMatchingAnnotationForElementType(final WiringElementType type,
                                                         final HasAnnotations hasAnnotations) {
 
     final Collection<Class<? extends Annotation>> annotationsForElementType = getAnnotationsForElementType(type);
 
-    for (final Annotation a : hasAnnotations.unsafeGetAnnotations()) {
-      if (annotationsForElementType.contains(a.annotationType())) {
+    for (final MetaAnnotation a : hasAnnotations.getAnnotations()) {
+      if (annotationsForElementType.stream().anyMatch(a::instanceOf)) {
         return a;
       }
     }
 
-    final Set<Annotation> annotationSet = new HashSet<Annotation>();
+    final Set<MetaAnnotation> annotationSet = new HashSet<>();
 
-    fillInStereotypes(annotationSet, hasAnnotations.unsafeGetAnnotations(), false);
+    fillInStereotypes(annotationSet, hasAnnotations.getAnnotations(), false);
 
-    for (final Annotation a : annotationSet) {
-      if (annotationsForElementType.contains(a.annotationType())) {
+    for (final MetaAnnotation a : annotationSet) {
+      if (annotationsForElementType.stream().anyMatch(a::instanceOf)) {
         return a;
       }
     }
     return null;
   }
 
-  private static void fillInStereotypes(final Set<Annotation> annotationSet,
-                                        final Annotation[] from,
+  private static void fillInStereotypes(final Set<MetaAnnotation> annotationSet,
+                                        final Collection<MetaAnnotation> from,
                                         boolean filterScopes) {
 
-    final List<Class<? extends Annotation>> stereotypes
-        = new ArrayList<Class<? extends Annotation>>();
+    final List<MetaClass> stereotypes = new ArrayList<>();
 
-    for (final Annotation a : from) {
-      final Class<? extends Annotation> aClass = a.annotationType();
+    for (final MetaAnnotation a : from) {
+      final MetaClass aClass = a.annotationType();
       if (aClass.isAnnotationPresent(Stereotype.class)) {
         stereotypes.add(aClass);
       }
@@ -422,7 +422,7 @@ public class InjectionContext {
       }
     }
 
-    for (final Class<? extends Annotation> stereotype : stereotypes) {
+    for (final MetaClass stereotype : stereotypes) {
       fillInStereotypes(annotationSet, stereotype.getAnnotations(), filterScopes);
     }
   }

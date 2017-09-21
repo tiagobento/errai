@@ -205,7 +205,7 @@ public class IOCProcessor {
 
     start = System.currentTimeMillis();
 
-    final Map<Class<? extends Annotation>, MetaClass> scopeContexts = findScopeContexts(processingContext);
+    final Map<MetaClass, MetaClass> scopeContexts = findScopeContexts(processingContext);
     final Set<MetaClass> scopeContextSet = new LinkedHashSet<>(scopeContexts.values());
     final Statement[] contextLocalVarInvocation = contextLocalVarInvocation(scopeContextSet);
 
@@ -335,7 +335,7 @@ public class IOCProcessor {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private void declareAndRegisterFactories(final IOCProcessingContext processingContext,
-          final DependencyGraph dependencyGraph, final Map<Class<? extends Annotation>, MetaClass> scopeContexts,
+          final DependencyGraph dependencyGraph, final Map<MetaClass, MetaClass> scopeContexts,
           final Collection<MetaClass> orderedScopeContexts, final BlockBuilder registerFactoriesBody) {
     final Parameter[] contextParamsDeclaration = contextParamsDeclaration(orderedScopeContexts);
     final Statement[] contextLocalVarInvocation = contextLocalVarInvocation(orderedScopeContexts);
@@ -362,7 +362,7 @@ public class IOCProcessor {
   }
 
   private void declareAndProcessInjectable(final IOCProcessingContext processingContext,
-          final Map<Class<? extends Annotation>, MetaClass> scopeContexts,
+          final Map<MetaClass, MetaClass> scopeContexts,
           @SuppressWarnings("rawtypes") final BlockBuilder curMethod, final Injectable injectable) {
     if (injectionContext.isAsync() && injectable.loadAsync()) {
       final MetaClass factoryClass = addFactoryDeclaration(injectable, processingContext);
@@ -423,7 +423,7 @@ public class IOCProcessor {
 
   @SuppressWarnings("unchecked")
   private void declareAndRegisterConcreteInjectable(final Injectable injectable,
-          final IOCProcessingContext processingContext, final Map<Class<? extends Annotation>, MetaClass> scopeContexts,
+          final IOCProcessingContext processingContext, final Map<MetaClass, MetaClass> scopeContexts,
           @SuppressWarnings("rawtypes") final BlockBuilder registerFactoriesBody) {
     final MetaClass factoryClass = addFactoryDeclaration(injectable, processingContext);
     registerFactoryWithContext(injectable, factoryClass, scopeContexts, registerFactoriesBody);
@@ -529,11 +529,11 @@ public class IOCProcessor {
   }
 
   private void registerFactoryWithContext(final Injectable injectable, final MetaClass factoryClass,
-          final Map<Class<? extends Annotation>, MetaClass> scopeContexts,
+          final Map<MetaClass, MetaClass> scopeContexts,
           @SuppressWarnings("rawtypes") final BlockBuilder registerFactoriesBody) {
-    final Class<? extends Annotation> scope = injectable.getScope();
+    final MetaClass scope = injectable.getScope();
     final MetaClass injectedType = injectable.getInjectedType();
-    final MetaClass scopeContextImpl = Assert.notNull("No scope context for " + scope.getSimpleName(), scopeContexts.get(scope));
+    final MetaClass scopeContextImpl = Assert.notNull("No scope context for " + scope.getName(), scopeContexts.get(scope));
     final String contextVarName = getContextVarName(scopeContextImpl);
     registerFactoriesBody.append(loadVariable(contextVarName).invoke("registerFactory",
             Stmt.castTo(parameterizedAs(Factory.class, typeParametersOf(injectedType)),
@@ -544,9 +544,9 @@ public class IOCProcessor {
     return scopeContextImpl.getFullyQualifiedName().replace('.', '_') + "_context";
   }
 
-  private Map<Class<? extends Annotation>, MetaClass> findScopeContexts(final IOCProcessingContext processingContext) {
+  private Map<MetaClass, MetaClass> findScopeContexts(final IOCProcessingContext processingContext) {
     final Collection<MetaClass> scopeContexts = processingContext.metaClassFinder().findAnnotatedWith(ScopeContext.class);
-    final Map<Class<? extends Annotation>, MetaClass> annoToContextImpl = new HashMap<>();
+    final Map<MetaClass, MetaClass> annoToContextImpl = new HashMap<>();
     for (final MetaClass scopeContext : scopeContexts) {
       if (!scopeContext.isAssignableTo(Context.class)) {
         throw new RuntimeException("They type " + scopeContext.getFullyQualifiedName()
@@ -554,26 +554,15 @@ public class IOCProcessor {
       }
       final MetaAnnotation anno = scopeContext.getAnnotation(ScopeContext.class).get();
       for (final MetaClass scope : anno.valueAsArray(MetaClass[].class)) {
-        annoToContextImpl.put(getScopeClass(scope), scopeContext);
+        annoToContextImpl.put(scope, scopeContext);
       }
     }
     final MetaClass depContextImpl = MetaClassFactory.get(DependentScopeContext.class);
     for (final Class<? extends Annotation> customAnno : injectionContext.getAnnotationsForElementType(WiringElementType.DependentBean)) {
-      annoToContextImpl.put(customAnno, depContextImpl);
+      annoToContextImpl.put(MetaClassFactory.get(customAnno), depContextImpl);
     }
 
     return annoToContextImpl;
-  }
-
-  @SuppressWarnings("unchecked")
-  private Class<? extends Annotation> getScopeClass(final MetaClass scope) {
-    try {
-      // Because we're sure all scope classes will be precompiled when generating code for an @ErraiApp,
-      // it's safe to run a Class.forName on the APT environment too
-      return (Class<? extends Annotation>) Class.forName(scope.getCanonicalName());
-    } catch (final Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private MetaClass addFactoryDeclaration(final Injectable injectable, final IOCProcessingContext processingContext) {
@@ -628,7 +617,7 @@ public class IOCProcessor {
             maybeProcessAsStaticOnlyProducer(builder, type, problems);
           }
           else if ((enabled = isEnabled(type)) && isConstructable(type, problems)) {
-            final Class<? extends Annotation> directScope = getScope(type);
+            final MetaClass directScope = getScope(type);
             final Injectable typeInjectable = builder.addInjectable(type, qualFactory.forSource(type), getPathPredicate(type, problems),
                     directScope, InjectableType.Type, getWiringTypes(type, directScope));
             processInjectionPoints(typeInjectable, builder, problems);
@@ -636,7 +625,7 @@ public class IOCProcessor {
             maybeProcessAsProvider(typeInjectable, builder, true);
           }
           else if (!enabled) {
-            final Class<? extends Annotation> directScope = getScope(type);
+            final MetaClass directScope = getScope(type);
             final Injectable typeInjectable = builder.addInjectable(type, qualFactory.forSource(type), getPathPredicate(type, problems),
                     directScope, InjectableType.Disabled, getWiringTypes(type, directScope));
             maybeProcessAsProducer(builder, type, typeInjectable, false, problems);
@@ -783,7 +772,7 @@ public class IOCProcessor {
     return anno.annotationType().isAnnotationPresent(Stereotype.class);
   }
 
-  private WiringElementType[] getWiringTypes(final MetaClass type, final Class<? extends Annotation> directScope) {
+  private WiringElementType[] getWiringTypes(final MetaClass type, final MetaClass directScope) {
     final List<WiringElementType> wiringTypes = new ArrayList<>();
     wiringTypes.addAll(getWiringTypesForScopeAnnotation(directScope));
 
@@ -852,38 +841,36 @@ public class IOCProcessor {
     builder.addProducerMemberDependency(providedInjectable, providerImplInjectable.getInjectedType(), providerImplInjectable.getQualifier(), providerMethod);
   }
 
-  private Class<? extends Annotation> getScope(final HasAnnotations annotated) {
-    final Class<? extends Annotation> foundScope = getDirectScope(annotated);
-    return (foundScope != null && !injectionContext.isElementType(WiringElementType.DependentBean, foundScope))
-            ? foundScope : Dependent.class;
+  private MetaClass getScope(final HasAnnotations annotated) {
+    final MetaClass foundScope = getDirectScope(annotated);
+
+    if (foundScope != null && !injectionContext.isElementType(WiringElementType.DependentBean, foundScope)) {
+      return foundScope;
+    } else {
+      return MetaClassFactory.get(Dependent.class);
+    }
   }
 
-  private Class<? extends Annotation> getDirectScope(final HasAnnotations annotated) {
+  private MetaClass getDirectScope(final HasAnnotations annotated) {
     // TODO validate that there's only one scope?
     final Set<Class<? extends Annotation>> scopeAnnoTypes = new HashSet<>();
     scopeAnnoTypes.addAll(injectionContext.getAnnotationsForElementType(WiringElementType.DependentBean));
     scopeAnnoTypes.addAll(injectionContext.getAnnotationsForElementType(WiringElementType.NormalScopedBean));
     scopeAnnoTypes.addAll(injectionContext.getAnnotationsForElementType(WiringElementType.PseudoScopedBean));
 
-    final Predicate<Class<? extends Annotation>> isExplicitScope =
-            type -> Arrays.stream(type.getAnnotations())
-                          .map(Annotation::annotationType)
-                          .anyMatch(aType -> NormalScope.class.equals(aType) || Scope.class.equals(aType));
-
-    final PriorityQueue<Class<? extends Annotation>> pq = new PriorityQueue<>((o1, o2) -> {
+    final PriorityQueue<MetaClass> pq = new PriorityQueue<>((o1, o2) -> {
       final int score1, score2;
-      score1 = (isExplicitScope.test(o1) ? 1 : -1);
-      score2 = (isExplicitScope.test(o2) ? 1 : -1);
-
+      score1 = (isExplicitScope(o1) ? 1 : -1);
+      score2 = (isExplicitScope(o2) ? 1 : -1);
       return score2 - score1;
     });
 
-    for (final Annotation anno : annotated.unsafeGetAnnotations()) {
-      final Class<? extends Annotation> annoType = anno.annotationType();
-      if (scopeAnnoTypes.contains(annoType)) {
+    for (final MetaAnnotation anno : annotated.getAnnotations()) {
+      final MetaClass annoType = anno.annotationType();
+      if (scopeAnnoTypes.stream().anyMatch(anno::instanceOf)) {
         pq.add(annoType);
       } else if (annoType.isAnnotationPresent(Stereotype.class)) {
-        final Class<? extends Annotation> stereotypeScope = getDirectScope(MetaClassFactory.get(annoType));
+        final MetaClass stereotypeScope = getDirectScope(annoType);
         if (stereotypeScope != null) {
           pq.add(stereotypeScope);
         }
@@ -896,6 +883,11 @@ public class IOCProcessor {
     else {
       return pq.poll();
     }
+  }
+
+  private boolean isExplicitScope(final MetaClass type) {
+    return type.getAnnotations().stream()
+                  .anyMatch(m -> m.instanceOf(NormalScope.class) || m.instanceOf(Scope.class));
   }
 
   /**
@@ -918,7 +910,7 @@ public class IOCProcessor {
   private void processProducerMethod(final Injectable producerTypeInjectable, final MetaClass producerType,
           final DependencyGraphBuilder builder, final Collection<MetaMethod> disposesMethods, final MetaMethod method,
           final boolean enabled, final List<String> problems) {
-    final Class<? extends Annotation> directScope = getScope(method);
+    final MetaClass directScope = getScope(method);
     final WiringElementType[] wiringTypes = getWiringTypeForProducer(producerType, method, directScope);
     final InjectableType injectableType = (enabled ? InjectableType.Producer : InjectableType.Disabled);
     final Injectable producedInjectable = builder.addInjectable(getMethodReturnType(method),
@@ -977,7 +969,7 @@ public class IOCProcessor {
   }
 
   private WiringElementType[] getWiringTypeForProducer(final MetaClass enclosingClass, final HasAnnotations annotated,
-          final Class<? extends Annotation> directScope) {
+          final MetaClass directScope) {
     final List<WiringElementType> wiringTypes = new ArrayList<>();
 
     wiringTypes.addAll(getWiringTypesForScopeAnnotation(directScope));
@@ -1048,7 +1040,7 @@ public class IOCProcessor {
     }
   }
 
-  private Collection<WiringElementType> getWiringTypesForScopeAnnotation(final Class<? extends Annotation> directScope) {
+  private Collection<WiringElementType> getWiringTypesForScopeAnnotation(final MetaClass directScope) {
     if (injectionContext.isElementType(WiringElementType.NormalScopedBean, directScope)) {
       return Collections.singleton(WiringElementType.NormalScopedBean);
     } else if (injectionContext.isElementType(WiringElementType.DependentBean, directScope)) {
@@ -1079,7 +1071,7 @@ public class IOCProcessor {
   private void processProducerField(final Injectable producerInjectable, final MetaClass producerType,
           final DependencyGraphBuilder builder, final Collection<MetaMethod> disposesMethods, final MetaField field,
           final boolean enabled, final List<String> problems) {
-    final Class<? extends Annotation> scopeAnno = getScope(field);
+    final MetaClass scopeAnno = getScope(field);
     final InjectableType injectableType = (enabled ? InjectableType.Producer : InjectableType.Disabled);
     final Injectable producedInjectable = builder.addInjectable(field.getType(), qualFactory.forSource(field), getPathPredicate(field, problems),
             scopeAnno, injectableType, getWiringTypeForProducer(producerType, field, scopeAnno));
@@ -1234,9 +1226,9 @@ public class IOCProcessor {
   }
 
   private boolean scopeDoesNotRequireProxy(final MetaClass type) {
-    final Class<? extends Annotation> scope = getScope(type);
-
-    return scope.equals(EntryPoint.class) || injectionContext.getAnnotationsForElementType(WiringElementType.DependentBean).contains(scope);
+    final MetaClass scope = getScope(type);
+    return scope.instanceOf(EntryPoint.class) || injectionContext.getAnnotationsForElementType(
+            WiringElementType.DependentBean).stream().anyMatch(type::instanceOf);
   }
 
   private List<MetaConstructor> getInjectableConstructors(final MetaClass type) {

@@ -37,6 +37,7 @@ import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.StatementBuilder;
 import org.jboss.errai.codegen.literal.LiteralFactory;
 import org.jboss.errai.codegen.meta.HasAnnotations;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaConstructor;
@@ -751,7 +752,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
 
   protected Statement generateFactoryHandleStatement(final Injectable injectable) {
     final Statement newObject;
-    if (injectable.getInjectedType().unsafeIsAnnotationPresent(ActivatedBy.class)) {
+    if (injectable.getInjectedType().isAnnotationPresent(ActivatedBy.class)) {
       final Class<? extends BeanActivator> activatorType = injectable.getInjectedType().unsafeGetAnnotation(ActivatedBy.class).value();
       newObject = newObject(FactoryHandleImpl.class, loadLiteral(injectable.getInjectedType()),
               injectable.getFactoryName(), injectable.getScope(), isEager(injectable.getInjectedType()),
@@ -765,13 +766,13 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   }
 
   protected static Object isEager(final MetaClass injectedType) {
-    return injectedType.unsafeIsAnnotationPresent(EntryPoint.class) ||
+    return injectedType.isAnnotationPresent(EntryPoint.class) ||
             // TODO review this before adding any scopes other than app-scoped and depdendent
-            (!injectedType.unsafeIsAnnotationPresent(Dependent.class) && hasStartupAnnotation(injectedType));
+            (!injectedType.isAnnotationPresent(Dependent.class) && hasStartupAnnotation(injectedType));
   }
 
   protected static boolean hasStartupAnnotation(final MetaClass injectedType) {
-    for (final Annotation anno : injectedType.unsafeGetAnnotations()) {
+    for (final MetaAnnotation anno : injectedType.getAnnotations()) {
       if (anno.annotationType().getName().equals("javax.ejb.Startup")) {
         return true;
       }
