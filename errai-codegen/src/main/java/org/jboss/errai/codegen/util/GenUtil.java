@@ -89,7 +89,7 @@ public class GenUtil {
         }
       }
       try {
-        if (method.isVarArgs() && i == methodParameters.length - 1) {
+        if (method.isVarArgs() && i == methodParameters.length - 1 && !parameter.getClass().isArray()) {
           final MetaClass varArgsType = methodParameters[methodParameters.length - 1].getType().getComponentType();
           statements[i] = convert(context, parameter, varArgsType);
           i++;
