@@ -20,7 +20,7 @@ import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.meta.HasAnnotations;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.common.apt.configuration.ErraiAptModuleConfiguration;
+import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.ioc.client.api.IOCExtension;
@@ -74,7 +74,7 @@ public class DataBindingIOCExtension implements IOCExtensionConfigurator {
 
     //FIXME: tiago: duplicated logic
     final Collection<MetaClass> allBindableTypes = context.metaClassFinder().findAnnotatedWith(Bindable.class);
-    allBindableTypes.addAll(new ErraiAptModuleConfiguration(context.metaClassFinder()).getBindableTypes());
+    allBindableTypes.addAll(new AptErraiModulesConfiguration(context.metaClassFinder()).getBindableTypes());
 
     final Model anno = new Model() {
       @Override

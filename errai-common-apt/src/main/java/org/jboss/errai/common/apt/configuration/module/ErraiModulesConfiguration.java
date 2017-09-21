@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
-
-import org.jboss.errai.common.configuration.ErraiApp;
+package org.jboss.errai.common.apt.configuration.module;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiApp(userOnHostPageEnabled = true,
-          asyncBeanManager = true,
-          enableWebSocketServer = true,
-          autoDiscoverServices = true,
-          applicationContext = "/test")
-class ErraiTestApp {
+public interface ErraiModulesConfiguration extends ErraiSeparateModuleConfiguration.Ioc,
+        ErraiSeparateModuleConfiguration.DataBinding, ErraiSeparateModuleConfiguration.Marshalling {
+
 }

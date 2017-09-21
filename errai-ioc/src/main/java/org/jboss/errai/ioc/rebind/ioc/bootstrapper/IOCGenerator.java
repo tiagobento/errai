@@ -22,7 +22,7 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration;
+import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
@@ -31,12 +31,13 @@ import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
+import org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration.ErraiAppPropertiesConfiguration;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 
 /**
  * The main generator class for the Errai IOC framework.
@@ -68,19 +69,35 @@ public class IOCGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-    final MetaClassFinder metaClassFinder = ann -> Stream.concat(
-            ClassScanner.getTypesAnnotatedWith(ann, translatablePackages, context).stream(),
-            ScannerSingleton.getOrCreateInstance().getTypesAnnotatedWith(ann).stream().map(MetaClassFactory::get))
-            .collect(toSet());
+    final MetaClassFinder metaClassFinder = ann -> findMetaClasses(context, translatablePackages, ann);
+    final ErraiConfiguration erraiConfiguration = new ErraiAppPropertiesConfiguration();
 
-    return generate(context, metaClassFinder, new ErraiAppPropertiesIocModuleConfiguration());
+    return generate(context, metaClassFinder, erraiConfiguration);
   }
 
   public String generate(final GeneratorContext context,
           final MetaClassFinder metaClassFinder,
-          final ErraiModuleConfiguration.Ioc iocModuleConfiguration) {
+          final ErraiConfiguration erraiConfiguration) {
 
-    return new IOCBootstrapGenerator(metaClassFinder, context, iocModuleConfiguration).generate(packageName, className);
+    return new IOCBootstrapGenerator(metaClassFinder, context, erraiConfiguration).generate(packageName, className);
+  }
+
+  private Collection<MetaClass> findMetaClasses(final GeneratorContext context,
+          final Set<String> translatablePackages,
+          final Class<? extends Annotation> annotation) {
+
+    final Collection<MetaClass> typesAnnotatedWith = ClassScanner.getTypesAnnotatedWith(annotation,
+            translatablePackages, context);
+
+    if (!typesAnnotatedWith.isEmpty()) {
+      return typesAnnotatedWith;
+    }
+
+    return ScannerSingleton.getOrCreateInstance()
+            .getTypesAnnotatedWith(annotation)
+            .stream()
+            .map(MetaClassFactory::get)
+            .collect(toList());
   }
 
   @Override

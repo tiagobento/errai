@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.module;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.codegen.meta.TestMetaClassFinder;
-import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocWhitelisted1;
-import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocAlternative2;
-import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.Serializable2;
+import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocWhitelisted1;
+import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocAlternative2;
+import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.Serializable2;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Set;
 
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.Bindable1;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocAlternative1;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocBlacklisted1;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.NonSerializable1;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.Serializable1;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.Bindable2;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocBlacklisted2;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocWhitelisted2;
-import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.NonSerializable2;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.Bindable1;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocAlternative1;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocBlacklisted1;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.NonSerializable1;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.Serializable1;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.Bindable2;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocBlacklisted2;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocWhitelisted2;
+import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.NonSerializable2;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -46,7 +46,7 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
   @Test
   public void testGetAllPropertiesWithDefaultValues() {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiDefaultTestModule.class));
-    final ErraiAptModuleConfiguration config = new ErraiAptModuleConfiguration(metaClassFinder);
+    final AptErraiModulesConfiguration config = new AptErraiModulesConfiguration(metaClassFinder);
 
     assertTrue(config.getBindableTypes().isEmpty());
     assertTrue(config.getIocAlternatives().isEmpty());
@@ -61,7 +61,7 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
   @Test
   public void testGetAllPropertiesWithCustomValues() {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiTestCustomModule1.class));
-    final ErraiAptModuleConfiguration config = new ErraiAptModuleConfiguration(metaClassFinder);
+    final AptErraiModulesConfiguration config = new AptErraiModulesConfiguration(metaClassFinder);
 
     assertContainsOnly(config.getBindableTypes(), aptClass(Bindable1.class));
     assertContainsOnly(config.getIocAlternatives(), aptClass(IocAlternative1.class));
@@ -77,7 +77,7 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiTestCustomModule1.class),
             aptClass(ErraiTestCustomModule2.class));
 
-    final ErraiAptModuleConfiguration config = new ErraiAptModuleConfiguration(metaClassFinder);
+    final AptErraiModulesConfiguration config = new AptErraiModulesConfiguration(metaClassFinder);
 
     assertContainsOnly(config.getBindableTypes(), aptClass(Bindable1.class), aptClass(Bindable2.class));
     assertContainsOnly(config.getIocAlternatives(), aptClass(IocAlternative1.class), aptClass(IocAlternative2.class));

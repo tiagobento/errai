@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.app;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.codegen.meta.TestMetaClassFinder;
@@ -29,7 +29,7 @@ public class ErraiAppConfigurationTest extends ErraiAptTest {
   @Test
   public void testGetAllPropertiesWithDefaultValues() {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiTestAppWithDefaultValues.class));
-    final ErraiAppConfiguration config = new ErraiAppConfiguration(metaClassFinder);
+    final AptErraiAppConfiguration config = new AptErraiAppConfiguration(metaClassFinder);
 
     Assert.assertEquals("", config.getApplicationContext());
     Assert.assertEquals(false, config.isUserEnabledOnHostPage());
@@ -44,7 +44,7 @@ public class ErraiAppConfigurationTest extends ErraiAptTest {
             aptClass(ErraiTestAppWithDefaultValues.class));
 
     try {
-      new ErraiAppConfiguration(metaClassFinder);
+      new AptErraiAppConfiguration(metaClassFinder);
     } catch (final RuntimeException e) {
       return;
     }
@@ -55,7 +55,7 @@ public class ErraiAppConfigurationTest extends ErraiAptTest {
   @Test
   public void testGetAllPropertiesWithCustomValues() {
     final TestMetaClassFinder metaClassFinder = new TestMetaClassFinder(aptClass(ErraiTestApp.class));
-    final ErraiAppConfiguration config = new ErraiAppConfiguration(metaClassFinder);
+    final AptErraiAppConfiguration config = new AptErraiAppConfiguration(metaClassFinder);
 
     Assert.assertEquals(true, config.isUserEnabledOnHostPage());
     Assert.assertEquals(true, config.asyncBeanManager());

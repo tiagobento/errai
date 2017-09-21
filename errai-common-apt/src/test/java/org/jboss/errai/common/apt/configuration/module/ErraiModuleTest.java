@@ -1,9 +1,9 @@
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.module;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.common.apt.AnnotatedSourceElementsFinder;
 import org.jboss.errai.common.apt.TestAnnotatedSourceElementsFinder;
-import org.jboss.errai.common.apt.configuration2.AnnotatedTypeOutOfModule;
+import org.jboss.errai.common.apt.configuration.mdoule2.AnnotatedTypeOutOfModule;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
 import org.junit.Assert;
 import org.junit.Test;
