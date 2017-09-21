@@ -80,8 +80,9 @@ public final class DependencyGraphBuilderImpl implements DependencyGraphBuilder 
 
   @Override
   public Injectable addInjectable(final MetaClass injectedType, final Qualifier qualifier,
-          final Predicate<List<InjectableHandle>> pathPredicate, final Class<? extends Annotation> literalScope,
+          final Predicate<List<InjectableHandle>> pathPredicate, final MetaClass literalScope,
           final InjectableType injectableType, final WiringElementType... wiringTypes) {
+
     final InjectableImpl injectable = new InjectableImpl(injectedType, qualifier, pathPredicate,
             nameGenerator.generateFor(injectedType, qualifier, injectableType), literalScope, injectableType,
             Arrays.asList(wiringTypes));
@@ -359,7 +360,7 @@ public final class DependencyGraphBuilderImpl implements DependencyGraphBuilder 
     case Annotated:
       return inj -> !inj.getWiringElementTypes().contains(WiringElementType.Simpleton);
     case Aggressive:
-      return inj -> EntryPoint.class.equals(inj.getScope()) || inj.getWiringElementTypes().contains(WiringElementType.JsType);
+      return inj -> inj.getScope().instanceOf(EntryPoint.class) || inj.getWiringElementTypes().contains(WiringElementType.JsType);
     default:
       throw new RuntimeException("Unrecognized reachability strategy, " + strategy.toString());
     }

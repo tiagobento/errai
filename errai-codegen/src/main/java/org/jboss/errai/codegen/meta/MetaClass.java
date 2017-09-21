@@ -257,4 +257,9 @@ public abstract class MetaClass extends AbstractHasAnnotations implements MetaTy
 
   public abstract int hashContent();
 
+
+  public boolean instanceOf(final Class<? extends Annotation> clazz) {
+    return clazz.getCanonicalName().equals(getCanonicalName());
+  }
+
 }
