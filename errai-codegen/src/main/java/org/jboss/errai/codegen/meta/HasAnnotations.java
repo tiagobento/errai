@@ -41,7 +41,7 @@ public interface HasAnnotations {
    */
   @Deprecated
   default boolean unsafeIsAnnotationPresent(final Class<? extends Annotation> annotation) {
-    return unsafeGetAnnotation(annotation) != null;
+    return isAnnotationPresent(annotation);
   }
 
   /**

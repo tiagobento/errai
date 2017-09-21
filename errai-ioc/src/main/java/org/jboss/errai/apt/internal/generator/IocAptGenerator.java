@@ -16,11 +16,16 @@
 
 package org.jboss.errai.apt.internal.generator;
 
+import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
 import org.jboss.errai.common.apt.configuration.ErraiAptConfiguration;
 import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
@@ -40,7 +45,13 @@ public class IocAptGenerator extends ErraiAptGenerator {
   @Override
   public String generate() {
     final ErraiConfiguration erraiConfiguration = new ErraiAptConfiguration(this::findAnnotatedMetaClasses);
-    return iocGenerator.generate(null, this::findAnnotatedMetaClasses, erraiConfiguration);
+    return iocGenerator.generate(null, this::findAnnotatedMetaClasses, erraiConfiguration, findRelevantClasses());
+  }
+
+  private Collection<MetaClass> findRelevantClasses() {
+    final Collection<MetaClass> metaClasses = new ArrayList<>(findAnnotatedMetaClasses(Inject.class));
+    metaClasses.addAll(findAnnotatedMetaClasses(com.google.inject.Inject.class));
+    return metaClasses;
   }
 
   @Override

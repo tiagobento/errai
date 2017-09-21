@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.apt.export;
+package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
+
+import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFactory;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-interface SupportedAnnotationTypes {
+public class IocRelevantClassesUtil {
 
-  String IOC_BOOTSTRAP_TASK = "org.jboss.errai.ioc.client.api.IOCBootstrapTask";
-  String IOC_EXTENSION = "org.jboss.errai.ioc.client.api.IOCExtension";
-  String CODE_DECORATOR = "org.jboss.errai.ioc.client.api.CodeDecorator";
-  String SCOPE_CONTEXT = "org.jboss.errai.ioc.client.api.ScopeContext";
-  String JAVAX_INJECT = "javax.inject.Inject";
-  String GOOGLE_INJECT = "com.google.inject.Inject";
+  public static Collection<MetaClass> findRelevantClasses() {
+
+    final Collection<MetaClass> allMetaClasses = new HashSet<>();
+    allMetaClasses.addAll(MetaClassFactory.getAllCachedClasses());
+    allMetaClasses.remove(MetaClassFactory.get(Object.class));
+
+    return allMetaClasses;
+  }
 }

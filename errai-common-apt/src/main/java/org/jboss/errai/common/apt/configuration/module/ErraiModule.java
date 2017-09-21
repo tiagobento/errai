@@ -16,6 +16,8 @@
 
 package org.jboss.errai.common.apt.configuration.module;
 
+import com.sun.tools.javac.code.Symbol;
+import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 import org.jboss.errai.common.apt.AnnotatedSourceElementsFinder;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
 
@@ -67,14 +69,34 @@ public class ErraiModule {
   Set<Element> findAnnotatedClassesAndInterfaces(final TypeElement annotationTypeElement) {
     return annotatedSourceElementsFinder.findSourceElementsAnnotatedWith(annotationTypeElement)
             .stream()
-            .filter(e -> e.getKind().isClass() || e.getKind().isInterface())
             .filter(this::isPartOfModule)
+            .flatMap(this::getTypeElement)
             .collect(toSet());
+  }
+
+  private Stream<? extends Element> getTypeElement(final Element element) {
+    if (element.getKind().isClass() || element.getKind().isInterface()) {
+      return Stream.of(element);
+    } else if (element.getKind().isField()) {
+      return Stream.of(APTClassUtil.types.asElement(element.asType()));
+    } else {
+      return Stream.of();
+    }
   }
 
   private boolean isPartOfModule(final Element element) {
     // Exporting only classes on subpackages of an @ErraiModule is not ideal, but works for now.
-    return ((TypeElement) element).getQualifiedName().toString().contains(packageName + ".");
+    if (element.getKind().isClass() || element.getKind().isInterface()) {
+      return isUnderModulePackage((Symbol) element);
+    } else if (element.getKind().isField()) {
+      return isUnderModulePackage(((Symbol.VarSymbol) element).owner);
+    } else {
+      return false;
+    }
+  }
+
+  private boolean isUnderModulePackage(final Symbol element) {
+    return element.getQualifiedName().toString().contains(packageName + ".");
   }
 
   String erraiModuleUniqueNamespace() {
