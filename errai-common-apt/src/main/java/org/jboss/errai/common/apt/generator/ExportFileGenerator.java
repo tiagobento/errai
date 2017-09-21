@@ -17,7 +17,7 @@
 package org.jboss.errai.common.apt.generator;
 
 import org.jboss.errai.common.apt.AnnotatedSourceElementsFinder;
-import org.jboss.errai.common.apt.configuration.ErraiModule;
+import org.jboss.errai.common.apt.configuration.module.ErraiModule;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
 
 import javax.annotation.processing.Filer;

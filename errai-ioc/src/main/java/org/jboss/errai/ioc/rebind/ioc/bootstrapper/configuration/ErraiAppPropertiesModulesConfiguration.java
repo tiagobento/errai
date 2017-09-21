@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
+package org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration;
 
 import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration;
+import org.jboss.errai.common.apt.configuration.module.ErraiModulesConfiguration;
 import org.jboss.errai.common.metadata.MetaDataScanner;
 import org.jboss.errai.common.metadata.ScannerSingleton;
-import org.jboss.errai.config.util.ClassScanner;
-import org.jboss.errai.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.jboss.errai.ioc.util.PropertiesUtil.getPropertyValues;
@@ -37,16 +35,16 @@ import static org.jboss.errai.ioc.util.PropertiesUtil.getPropertyValues;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAppPropertiesIocModuleConfiguration implements ErraiModuleConfiguration.Ioc {
+public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfiguration {
 
   private static final String QUALIFYING_METADATA_FACTORY_PROPERTY = "errai.ioc.QualifyingMetaDataFactory";
   private static final String ENABLED_ALTERNATIVES_PROPERTY = "errai.ioc.enabled.alternatives";
   private static final String WHITELIST_PROPERTY = "errai.ioc.whitelist";
   private static final String BLACKLIST_PROPERTY = "errai.ioc.blacklist";
 
-  private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesIocModuleConfiguration.class);
+  private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesModulesConfiguration.class);
 
-  public ErraiAppPropertiesIocModuleConfiguration() {
+  public ErraiAppPropertiesModulesConfiguration() {
     final MetaDataScanner scanner = ScannerSingleton.getOrCreateInstance();
     final Multimap<String, String> props = scanner.getErraiProperties();
 
@@ -90,5 +88,20 @@ public class ErraiAppPropertiesIocModuleConfiguration implements ErraiModuleConf
             .filter(s -> !s.contains("*"))
             .map(MetaClassFactory::get)
             .collect(toSet());
+  }
+
+  @Override
+  public Set<MetaClass> getBindableTypes() {
+    return Collections.emptySet(); //FIXME: tiago: implement
+  }
+
+  @Override
+  public Set<MetaClass> getSerializableTypes() {
+    return Collections.emptySet(); //FIXME: tiago: implement
+  }
+
+  @Override
+  public Set<MetaClass> getNonSerializableTypes() {
+    return Collections.emptySet();  //FIXME: tiago: implement
   }
 }

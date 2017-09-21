@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.module;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration.DataBinding;
-import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration.Ioc;
-import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration.Marshalling;
 import org.jboss.errai.common.configuration.ErraiModule;
 
 import java.util.Optional;
@@ -41,11 +38,11 @@ import static org.jboss.errai.common.configuration.ErraiModule.Property.SERIALIZ
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAptModuleConfiguration implements Ioc, Marshalling, DataBinding {
+public class AptErraiModulesConfiguration implements ErraiModulesConfiguration {
 
   private final Set<MetaAnnotation> erraiModules;
 
-  public ErraiAptModuleConfiguration(final MetaClassFinder metaClassFinder) {
+  public AptErraiModulesConfiguration(final MetaClassFinder metaClassFinder) {
     erraiModules = metaClassFinder.findAnnotatedWith(ErraiModule.class)
             .stream()
             .map(module -> module.getAnnotation(ErraiModule.class))

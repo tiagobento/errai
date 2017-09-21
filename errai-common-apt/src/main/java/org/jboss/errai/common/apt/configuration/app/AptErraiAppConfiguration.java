@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.app;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
@@ -33,11 +33,11 @@ import static org.jboss.errai.common.configuration.ErraiApp.Property.USER_ON_HOS
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAppConfiguration {
+public class AptErraiAppConfiguration implements ErraiAppConfiguration {
 
   private final MetaAnnotation erraiAppAnnotation;
 
-  public ErraiAppConfiguration(final MetaClassFinder metaClassFinder) {
+  public AptErraiAppConfiguration(final MetaClassFinder metaClassFinder) {
     final List<MetaAnnotation> erraiAppMetaAnnotation = metaClassFinder.findAnnotatedWith(ErraiApp.class)
             .stream()
             .map(app -> app.getAnnotation(ErraiApp.class))
@@ -51,23 +51,28 @@ public class ErraiAppConfiguration {
     this.erraiAppAnnotation = erraiAppMetaAnnotation.get(0);
   }
 
-  public Boolean isUserEnabledOnHostPage() {
+  @Override
+  public boolean isUserEnabledOnHostPage() {
     return erraiAppAnnotation.value(USER_ON_HOST_PAGE_ENABLED);
   }
 
-  public Boolean isWebSocketServerEnabled() {
+  @Override
+  public boolean isWebSocketServerEnabled() {
     return erraiAppAnnotation.value(ENABLE_WEB_SOCKET_SERVER);
   }
 
-  public Boolean isAutoDiscoverServicesEnabled() {
+  @Override
+  public boolean isAutoDiscoverServicesEnabled() {
     return erraiAppAnnotation.value(AUTO_DISCOVER_SERVICES);
   }
 
+  @Override
   public String getApplicationContext() {
     return erraiAppAnnotation.value(APPLICATION_CONTEXT);
   }
 
-  public Boolean asyncBeanManager() {
+  @Override
+  public boolean asyncBeanManager() {
     return erraiAppAnnotation.value(ASYNC_BEAN_MANAGER);
   }
 

@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.app;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@interface TestEnclosedElementAnnotation {
+interface ErraiSeparateAppConfiguration {
+
+  interface Others {
+
+    boolean isUserEnabledOnHostPage();
+
+    boolean isWebSocketServerEnabled();
+
+    String getApplicationContext();
+  }
+
+  interface Ioc {
+
+    boolean isAutoDiscoverServicesEnabled();
+
+    boolean asyncBeanManager();
+  }
 }

@@ -19,7 +19,7 @@ package org.jboss.errai.apt.internal.generator;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerator;
-import org.jboss.errai.common.apt.configuration.ErraiAptModuleConfiguration;
+import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.rebind.BindableProxyLoaderGenerator;
 
@@ -34,12 +34,12 @@ import java.util.Collection;
 public class BindableProxyLoaderAptGenerator extends ErraiAptGenerator {
 
   private final BindableProxyLoaderGenerator bindableProxyLoaderGenerator;
-  private final ErraiAptModuleConfiguration erraiModuleConfiguration;
+  private final AptErraiModulesConfiguration erraiModuleConfiguration;
 
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public BindableProxyLoaderAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
-    this.erraiModuleConfiguration = new ErraiAptModuleConfiguration(this::findAnnotatedMetaClasses);
+    this.erraiModuleConfiguration = new AptErraiModulesConfiguration(this::findAnnotatedMetaClasses);
     this.bindableProxyLoaderGenerator = new BindableProxyLoaderGenerator();
   }
 

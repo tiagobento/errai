@@ -26,7 +26,7 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.util.Implementations;
 import org.jboss.errai.codegen.util.Stmt;
-import org.jboss.errai.common.apt.configuration.ErraiModuleConfiguration;
+import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.common.server.api.ErraiBootstrapFailure;
 import org.jboss.errai.config.rebind.EnvUtil;
@@ -71,10 +71,10 @@ public class IOCBootstrapGenerator {
   private final MetaClassFinder metaClassFinder;
   private final GeneratorContext context;
 
-  private final List<MetaClass> beforeTasks = new ArrayList<MetaClass>();
-  private final List<MetaClass> afterTasks = new ArrayList<MetaClass>();
+  private final List<MetaClass> beforeTasks = new ArrayList<>();
+  private final List<MetaClass> afterTasks = new ArrayList<>();
 
-  private final ErraiModuleConfiguration.Ioc iocModuleConfiguration;
+  private final ErraiConfiguration erraiConfiguration;
 
   private static final Logger log = LoggerFactory.getLogger(IOCBootstrapGenerator.class);
 
@@ -82,10 +82,11 @@ public class IOCBootstrapGenerator {
 
   public IOCBootstrapGenerator(final MetaClassFinder metaClassFinder,
           final GeneratorContext context,
-          final ErraiModuleConfiguration.Ioc iocModuleConfiguration) {
+          final ErraiConfiguration erraiConfiguration) {
+
     this.metaClassFinder = metaClassFinder;
     this.context = context;
-    this.iocModuleConfiguration = iocModuleConfiguration;
+    this.erraiConfiguration = erraiConfiguration;
   }
 
   public String generate(final String packageName, final String className) {
@@ -134,16 +135,13 @@ public class IOCBootstrapGenerator {
   }
 
   private InjectionContext buildInjectionContext(final IOCProcessingContext iocProcessingContext) {
-    //FIXME: tiago: reflection scanning happening at this line
-    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
-    final boolean asyncBootstrap = s != null && Boolean.parseBoolean(s);
 
     final InjectionContext injectionContext = InjectionContext.Builder.create()
             .processingContext(iocProcessingContext)
-            .enabledAlternatives(classNames(iocModuleConfiguration.getIocAlternatives()))
-            .addToWhitelist(classNames(iocModuleConfiguration.getIocWhitelist()))
-            .addToBlacklist(classNames(iocModuleConfiguration.getIocBlacklist()))
-            .asyncBootstrap(asyncBootstrap)
+            .enabledAlternatives(classNames(erraiConfiguration.modules().getIocAlternatives()))
+            .addToWhitelist(classNames(erraiConfiguration.modules().getIocWhitelist()))
+            .addToBlacklist(classNames(erraiConfiguration.modules().getIocBlacklist()))
+            .asyncBootstrap(erraiConfiguration.app().asyncBeanManager())
             .build();
 
     injectionContext.mapElementType(WiringElementType.PseudoScopedBean, Singleton.class);
@@ -158,10 +156,6 @@ public class IOCBootstrapGenerator {
     injectionContext.mapElementType(WiringElementType.AlternativeBean, Alternative.class);
 
     return injectionContext;
-  }
-
-  private Collection<String> classNames(final Set<MetaClass> metaClasses) {
-    return metaClasses.stream().map(MetaClass::getCanonicalName).collect(toList());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -202,7 +196,7 @@ public class IOCBootstrapGenerator {
     long start;
     log.debug("Running after tasks...");
     start = System.currentTimeMillis();
-    _doRunnableTasks(afterTasks, blockBuilder);
+    doRunnableTasks(afterTasks, blockBuilder);
     log.debug("Tasks run in " + (System.currentTimeMillis() - start) + "ms");
   }
 
@@ -210,11 +204,11 @@ public class IOCBootstrapGenerator {
     long start;
     log.debug("Running before tasks...");
     start = System.currentTimeMillis();
-    _doRunnableTasks(beforeTasks, builder);
+    doRunnableTasks(beforeTasks, builder);
     log.debug("Tasks run in " + (System.currentTimeMillis() - start) + "ms");
   }
 
-  private static void _doRunnableTasks(final Collection<MetaClass> classes, final BlockBuilder<?> blockBuilder) {
+  private void doRunnableTasks(final Collection<MetaClass> classes, final BlockBuilder<?> blockBuilder) {
     for (final MetaClass clazz : classes) {
       if (!clazz.isAssignableTo(Runnable.class)) {
         throw new RuntimeException(
@@ -226,7 +220,7 @@ public class IOCBootstrapGenerator {
   }
 
   @SuppressWarnings("rawtypes")
-  public void processExtensions(final InjectionContext injectionContext) {
+  private void processExtensions(final InjectionContext injectionContext) {
 
     //Configure IocExtensions
     final List<IOCExtensionConfigurator> extensionConfigurators = metaClassFinder.findAnnotatedWith(IOCExtension.class)
@@ -288,9 +282,10 @@ public class IOCBootstrapGenerator {
     return annoType;
   }
 
-  private void configureIocExtension(final IOCExtensionConfigurator extension,
+  private void configureIocExtension(final IOCExtensionConfigurator extensionConfigurator,
           final InjectionContext injectionContext) {
-    extension.configure(injectionContext.getProcessingContext(), injectionContext);
+
+    extensionConfigurator.configure(injectionContext.getProcessingContext(), injectionContext);
   }
 
   private IOCExtensionConfigurator newIocExtension(final MetaClass metaClass) {
@@ -311,5 +306,9 @@ public class IOCBootstrapGenerator {
     } catch (final Exception e) {
       throw new ErraiBootstrapFailure("unable to load IOC Extension Configurator: " + e.getMessage(), e);
     }
+  }
+
+  private Collection<String> classNames(final Set<MetaClass> metaClasses) {
+    return metaClasses.stream().map(MetaClass::getCanonicalName).collect(toList());
   }
 }

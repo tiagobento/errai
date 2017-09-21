@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.mdoule2;
 
-import org.jboss.errai.common.configuration.ErraiApp;
+import org.jboss.errai.common.apt.configuration.module.TestAnnotation;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiApp
-class ErraiTestAppWithDefaultValues {
+@TestAnnotation
+public class AnnotatedTypeOutOfModule {
 }

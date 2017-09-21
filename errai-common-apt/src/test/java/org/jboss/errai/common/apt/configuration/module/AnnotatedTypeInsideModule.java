@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
+package org.jboss.errai.common.apt.configuration.module;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @TestAnnotation
-public class TestExportableTypeWithFieldAnnotations {
-
-  @TestEnclosedElementAnnotation
-  String foo;
-
-  @TestEnclosedElementAnnotation
-  String bar() {
-    return "bar";
-  }
-
+public class AnnotatedTypeInsideModule {
 }
