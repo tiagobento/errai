@@ -39,6 +39,7 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 import org.jboss.errai.codegen.meta.MetaParameter;
+import org.jboss.errai.codegen.meta.RuntimeMetaAnnotation;
 import org.jboss.errai.codegen.util.CDIAnnotationUtils;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Qualifier;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.QualifierFactory;
@@ -69,7 +70,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
     }
   };
 
-  private static final AnnotationWrapper ANY_WRAPPER = new AnnotationWrapper(ANY);
+  private static final AnnotationWrapper ANY_WRAPPER = new AnnotationWrapper(new RuntimeMetaAnnotation(ANY));
 
   private static final Default DEFAULT = new Default() {
     @Override
@@ -86,7 +87,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
     }
   };
 
-  private static final AnnotationWrapper DEFAULT_WRAPPER = new AnnotationWrapper(DEFAULT);
+  private static final AnnotationWrapper DEFAULT_WRAPPER = new AnnotationWrapper(new RuntimeMetaAnnotation(DEFAULT));
 
   private static final Qualifier UNIVERSAL = new Universal();
 
@@ -121,15 +122,15 @@ public class DefaultQualifierFactory implements QualifierFactory {
 
   private SortedSet<AnnotationWrapper> getRawQualifiers(final HasAnnotations annotated) {
     final SortedSet<AnnotationWrapper> annos = new TreeSet<>();
-    for (final Annotation anno : annotated.unsafeGetAnnotations()) {
+    for (final MetaAnnotation anno : annotated.getAnnotations()) {
       if (anno.annotationType().isAnnotationPresent(javax.inject.Qualifier.class)) {
-        if (anno.annotationType().equals(Named.class) && ((Named) anno).value().equals("")) {
+        if (anno.annotationType().equals(MetaClassFactory.get(Named.class)) && anno.value().equals("")) {
           annos.add(createNamed(annotated));
         } else {
           annos.add(new AnnotationWrapper(anno));
         }
       } else if (anno.annotationType().isAnnotationPresent(Stereotype.class)) {
-        annos.addAll(getRawQualifiers(MetaClassFactory.get(anno.annotationType())));
+        annos.addAll(getRawQualifiers(anno.annotationType()));
       }
     }
 
@@ -152,7 +153,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
   }
 
   private AnnotationWrapper createNamed(final String defaultName) {
-    return new AnnotationWrapper(new Named() {
+    return new AnnotationWrapper(new RuntimeMetaAnnotation(new Named() {
       @Override
       public Class<? extends Annotation> annotationType() {
         return Named.class;
@@ -167,7 +168,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
       public String toString() {
         return "@javax.inject.Named(value=" + defaultName + ")";
       }
-    });
+    }));
   }
 
   private void maybeAddDefaultForSource(final Set<AnnotationWrapper> annos) {
@@ -183,7 +184,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
   }
 
   private boolean onlyContainsNamed(final Set<AnnotationWrapper> annos) {
-    return annos.size() == 1 && annos.iterator().next().anno.annotationType().equals(Named.class);
+    return annos.size() == 1 && annos.iterator().next().anno.annotationType().equals(MetaClassFactory.get(Named.class));
   }
 
   @Override
@@ -209,7 +210,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
   }
 
   private Qualifier combineNormal(final NormalQualifier q1, final NormalQualifier q2) {
-    final Multimap<Class<? extends Annotation>, AnnotationWrapper> allAnnosByType = HashMultimap.create();
+    final Multimap<MetaClass, AnnotationWrapper> allAnnosByType = HashMultimap.create();
     for (final AnnotationWrapper wrapper : q1.annotations) {
       allAnnosByType.put(wrapper.anno.annotationType(), wrapper);
     }
@@ -217,7 +218,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
       allAnnosByType.put(wrapper.anno.annotationType(), wrapper);
     }
 
-    for (final Class<? extends Annotation> annoType : allAnnosByType.keySet()) {
+    for (final MetaClass annoType : allAnnosByType.keySet()) {
       if (allAnnosByType.get(annoType).size() == 2) {
         final Iterator<AnnotationWrapper> iter = allAnnosByType.get(annoType).iterator();
         throw new RuntimeException("Found two annotations of same type but with different values:\n\t"
@@ -275,8 +276,8 @@ public class DefaultQualifierFactory implements QualifierFactory {
     @Override
     public String getName() {
       for (final AnnotationWrapper wrapper : annotations) {
-        if (wrapper.anno.annotationType().equals(Named.class)) {
-          return ((Named) wrapper.anno).value();
+        if (wrapper.anno.annotationType().equals(MetaClassFactory.get(Named.class))) {
+          return wrapper.anno.value();
         }
       }
 
@@ -304,9 +305,9 @@ public class DefaultQualifierFactory implements QualifierFactory {
     }
 
     @Override
-    public Iterator<Annotation> iterator() {
+    public Iterator<MetaAnnotation> iterator() {
       final Iterator<AnnotationWrapper> iter = annotations.iterator();
-      return new Iterator<Annotation>() {
+      return new Iterator<MetaAnnotation>() {
 
         @Override
         public boolean hasNext() {
@@ -314,7 +315,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
         }
 
         @Override
-        public Annotation next() {
+        public MetaAnnotation next() {
           return iter.next().anno;
         }
 
@@ -358,15 +359,15 @@ public class DefaultQualifierFactory implements QualifierFactory {
     }
 
     @Override
-    public Iterator<Annotation> iterator() {
-      return Collections.<Annotation>emptyList().iterator();
+    public Iterator<MetaAnnotation> iterator() {
+      return Collections.<MetaAnnotation>emptyList().iterator();
     }
   }
 
   private static final class AnnotationWrapper implements Comparable<AnnotationWrapper> {
-    private final Annotation anno;
+    private final MetaAnnotation anno;
 
-    private AnnotationWrapper(final Annotation anno) {
+    private AnnotationWrapper(final MetaAnnotation anno) {
       this.anno = anno;
     }
 
