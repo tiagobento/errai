@@ -747,7 +747,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   }
 
   public static AbstractStatementBuilder getAnnotationArrayStmt(final org.jboss.errai.ioc.rebind.ioc.graph.api.Qualifier qualifier) {
-    return newArray(Annotation.class).initialize(qualifier.stream().map(AbstractBodyGenerator::annotationLiteral).toArray());
+    return newArray(MetaAnnotation.class).initialize(qualifier.stream().map(AbstractBodyGenerator::annotationLiteral).toArray());
   }
 
   protected Statement generateFactoryHandleStatement(final Injectable injectable) {
@@ -781,13 +781,13 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
     return false;
   }
 
-  public static Statement annotationLiteral(final Annotation qual) {
-    if (qual.annotationType().equals(Any.class)) {
+  public static Statement annotationLiteral(final MetaAnnotation qual) {
+    if (qual.annotationType().equals(MetaClassFactory.get(Any.class))) {
       return loadStatic(QualifierUtil.class, "ANY_ANNOTATION");
-    } else if (qual.annotationType().equals(Default.class)) {
+    } else if (qual.annotationType().equals(MetaClassFactory.get(Default.class))) {
       return loadStatic(QualifierUtil.class, "DEFAULT_ANNOTATION");
-    } else if (qual.annotationType().equals(Named.class)) {
-      return invokeStatic(QualifierUtil.class, "createNamed", ((Named) qual).value());
+    } else if (qual.annotationType().equals(MetaClassFactory.get(Named.class))) {
+      return invokeStatic(QualifierUtil.class, "createNamed", qual.<String>value());
     } else {
       return LiteralFactory.getLiteral(qual);
     }

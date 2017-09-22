@@ -21,9 +21,12 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
+import org.jboss.errai.codegen.meta.RuntimeMetaAnnotation;
+import org.jboss.errai.codegen.meta.impl.apt.APTAnnotation;
 import org.jboss.errai.common.client.util.AnnotationPropertyAccessor;
 import org.jboss.errai.common.client.util.AnnotationPropertyAccessorBuilder;
 import org.jboss.errai.common.metadata.MetaDataScanner;
@@ -37,6 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -503,4 +507,39 @@ public class CDIAnnotationUtils {
         return o -> String.valueOf(o);
       }
     }
+
+  public static boolean equals(MetaAnnotation anno1, MetaAnnotation anno2) {
+
+      if (anno1 instanceof RuntimeMetaAnnotation && anno2 instanceof RuntimeMetaAnnotation) {
+      return equals(((RuntimeMetaAnnotation) anno1).getAnnotation(), ((RuntimeMetaAnnotation) anno2).getAnnotation());
+    }
+
+    if (anno1 instanceof APTAnnotation && anno2 instanceof APTAnnotation) {
+      for (Map.Entry<String, Object> e : ((APTAnnotation) anno1).values().entrySet()) {
+        final Object o = ((APTAnnotation) anno2).values().get(e.getKey());
+        if (o == null || !o.equals(e.getValue())) {
+          return false;
+        }
+      }
+    }
+
+    final MetaAnnotation apt = anno1 instanceof APTAnnotation ? anno1 : anno2;
+    final MetaAnnotation runtime = anno2 instanceof APTAnnotation ? anno1 : anno2;
+
+    if (apt instanceof APTAnnotation && runtime instanceof RuntimeMetaAnnotation) {
+      for (Map.Entry<String, Object> entry : ((APTAnnotation) apt).values().entrySet()) {
+        final String key = entry.getKey();
+        if (runtime.annotationType().getMethod(key, new MetaClass[0]).isAnnotationPresent(Nonbinding.class)) {
+          continue;
+        }
+        Object runtimeValue = runtime.value(entry.getKey());
+        Object aptValue = apt.value(entry.getKey());
+        if (runtimeValue == null || !runtimeValue.equals(aptValue)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }

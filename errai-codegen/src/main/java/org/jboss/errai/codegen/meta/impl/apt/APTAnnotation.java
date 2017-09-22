@@ -174,4 +174,8 @@ public class APTAnnotation extends MetaAnnotation {
       return throwUnsupportedTypeError(value);
     }
   }
+
+  public Map<String, Object> values() {
+    return values;
+  }
 }
