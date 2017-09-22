@@ -44,4 +44,14 @@ public abstract class MetaAnnotation {
   public boolean instanceOf(final Class<? extends Annotation> clazz) {
     return clazz.getCanonicalName().equals(annotationType().getCanonicalName());
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof MetaAnnotation && annotationType().equals(((MetaAnnotation) o).annotationType());
+  }
+
+  @Override
+  public String toString() {
+    return "MetaAnnotation[" + annotationType().toString() + "]";
+  }
 }
