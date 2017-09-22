@@ -112,6 +112,7 @@
     <module>errai-jaxrs-export-apt</module>
     <module>errai-data-binding-export-apt</module>
     <module>errai-ioc-export-apt</module>
+    <module>errai-navigation-export-apt</module>
   </modules>
 
   <repositories>

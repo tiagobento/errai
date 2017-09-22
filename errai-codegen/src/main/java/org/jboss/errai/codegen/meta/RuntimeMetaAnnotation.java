@@ -17,6 +17,7 @@
 package org.jboss.errai.codegen.meta;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
@@ -34,7 +35,9 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
   @SuppressWarnings("unchecked")
   public <V> V valueAsArray(final String attributeName, final Class<V> arrayClass) {
     try {
-      final Object value = annotation.getClass().getMethod(attributeName).invoke(annotation);
+      final Method method = annotation.getClass().getMethod(attributeName);
+      method.setAccessible(true);
+      final Object value = method.invoke(annotation);
       return (V) convertValue(value);
     } catch (Exception e) {
       throw new RuntimeException(e);
