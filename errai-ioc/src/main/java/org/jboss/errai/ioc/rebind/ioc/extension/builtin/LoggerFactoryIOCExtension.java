@@ -18,6 +18,7 @@ package org.jboss.errai.ioc.rebind.ioc.extension.builtin;
 
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.util.Stmt;
@@ -66,13 +67,10 @@ public class LoggerFactoryIOCExtension implements IOCExtensionConfigurator {
     injectionContext.registerInjectableProvider(handle, new InjectableProvider() {
       @Override
       public CustomFactoryInjectable getInjectable(final InjectionSite injectionSite, final FactoryNameGenerator nameGenerator) {
-        final String loggerName;
-        if (injectionSite.unsafeIsAnnotationPresent(NamedLogger.class)) {
-          loggerName = injectionSite.unsafeGetAnnotation(NamedLogger.class).value();
-        }
-        else {
-          loggerName = injectionSite.getEnclosingType().getFullyQualifiedName();
-        }
+
+        final String loggerName = injectionSite.getAnnotation(NamedLogger.class)
+                .map(MetaAnnotation::<String>value)
+                .orElse(injectionSite.getEnclosingType().getFullyQualifiedName());
 
         if (!injectablesByLoggerName.containsKey(loggerName)) {
           final Statement loggerValue = invokeStatic(LoggerFactory.class, "getLogger", loggerName);
