@@ -88,6 +88,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           final Set<String> translatablePackages,
           final Class<? extends Annotation> annotation) {
 
+    //FIXME: tiago: this is a terrible workaround
     final Collection<MetaClass> typesAnnotatedWith = ClassScanner.getTypesAnnotatedWith(annotation,
             translatablePackages, context);
 
