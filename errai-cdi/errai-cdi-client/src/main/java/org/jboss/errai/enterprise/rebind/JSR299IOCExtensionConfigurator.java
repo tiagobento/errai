@@ -91,16 +91,17 @@ public class JSR299IOCExtensionConfigurator implements IOCExtensionConfigurator 
     final BlockStatement instanceInitializer = context.getBootstrapClass().getInstanceInitializer();
     final Set<MetaClass> knownObserverTypes = new HashSet<>();
 
+    //FIXME: tiago: change to metaClassFinder
     for (final MetaParameter parameter : ClassScanner.getParametersAnnotatedWith(Observes.class,
             context.getGeneratorContext())) {
       knownObserverTypes.add(parameter.getType());
     }
 
+
+    //FIXME: tiago: how to get subTypesOf?
     final Set<MetaClass> knownTypesWithSuperTypes = new HashSet<>(knownObserverTypes);
     for (final MetaClass cls : knownObserverTypes) {
-      for (final MetaClass subClass : ClassScanner.getSubTypesOf(cls, context.getGeneratorContext())) {
-        knownTypesWithSuperTypes.add(subClass);
-      }
+      knownTypesWithSuperTypes.addAll(ClassScanner.getSubTypesOf(cls, context.getGeneratorContext()));
     }
 
     addTypeHierarchyFor(context, knownTypesWithSuperTypes);
