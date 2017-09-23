@@ -32,6 +32,7 @@ import com.google.gwt.core.client.GWT;
  * @author Divya Dadlani <ddadlani@redhat.com>
  *
  */
+@ApplicationScoped
 public class URLPatternMatcherProvider {
 
   @Produces @ApplicationScoped
