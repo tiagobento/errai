@@ -747,7 +747,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   }
 
   public static AbstractStatementBuilder getAnnotationArrayStmt(final org.jboss.errai.ioc.rebind.ioc.graph.api.Qualifier qualifier) {
-    return newArray(MetaAnnotation.class).initialize(qualifier.stream().map(AbstractBodyGenerator::annotationLiteral).toArray());
+    return newArray(Annotation.class).initialize(qualifier.stream().map(AbstractBodyGenerator::annotationLiteral).toArray());
   }
 
   protected Statement generateFactoryHandleStatement(final Injectable injectable) {
