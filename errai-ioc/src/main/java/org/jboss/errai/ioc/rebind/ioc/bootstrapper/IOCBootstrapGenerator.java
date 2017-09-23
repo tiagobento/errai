@@ -139,7 +139,7 @@ public class IOCBootstrapGenerator {
 
     final InjectionContext injectionContext = InjectionContext.Builder.create()
             .processingContext(iocProcessingContext)
-            .enabledAlternatives(classNames(erraiConfiguration.modules().getIocAlternatives()))
+            .enabledAlternatives(classNames(erraiConfiguration.modules().getIocEnabledAlternatives()))
             .addToWhitelist(classNames(erraiConfiguration.modules().getIocWhitelist()))
             .addToBlacklist(classNames(erraiConfiguration.modules().getIocBlacklist()))
             .asyncBootstrap(erraiConfiguration.app().asyncBeanManager())
@@ -167,7 +167,7 @@ public class IOCBootstrapGenerator {
     processExtensions(injectionContext);
     log.debug("Extensions processed in {}ms", (System.currentTimeMillis() - start));
 
-    final IOCProcessor iocProcessor = new IOCProcessor(injectionContext);
+    final IOCProcessor iocProcessor = new IOCProcessor(injectionContext, erraiConfiguration);
     final IOCProcessingContext iocProcessingContext = injectionContext.getProcessingContext();
 
     final ClassStructureBuilder<?> classBuilder = iocProcessingContext.getBootstrapBuilder();

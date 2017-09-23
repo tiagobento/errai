@@ -23,6 +23,9 @@ import org.jboss.errai.config.rebind.EnvUtil;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class ErraiAppPropertiesErraiAppConfiguration implements ErraiAppConfiguration {
+
+  public static final String ERRAI_IOC_ASYNC_BEAN_MANAGER = "errai.ioc.async_bean_manager";
+
   @Override
   public boolean isUserEnabledOnHostPage() {
     return false; //FIXME: tiago: implement
@@ -45,7 +48,7 @@ public class ErraiAppPropertiesErraiAppConfiguration implements ErraiAppConfigur
 
   @Override
   public boolean asyncBeanManager() {
-    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
+    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty(ERRAI_IOC_ASYNC_BEAN_MANAGER);
     return s != null && Boolean.parseBoolean(s);
   }
 }

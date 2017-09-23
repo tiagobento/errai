@@ -23,6 +23,7 @@ import org.jboss.errai.common.apt.exportfile.ExportFile;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import java.util.Optional;
@@ -30,6 +31,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
+import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
+import static javax.lang.model.element.ElementKind.METHOD;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -79,6 +82,8 @@ public class ErraiModule {
       return Stream.of(element);
     } else if (element.getKind().isField()) {
       return Stream.of(APTClassUtil.types.asElement(element.asType()));
+    } else if (element.getKind().equals(METHOD) || element.getKind().equals(CONSTRUCTOR)) {
+      return ((ExecutableElement) element).getParameters().stream();
     } else {
       return Stream.of();
     }
@@ -96,7 +101,8 @@ public class ErraiModule {
   }
 
   private boolean isUnderModulePackage(final Symbol element) {
-    return element.getQualifiedName().toString().contains(packageName + ".");
+    final String elementQualifiedName = element.getQualifiedName().toString();
+    return !elementQualifiedName.contains(".server.") && elementQualifiedName.contains(packageName + ".");
   }
 
   String erraiModuleUniqueNamespace() {

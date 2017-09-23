@@ -33,6 +33,8 @@ import org.jboss.errai.ioc.client.container.async.AsyncBeanManagerImpl;
 
 import java.io.PrintWriter;
 
+import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
+
 /**
  * @author Mike Brock
  */
@@ -77,7 +79,7 @@ public class IOCEnvironmentGenerator extends Generator {
     final boolean asyncBootstrap;
 
     //FIXME: tiago: reflection scanning happening at this line
-    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.async_bean_manager");
+    final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty(ERRAI_IOC_ASYNC_BEAN_MANAGER);
     asyncBootstrap = s != null && Boolean.parseBoolean(s);
 
     final Statement newBeanManager = asyncBootstrap ? Stmt.newObject(AsyncBeanManagerImpl.class) : Stmt.newObject(SyncBeanManagerImpl.class);

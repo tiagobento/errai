@@ -16,12 +16,20 @@
 
 package org.jboss.errai.apt.internal.export.annotation;
 
+import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
+import org.jboss.errai.ioc.client.api.EntryPoint;
 import org.jboss.errai.ioc.client.api.IOCBootstrapTask;
 import org.jboss.errai.ioc.client.api.IOCExtension;
+import org.jboss.errai.ioc.client.api.IOCProvider;
 import org.jboss.errai.ioc.client.api.ScopeContext;
+import org.jboss.errai.ioc.client.api.SharedSingleton;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -35,6 +43,15 @@ public final class ErraiIocExportedAnnotations {
   private IOCExtension iocExtension;
   private CodeDecorator codeDecorator;
   private ScopeContext scopeContext;
+
   private Inject javaxInject;
   private com.google.inject.Inject googleInject;
+  private IOCProvider iocProvider;
+  private Dependent dependent;
+  private ApplicationScoped applicationScoped;
+  private Alternative alternative;
+  private Singleton singleton;
+  private EntryPoint entryPoint;
+  private SharedSingleton sharedSingleton;
+  private IOCProducer iocProducer;
 }

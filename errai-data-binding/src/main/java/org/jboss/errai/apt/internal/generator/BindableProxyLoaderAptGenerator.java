@@ -24,7 +24,9 @@ import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.rebind.BindableProxyLoaderGenerator;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
@@ -61,7 +63,7 @@ public class BindableProxyLoaderAptGenerator extends ErraiAptGenerator {
   @Override
   public Collection<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
 
-    final Collection<MetaClass> annotatedMetaClasses = super.findAnnotatedMetaClasses(annotation);
+    final Collection<MetaClass> annotatedMetaClasses = new HashSet<>(super.findAnnotatedMetaClasses(annotation));
 
     if (annotation.equals(Bindable.class)) {
       annotatedMetaClasses.addAll(erraiModuleConfiguration.getBindableTypes());

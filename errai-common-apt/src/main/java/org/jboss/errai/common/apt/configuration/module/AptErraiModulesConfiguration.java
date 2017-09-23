@@ -66,7 +66,7 @@ public class AptErraiModulesConfiguration implements ErraiModulesConfiguration {
   }
 
   @Override
-  public Set<MetaClass> getIocAlternatives() {
+  public Set<MetaClass> getIocEnabledAlternatives() {
     return getConfiguredArrayProperty(a -> stream(a.valueAsArray(IOC_ALTERNATIVES, MetaClass[].class)));
   }
 

@@ -64,7 +64,7 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
   //FIXME: tiago: wildcard doens't work on this implementation
 
   @Override
-  public Set<MetaClass> getIocAlternatives() {
+  public Set<MetaClass> getIocEnabledAlternatives() {
     return getPropertyValues(ENABLED_ALTERNATIVES_PROPERTY, "\\s").stream()
             .map(String::trim)
             .filter(s -> !s.contains("*"))

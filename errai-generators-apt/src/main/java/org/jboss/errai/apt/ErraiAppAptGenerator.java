@@ -59,7 +59,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
     try {
       generateAndSaveSourceFiles(annotations, new AptAnnotatedSourceElementsFinder(roundEnv));
     } catch (final Exception e) {
-      System.out.println("Error generating files: " + e.getMessage());
+      System.out.println("Error generating files:");
       e.printStackTrace();
     }
 

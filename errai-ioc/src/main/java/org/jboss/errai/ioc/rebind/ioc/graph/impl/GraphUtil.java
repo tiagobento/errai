@@ -16,12 +16,6 @@
 
 package org.jboss.errai.ioc.rebind.ioc.graph.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.commons.lang3.Validate;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
@@ -31,6 +25,14 @@ import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.Dependenc
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.InjectableType;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.HasInjectableHandle;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  *
@@ -147,16 +149,17 @@ final class GraphUtil {
     final StringBuilder message = new StringBuilder()
             .append("Unsatisfied ")
             .append(dep.dependencyType.toString().toLowerCase())
-            .append(" dependency ")
+            .append(" dependency [")
             .append(dep.injectable)
-            .append(" for ")
+            .append("] for [")
             .append(concrete)
-            .append('.');
+            .append("].");
 
     if (!resolvedDisabledBeans.isEmpty()) {
-      message.append(" Some beans were found that satisfied this dependency, but must be enabled:\n");
-      resolvedDisabledBeans.stream().forEach(inj -> message
-              .append(inj.getInjectedType().getFullyQualifiedName()).append('\n'));
+      message.append(" Some beans were found that satisfied this dependency, but must be enabled: ");
+      message.append(resolvedDisabledBeans.stream()
+              .map(s -> s.getInjectedType().getFullyQualifiedName())
+              .collect(joining(", ")));
     }
 
     return message.toString();
@@ -170,14 +173,14 @@ final class GraphUtil {
                   .append(dep.injectable)
                   .append(" in ")
                   .append(concrete)
-                  .append(".\n")
-                  .append("Resolved types:\n")
+                  .append(". Resolved types: ")
                   .append(resolved.get(0));
     for (int i = 1; i < resolved.size(); i++) {
       messageBuilder.append(", ")
                     .append(resolved.get(i));
     }
 
+    messageBuilder.append("\n");
     return messageBuilder.toString();
   }
 

@@ -49,7 +49,7 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
     final AptErraiModulesConfiguration config = new AptErraiModulesConfiguration(metaClassFinder);
 
     assertTrue(config.getBindableTypes().isEmpty());
-    assertTrue(config.getIocAlternatives().isEmpty());
+    assertTrue(config.getIocEnabledAlternatives().isEmpty());
     assertTrue(config.getIocBlacklist().isEmpty());
     assertTrue(config.getIocWhitelist().isEmpty());
     assertTrue(config.getSerializableTypes().isEmpty());
@@ -64,7 +64,7 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
     final AptErraiModulesConfiguration config = new AptErraiModulesConfiguration(metaClassFinder);
 
     assertContainsOnly(config.getBindableTypes(), aptClass(Bindable1.class));
-    assertContainsOnly(config.getIocAlternatives(), aptClass(IocAlternative1.class));
+    assertContainsOnly(config.getIocEnabledAlternatives(), aptClass(IocAlternative1.class));
     assertContainsOnly(config.getIocBlacklist(), aptClass(IocBlacklisted1.class));
     assertContainsOnly(config.getIocWhitelist(), aptClass(IocWhitelisted1.class));
     assertContainsOnly(config.getSerializableTypes(), aptClass(Serializable1.class));
@@ -80,7 +80,7 @@ public class ErraiModuleConfigurationTest extends ErraiAptTest {
     final AptErraiModulesConfiguration config = new AptErraiModulesConfiguration(metaClassFinder);
 
     assertContainsOnly(config.getBindableTypes(), aptClass(Bindable1.class), aptClass(Bindable2.class));
-    assertContainsOnly(config.getIocAlternatives(), aptClass(IocAlternative1.class), aptClass(IocAlternative2.class));
+    assertContainsOnly(config.getIocEnabledAlternatives(), aptClass(IocAlternative1.class), aptClass(IocAlternative2.class));
     assertContainsOnly(config.getIocBlacklist(), aptClass(IocBlacklisted1.class), aptClass(IocBlacklisted2.class));
     assertContainsOnly(config.getIocWhitelist(), aptClass(IocWhitelisted1.class), aptClass(IocWhitelisted2.class));
     assertContainsOnly(config.getSerializableTypes(), aptClass(Serializable1.class), aptClass(Serializable2.class));

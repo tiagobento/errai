@@ -42,7 +42,7 @@ class InjectableReference extends InjectableBase implements HasInjectableHandle 
 
   @Override
   public String toString() {
-    return String.format("%s %s", getQualifier(), getInjectedType().getFullyQualifiedNameWithTypeParms());
+    return String.format("%s %s", getQualifier(), getInjectedType().getName());
   }
 
 }

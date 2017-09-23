@@ -44,14 +44,13 @@ import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
-import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.ioc.client.Bootstrapper;
-import org.jboss.errai.ioc.client.JsArray;
 import org.jboss.errai.ioc.client.WindowInjectionContext;
 import org.jboss.errai.ioc.client.WindowInjectionContextStorage;
 import org.jboss.errai.ioc.client.api.ContextualTypeProvider;
@@ -131,6 +130,7 @@ import static org.jboss.errai.codegen.util.Stmt.loadLiteral;
 import static org.jboss.errai.codegen.util.Stmt.loadVariable;
 import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator.getAnnotationArrayStmt;
 import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator.getAssignableTypesArrayStmt;
+import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
 
 /**
  * Creates {@link DependencyGraph} by adding all types and dependencies to the
@@ -156,13 +156,16 @@ public class IOCProcessor {
 
   private final Set<Class<? extends Annotation>> nonSimpletonTypeAnnotations = new HashSet<>();
 
+  private final ErraiConfiguration erraiConfiguration;
   private final InjectionContext injectionContext;
   private final QualifierFactory qualFactory;
-  private Collection<String> alternatives;
+  private final Collection<MetaClass> alternatives;
 
-  public IOCProcessor(final InjectionContext injectionContext) {
+  public IOCProcessor(final InjectionContext injectionContext, final ErraiConfiguration erraiConfiguration) {
     this.injectionContext = injectionContext;
+    this.erraiConfiguration = erraiConfiguration;
     this.qualFactory = injectionContext.getQualifierFactory();
+    this.alternatives = erraiConfiguration.modules().getIocEnabledAlternatives();
 
     nonSimpletonTypeAnnotations.add(IOCProvider.class);
     nonSimpletonTypeAnnotations.add(Specializes.class);
@@ -1256,27 +1259,14 @@ public class IOCProcessor {
 
   private boolean isActive(final MetaClass type) {
     if (type.isAnnotationPresent(Alternative.class)) {
-      return isAlternativeEnabled(type);
+      return alternatives.contains(type);
     } else {
       return true;
     }
   }
 
-  private boolean isAlternativeEnabled(final MetaClass type) {
-    if (alternatives == null) {
-      final String userDefinedAlternatives = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty("errai.ioc.enabled.alternatives");
-      if (userDefinedAlternatives != null) {
-        alternatives = new HashSet<>(Arrays.asList(userDefinedAlternatives.split("\\s+")));
-      } else {
-        alternatives = Collections.emptyList();
-      }
-    }
-
-    return alternatives.contains(type.getFullyQualifiedName());
-  }
-
   private boolean isEnabledByProperty(final MetaClass type) {
-    MetaAnnotation annotation = type.getAnnotation(EnabledByProperty.class).get();
+    final MetaAnnotation annotation = type.getAnnotation(EnabledByProperty.class).get();
 
     final boolean propValue = getPropertyValue(annotation.value(),
             annotation.value("matchValue"),
@@ -1292,6 +1282,11 @@ public class IOCProcessor {
                                      final String matchValue,
                                      final boolean matchByDefault,
                                      final boolean caseSensitive) {
+
+    if (propName.equals(ERRAI_IOC_ASYNC_BEAN_MANAGER)) {
+      return erraiConfiguration.app().asyncBeanManager();
+    }
+
     final String propertyValue = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty(propName);
     if (propertyValue == null) {
       return matchByDefault;

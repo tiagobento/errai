@@ -14,35 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
+package org.jboss.errai.ui;
 
-import org.jboss.errai.codegen.meta.MetaClass;
-
-import java.util.Set;
+import org.jboss.errai.common.configuration.ErraiModule;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-interface ErraiSeparateModuleConfiguration {
-
-  interface DataBinding {
-
-    Set<MetaClass> getBindableTypes();
-  }
-
-  interface Marshalling {
-
-    Set<MetaClass> getSerializableTypes();
-
-    Set<MetaClass> getNonSerializableTypes();
-  }
-
-  interface Ioc {
-
-    Set<MetaClass> getIocEnabledAlternatives();
-
-    Set<MetaClass> getIocBlacklist();
-
-    Set<MetaClass> getIocWhitelist();
-  }
+@ErraiModule
+public class ErraiCordovaModule {
 }

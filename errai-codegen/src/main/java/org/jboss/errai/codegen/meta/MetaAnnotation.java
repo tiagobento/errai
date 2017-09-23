@@ -52,6 +52,6 @@ public abstract class MetaAnnotation {
 
   @Override
   public String toString() {
-    return "MetaAnnotation[" + annotationType().toString() + "]";
+    return "@" + annotationType().getName();
   }
 }

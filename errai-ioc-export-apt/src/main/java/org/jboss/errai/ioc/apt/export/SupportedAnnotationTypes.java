@@ -27,4 +27,12 @@ interface SupportedAnnotationTypes {
   String SCOPE_CONTEXT = "org.jboss.errai.ioc.client.api.ScopeContext";
   String JAVAX_INJECT = "javax.inject.Inject";
   String GOOGLE_INJECT = "com.google.inject.Inject";
+  String IOC_PROVIDER = "org.jboss.errai.ioc.client.api.IOCProvider";
+  String DEPENDENT = "javax.enterprise.context.Dependent";
+  String APPLICATION_SCOPED = "javax.enterprise.context.ApplicationScoped";
+  String ALTERNATIVE = "javax.enterprise.inject.Alternative";
+  String SINGLETON = "javax.inject.Singleton";
+  String IOC_PRODUCER = "org.jboss.errai.common.client.api.annotations.IOCProducer";
+  String ENTRY_POINT = "org.jboss.errai.ioc.client.api.EntryPoint";
+  String SHARED_SINGLETON = "org.jboss.errai.ioc.client.api.SharedSingleton";
 }
