@@ -21,6 +21,7 @@ import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.meta.HasAnnotations;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 import org.jboss.errai.codegen.meta.MetaConstructor;
@@ -183,7 +184,7 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
           final DecoratorRunnable decoratorRunnable = new DecoratorRunnable(
                   decorator.getClass().getAnnotation(CodeDecorator.class).order(), elemType,
                   () -> {
-                    final Decorable decorable = new Decorable(annotated, annotated.unsafeGetAnnotation(annoType),
+                    final Decorable decorable = new Decorable(annotated, annotated.getAnnotation(annoType).get(),
                             Decorable.DecorableType.fromElementType(elemType), injectionContext,
                             builder.getClassDefinition().getContext(), builder.getClassDefinition(), injectable);
                     if (isNonPublicField(annotated) && !createdAccessors.contains(annotated)) {
@@ -320,7 +321,7 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
       final ContextualStatementBuilder injectedValue;
       if (depInjectable.isContextual()) {
         final MetaClass[] typeArgsClasses = getTypeArguments(field.getType());
-        final Annotation[] qualifiers = getQualifiers(field).toArray(new Annotation[0]);
+        final MetaAnnotation[] qualifiers = getQualifiers(field).toArray(new MetaAnnotation[0]);
         injectedValue = castTo(depInjectable.getInjectedType(),
                 loadVariable("contextManager").invoke("getContextualInstance",
                         loadLiteral(depInjectable.getFactoryName()), typeArgsClasses, qualifiers));
@@ -357,7 +358,7 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
       final ContextualStatementBuilder injectedValue;
       if (depInjectable.isContextual()) {
         final MetaClass[] typeArgsClasses = getTypeArguments(setter.getParameters()[0].getType());
-        final Annotation[] qualifiers = getQualifiers(setter).toArray(new Annotation[0]);
+        final MetaAnnotation[] qualifiers = getQualifiers(setter).toArray(new MetaAnnotation[0]);
         injectedValue = castTo(depInjectable.getInjectedType(),
                 loadVariable("contextManager").invoke("getContextualInstance",
                         loadLiteral(depInjectable.getFactoryName()), typeArgsClasses, qualifiers));
@@ -442,7 +443,7 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
 
     if (depInjectable.isContextual()) {
       final MetaClass[] typeArgsClasses = getTypeArguments(paramDep.getParameter().getType());
-      final Annotation[] qualifiers = getQualifiers(paramDep.getParameter()).toArray(new Annotation[0]);
+      final MetaAnnotation[] qualifiers = getQualifiers(paramDep.getParameter()).toArray(new MetaAnnotation[0]);
 
       injectedValue = castTo(depInjectable.getInjectedType(),
               loadVariable("contextManager").invoke("getContextualInstance",

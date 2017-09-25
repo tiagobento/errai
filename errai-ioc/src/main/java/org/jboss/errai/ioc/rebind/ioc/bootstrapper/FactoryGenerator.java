@@ -54,7 +54,7 @@ public class FactoryGenerator extends IncrementalGenerator {
 
   private static final Logger log = LoggerFactory.getLogger(FactoryGenerator.class);
 
-  private static final String GENERATED_PACKAGE = "org.jboss.errai.ioc.client";
+  public static final String GENERATED_PACKAGE = "org.jboss.errai.ioc.client";
   private static DependencyGraph graph;
   private static InjectionContext injectionContext;
   private static Map<String, String> generatedSourceByFactoryTypeName = new HashMap<String, String>();

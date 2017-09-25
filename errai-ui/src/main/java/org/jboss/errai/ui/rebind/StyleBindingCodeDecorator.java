@@ -161,7 +161,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
 
     case TYPE:
       // for api annotations being on a type is allowed.
-      if (decorable.getAnnotation().annotationType().getPackage().getName().startsWith("org.jboss.errai")) {
+      if (decorable.getAnnotation().annotationType().getPackageName().startsWith("org.jboss.errai")) {
         return;
       }
     default:

@@ -16,6 +16,8 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
+import com.sun.tools.classfile.Type;
+import com.sun.tools.javac.code.Symbol;
 import org.apache.commons.lang3.ClassUtils;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -23,6 +25,7 @@ import org.jboss.errai.codegen.meta.MetaClassFactory;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
@@ -146,7 +149,7 @@ public class APTAnnotation extends MetaAnnotation {
       return array.getClass();
     }
     case DECLARED:
-      final String fqcn = ((TypeElement) ((DeclaredType) value).asElement()).getQualifiedName().toString();
+      final String fqcn = ((Symbol) ((DeclaredType) value).asElement()).flatName().toString();
       try {
         return Class.forName(fqcn);
       } catch (final ClassNotFoundException e) {

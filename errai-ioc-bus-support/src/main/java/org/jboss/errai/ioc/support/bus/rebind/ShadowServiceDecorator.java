@@ -34,6 +34,7 @@ import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ElseBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.builder.impl.StatementBuilder;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
@@ -69,7 +70,7 @@ public class ShadowServiceDecorator extends IOCDecoratorExtension<ShadowService>
 
   @Override
   public void generateDecorator(final Decorable decorable, final FactoryController controller) {
-    final ShadowService shadowService = (ShadowService) decorable.getAnnotation();
+    final MetaAnnotation shadowService = decorable.getAnnotation();
     String serviceName = null;
 
     Statement subscribeShadowStatement = null;

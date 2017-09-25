@@ -69,9 +69,8 @@ public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
   private ErraiAptGeneratedSourceFile generatedFactoryClass(final Injectable injectable) {
     final MetaClass factoryMetaClass = processingContext.buildFactoryMetaClass(injectable);
     final String generatedSource = generateSources(factoryMetaClass, injectable);
-    final String packageName = factoryMetaClass.getPackageName();
     final String classSimpleName = factoryMetaClass.getName();
-    return new ErraiAptGeneratedSourceFile(packageName, classSimpleName, generatedSource);
+    return new ErraiAptGeneratedSourceFile(FactoryGenerator.GENERATED_PACKAGE, classSimpleName, generatedSource);
   }
 
   private String generateSources(final MetaClass factoryMetaClass, final Injectable injectable) {

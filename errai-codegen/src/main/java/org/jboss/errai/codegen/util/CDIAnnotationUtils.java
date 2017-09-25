@@ -286,6 +286,8 @@ public class CDIAnnotationUtils {
         }
         if (value instanceof Annotation) {
             return part1 ^ hashCode((Annotation) value);
+        } else if (value instanceof MetaAnnotation){
+          return part1 ^ hashCode((MetaAnnotation) value);
         }
         return part1 ^ value.hashCode();
     }
@@ -508,7 +510,7 @@ public class CDIAnnotationUtils {
       }
     }
 
-  public static boolean equals(MetaAnnotation anno1, MetaAnnotation anno2) {
+  public static boolean equals(final MetaAnnotation anno1, final MetaAnnotation anno2) {
 
       if (anno1 instanceof RuntimeMetaAnnotation && anno2 instanceof RuntimeMetaAnnotation) {
       return equals(((RuntimeMetaAnnotation) anno1).getAnnotation(), ((RuntimeMetaAnnotation) anno2).getAnnotation());
@@ -541,5 +543,25 @@ public class CDIAnnotationUtils {
     }
 
     return true;
+  }
+
+
+  public static int hashCode(final MetaAnnotation a) {
+    if (a instanceof RuntimeMetaAnnotation) {
+      return hashCode(((RuntimeMetaAnnotation) a).getAnnotation());
+    }
+
+    int result = 0;
+    final MetaClass type = a.annotationType();
+    for (final MetaMethod m : type.getDeclaredMethods()) {
+      if (!m.isAnnotationPresent(Nonbinding.class)) {
+        final Object value = a.value(m.getName());
+        if (value == null) {
+          throw new IllegalStateException(String.format("Annotation method %s returned null", m));
+        }
+        result += hashMember(m.getName(), value);
+      }
+    }
+    return result;
   }
 }

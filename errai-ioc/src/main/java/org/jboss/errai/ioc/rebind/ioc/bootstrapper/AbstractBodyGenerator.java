@@ -778,9 +778,9 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
     }
   }
 
-  protected Collection<Annotation> getQualifiers(final HasAnnotations injectedType) {
-    final Collection<Annotation> annos = new ArrayList<>();
-    for (final Annotation anno : injectedType.unsafeGetAnnotations()) {
+  protected Collection<MetaAnnotation> getQualifiers(final HasAnnotations injectedType) {
+    final Collection<MetaAnnotation> annos = new ArrayList<>();
+    for (final MetaAnnotation anno : injectedType.getAnnotations()) {
       if (anno.annotationType().isAnnotationPresent(Qualifier.class)) {
         annos.add(anno);
       }

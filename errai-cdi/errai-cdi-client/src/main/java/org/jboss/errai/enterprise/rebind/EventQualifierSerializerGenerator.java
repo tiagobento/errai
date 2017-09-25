@@ -97,7 +97,7 @@ public class EventQualifierSerializerGenerator extends AbstractAsyncGenerator {
 
   @Override
   protected boolean isRelevantClass(final MetaClass clazz) {
-    return clazz.isAnnotation() && clazz.unsafeIsAnnotationPresent(Qualifier.class);
+    return clazz.isAnnotation() && clazz.isAnnotationPresent(Qualifier.class);
   }
 
 }
