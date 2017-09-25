@@ -18,7 +18,7 @@ package org.jboss.errai.apt.internal.generator;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
-import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.ErraiAptConfiguration;
 import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.ioc.client.api.EntryPoint;
@@ -31,7 +31,6 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -40,7 +39,7 @@ import java.util.HashSet;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class IocAptGenerator extends ErraiAptGenerator {
+public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final IOCGenerator iocGenerator;
   private final ErraiAptConfiguration erraiModuleConfiguration;
@@ -59,7 +58,8 @@ public class IocAptGenerator extends ErraiAptGenerator {
   }
 
   private Collection<MetaClass> findRelevantClasses() {
-    final Collection<MetaClass> metaClasses = new HashSet<>(findAnnotatedMetaClasses(Inject.class));
+    final Collection<MetaClass> metaClasses = new HashSet<>();
+    metaClasses.addAll(findAnnotatedMetaClasses(Inject.class));
     metaClasses.addAll(findAnnotatedMetaClasses(com.google.inject.Inject.class));
     metaClasses.addAll(findAnnotatedMetaClasses(IOCProvider.class));
     metaClasses.addAll(findAnnotatedMetaClasses(Dependent.class));
@@ -88,6 +88,6 @@ public class IocAptGenerator extends ErraiAptGenerator {
 
   @Override
   public String getClassSimpleName() {
-    return iocGenerator.getClassName();
+    return iocGenerator.getClassSimpleName();
   }
 }

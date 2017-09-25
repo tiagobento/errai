@@ -18,13 +18,12 @@ package org.jboss.errai.apt.internal.generator;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
-import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.rebind.BindableProxyLoaderGenerator;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -33,7 +32,7 @@ import java.util.HashSet;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class BindableProxyLoaderAptGenerator extends ErraiAptGenerator {
+public class BindableProxyLoaderAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final BindableProxyLoaderGenerator bindableProxyLoaderGenerator;
   private final AptErraiModulesConfiguration erraiModuleConfiguration;

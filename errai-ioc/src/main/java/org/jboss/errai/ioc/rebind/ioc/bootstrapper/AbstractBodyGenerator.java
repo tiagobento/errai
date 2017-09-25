@@ -18,8 +18,6 @@ package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.gwt.core.ext.GeneratorContext;
-import com.google.gwt.core.ext.TreeLogger;
 import org.jboss.errai.codegen.BooleanOperator;
 import org.jboss.errai.codegen.InnerClass;
 import org.jboss.errai.codegen.Modifier;
@@ -59,7 +57,6 @@ import org.jboss.errai.ioc.client.container.FactoryHandleImpl;
 import org.jboss.errai.ioc.client.container.Proxy;
 import org.jboss.errai.ioc.client.container.ProxyHelper;
 import org.jboss.errai.ioc.client.container.ProxyHelperImpl;
-import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.Dependency;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.DependencyType;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.ParamDependency;
@@ -82,7 +79,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 import static org.jboss.errai.codegen.Parameter.finalOf;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
@@ -126,7 +122,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
 
   /**
    * This is populated at the start of
-   * {@link #generate(ClassStructureBuilder, Injectable, DependencyGraph, InjectionContext, TreeLogger, GeneratorContext)}
+   * {@link FactoryBodyGenerator#generate(ClassStructureBuilder, Injectable, InjectionContext)}
    * .
    *
    * Calls to {@link FactoryController#addInvokeAfter(MetaMethod, Statement)},
@@ -565,9 +561,6 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    * @param injectable
    *          Contains metadata (including dependencies) or the bean that the
    *          generated factory will produce.
-   * @param graph
-   *          The dependency graph that the {@link Injectable} parameter is
-   *          from.
    * @param injectionContext
    *          The single injection context shared between all
    *          {@link FactoryBodyGenerator FactoryBodyGenerators}.
@@ -575,19 +568,18 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    *         {@link Factory#createInstance(ContextManager)} method.
    */
   protected abstract List<Statement> generateCreateInstanceStatements(ClassStructureBuilder<?> bodyBlockBuilder,
-          Injectable injectable, DependencyGraph graph, InjectionContext injectionContext);
+          Injectable injectable, InjectionContext injectionContext);
 
   @Override
-  public void generate(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable,
-          final DependencyGraph graph, final InjectionContext injectionContext, final TreeLogger logger,
-          final GeneratorContext context) {
-    controller = new FactoryController(injectable.getInjectedType(), injectable.getFactoryName(), bodyBlockBuilder.getClassDefinition());
-    preGenerationHook(bodyBlockBuilder, injectable, graph, injectionContext);
+  public void generate(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable, final InjectionContext injectionContext) {
 
-    final List<Statement> factoryInitStatements = generateFactoryInitStatements(bodyBlockBuilder, injectable, graph, injectionContext);
-    final List<Statement> createInstanceStatements = generateCreateInstanceStatements(bodyBlockBuilder, injectable, graph, injectionContext);
-    final List<Statement> destroyInstanceStatements = generateDestroyInstanceStatements(bodyBlockBuilder, injectable, graph, injectionContext);
-    final List<Statement> invokePostConstructStatements = generateInvokePostConstructsStatements(bodyBlockBuilder, injectable, graph, injectionContext);
+    controller = new FactoryController(injectable.getInjectedType(), injectable.getFactoryName(), bodyBlockBuilder.getClassDefinition());
+    preGenerationHook(bodyBlockBuilder, injectable, injectionContext);
+
+    final List<Statement> factoryInitStatements = generateFactoryInitStatements(bodyBlockBuilder, injectable, injectionContext);
+    final List<Statement> createInstanceStatements = generateCreateInstanceStatements(bodyBlockBuilder, injectable, injectionContext);
+    final List<Statement> destroyInstanceStatements = generateDestroyInstanceStatements(bodyBlockBuilder, injectable, injectionContext);
+    final List<Statement> invokePostConstructStatements = generateInvokePostConstructsStatements(bodyBlockBuilder, injectable, injectionContext);
 
     implementConstructor(bodyBlockBuilder, injectable);
     maybeImplementFactoryInit(bodyBlockBuilder, injectable, factoryInitStatements);
@@ -611,8 +603,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
     }
   }
 
-  protected void preGenerationHook(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable,
-          final DependencyGraph graph, final InjectionContext injectionContext) {
+  protected void preGenerationHook(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable, final InjectionContext injectionContext) {
   }
 
   /**
@@ -622,9 +613,6 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    * @param injectable
    *          Contains metadata (including dependencies) or the bean that the
    *          generated factory will produce.
-   * @param graph
-   *          The dependency graph that the {@link Injectable} parameter is
-   *          from.
    * @param injectionContext
    *          The single injection context shared between all
    *          {@link FactoryBodyGenerator FactoryBodyGenerators}.
@@ -632,7 +620,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    *         {@link Factory#init(Context)} method.
    */
   protected List<Statement> generateFactoryInitStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     return Collections.emptyList();
   }
 
@@ -643,9 +631,6 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    * @param injectable
    *          Contains metadata (including dependencies) or the bean that the
    *          generated factory will produce.
-   * @param graph
-   *          The dependency graph that the {@link Injectable} parameter is
-   *          from.
    * @param injectionContext
    *          The single injection context shared between all
    *          {@link FactoryBodyGenerator FactoryBodyGenerators}.
@@ -653,7 +638,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    *         {@link Factory#invokePostConstructs(Object)} method.
    */
   protected List<Statement> generateInvokePostConstructsStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     return Collections.emptyList();
   }
 
@@ -696,9 +681,6 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    * @param injectable
    *          Contains metadata (including dependencies) or the bean that the
    *          generated factory will produce.
-   * @param graph
-   *          The dependency graph that the {@link Injectable} parameter is
-   *          from.
    * @param injectionContext
    *          The single injection context shared between all
    *          {@link FactoryBodyGenerator FactoryBodyGenerators}.
@@ -706,7 +688,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    *         {@link Factory#destroyInstance(Object, ContextManager)} method.
    */
   protected List<Statement> generateDestroyInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     return controller.getDestructionStatements();
   }
 

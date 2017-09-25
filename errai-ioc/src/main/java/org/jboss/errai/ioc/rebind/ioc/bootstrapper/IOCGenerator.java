@@ -19,6 +19,7 @@ package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
+import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
@@ -53,7 +54,7 @@ import static java.util.stream.Collectors.toList;
 public class IOCGenerator extends AbstractAsyncGenerator {
 
   private final String packageName = "org.jboss.errai.ioc.client";
-  private final String className = "BootstrapperImpl";
+  private final String classSimpleName = "BootstrapperImpl";
 
   public IOCGenerator() {
   }
@@ -63,7 +64,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           throws UnableToCompleteException {
 
     logger.log(TreeLogger.INFO, "generating ioc bootstrapping code...");
-    return startAsyncGeneratorsAndWaitFor(Bootstrapper.class, context, logger, packageName, className);
+    return startAsyncGeneratorsAndWaitFor(Bootstrapper.class, context, logger, packageName, classSimpleName);
   }
 
   @Override
@@ -81,7 +82,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           final Collection<MetaClass> relevantClasses) {
 
     return new IOCBootstrapGenerator(metaClassFinder, context, erraiConfiguration, relevantClasses).generate(
-            packageName, className);
+            packageName, classSimpleName);
   }
 
   private Collection<MetaClass> findMetaClasses(final GeneratorContext context,
@@ -125,8 +126,16 @@ public class IOCGenerator extends AbstractAsyncGenerator {
     return packageName;
   }
 
-  public String getClassName() {
-    return className;
+  public String getClassSimpleName() {
+    return classSimpleName;
   }
 
+  @Override
+  public boolean alreadyGeneratedSourcesViaAptGenerators(GeneratorContext context) {
+    try {
+      return context.getTypeOracle().getType(getPackageName() + "." + getClassSimpleName()) != null;
+    } catch (final NotFoundException e) {
+      return false;
+    }
+  }
 }

@@ -38,7 +38,6 @@ import org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryBodyGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCProcessingContext;
 import org.jboss.errai.ioc.rebind.ioc.extension.IOCExtensionConfigurator;
-import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.InjectionSite;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.QualifierFactory;
@@ -201,7 +200,7 @@ public class TransitionProviderIOCExtension implements IOCExtensionConfigurator 
 
       @Override
       protected List<Statement> generateCreateInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-              final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+              final Injectable injectable, final InjectionContext injectionContext) {
         final StatementBuilder anchorDeclaration = declareFinalVariable(
                         "anchor",
                         Anchor.class,

@@ -19,6 +19,7 @@ package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import jsinterop.annotations.JsType;
+import org.jboss.errai.apt.internal.generator.FactoriesAptGenerator;
 import org.jboss.errai.codegen.ArithmeticExpression;
 import org.jboss.errai.codegen.ArithmeticOperator;
 import org.jboss.errai.codegen.InnerClass;
@@ -200,11 +201,13 @@ public class IOCProcessor {
 
     start = System.currentTimeMillis();
     final DependencyGraph dependencyGraph = graphBuilder.createGraph(getReachabilityStrategy());
-    log.debug("Resolved dependency graph with {} reachable injectables in {}ms", dependencyGraph.getNumberOfInjectables(), System.currentTimeMillis() - start);
+    int numberOfInjectables = dependencyGraph.getNumberOfInjectables();
+    log.debug("Resolved dependency graph with {} reachable injectables in {}ms", numberOfInjectables, System.currentTimeMillis() - start);
 
     FactoryGenerator.resetTotalTime();
     FactoryGenerator.setDependencyGraph(dependencyGraph);
     FactoryGenerator.setInjectionContext(injectionContext);
+    FactoriesAptGenerator.setProcessingContext(processingContext);
 
     start = System.currentTimeMillis();
 
@@ -226,7 +229,7 @@ public class IOCProcessor {
     }
 
     registerFactoriesBody.finish();
-    bootstrapContainer(processingContext, dependencyGraph, scopeContextSet, contextLocalVarInvocation, contextManagerFieldName);
+    bootstrapContainer(processingContext, scopeContextSet, contextLocalVarInvocation, contextManagerFieldName, numberOfInjectables);
     log.debug("Processed factory GWT.create calls in {}ms", System.currentTimeMillis() - start);
   }
 
@@ -241,16 +244,18 @@ public class IOCProcessor {
     }
   }
 
-  private void bootstrapContainer(final IOCProcessingContext processingContext, final DependencyGraph dependencyGraph,
-          final Set<MetaClass> scopeContextSet, final Statement[] contextLocalVarInvocation,
-          final String contextManagerFieldName) {
+  private void bootstrapContainer(final IOCProcessingContext processingContext,
+          final Set<MetaClass> scopeContextSet,
+          final Statement[] contextLocalVarInvocation,
+          final String contextManagerFieldName,
+          final int numberOfInjectables) {
     processingContext.getBlockBuilder()
       .appendAll(contextLocalVarDeclarations(scopeContextSet))
       .append(loadVariable("logger").invoke("debug", "Registering factories with contexts."))
       .append(declareVariable("start", long.class, currentTime()))
       .append(loadVariable("this").invoke("registerFactories", (Object[]) contextLocalVarInvocation))
       .append(loadVariable("logger").invoke("debug",
-              "Registered " + dependencyGraph.getNumberOfInjectables() + " factories in {}ms", subtractFromCurrentTime(loadVariable("start"))))
+              "Registered " + numberOfInjectables + " factories in {}ms", subtractFromCurrentTime(loadVariable("start"))))
       .append(loadVariable("logger").invoke("debug", "Adding contexts to context manager..."))
       .append(loadVariable("start").assignValue(currentTime()));
     addContextsToContextManager(scopeContextSet, contextManagerFieldName, processingContext.getBlockBuilder());
@@ -345,6 +350,7 @@ public class IOCProcessor {
     int methodNumber = 0;
     int registeredInThisMethod = 0;
     BlockBuilder curMethod = null;
+
     for (final Injectable injectable : dependencyGraph) {
       if (registeredInThisMethod % 500 == 0) {
         if (curMethod != null) {
@@ -355,7 +361,9 @@ public class IOCProcessor {
         }
         curMethod = processingContext.getBootstrapBuilder().privateMethod(void.class, "registerFactories" + methodNumber, contextParamsDeclaration).body();
       }
-      declareAndProcessInjectable(processingContext, scopeContexts, curMethod, injectable);
+
+      final MetaClass factoryClass = processingContext.buildFactoryMetaClass(injectable);
+      declareAndProcessInjectable(scopeContexts, curMethod, injectable, factoryClass);
       registeredInThisMethod++;
     }
     if (curMethod != null) {
@@ -364,19 +372,19 @@ public class IOCProcessor {
     }
   }
 
-  private void declareAndProcessInjectable(final IOCProcessingContext processingContext,
-          final Map<MetaClass, MetaClass> scopeContexts,
-          @SuppressWarnings("rawtypes") final BlockBuilder curMethod, final Injectable injectable) {
+  private void declareAndProcessInjectable(final Map<MetaClass, MetaClass> scopeContexts,
+          final BlockBuilder curMethod, final Injectable injectable, final MetaClass factoryClass) {
+
     if (injectionContext.isAsync() && injectable.loadAsync()) {
-      final MetaClass factoryClass = addFactoryDeclaration(injectable, processingContext);
-      registerAsyncFactory(injectable, processingContext, curMethod, factoryClass);
+      registerAsyncFactory(injectable, curMethod, factoryClass);
     } else {
-      declareAndRegisterConcreteInjectable(injectable, processingContext, scopeContexts, curMethod);
+      declareAndRegisterConcreteInjectable(injectable, scopeContexts, curMethod, factoryClass);
     }
   }
 
-  private void registerAsyncFactory(final Injectable injectable, final IOCProcessingContext processingContext,
-          @SuppressWarnings("rawtypes") final BlockBuilder curMethod, final MetaClass factoryClass) {
+  private void registerAsyncFactory(final Injectable injectable,
+          final BlockBuilder curMethod,
+          final MetaClass factoryClass) {
     final Statement handle = generateFactoryHandle(injectable, curMethod);
     final Statement loader = generateFactoryLoader(injectable, factoryClass);
     curMethod.append(loadVariable("asyncBeanManagerSetup").invoke("registerAsyncBean", handle, loader));
@@ -425,10 +433,8 @@ public class IOCProcessor {
   }
 
   @SuppressWarnings("unchecked")
-  private void declareAndRegisterConcreteInjectable(final Injectable injectable,
-          final IOCProcessingContext processingContext, final Map<MetaClass, MetaClass> scopeContexts,
-          @SuppressWarnings("rawtypes") final BlockBuilder registerFactoriesBody) {
-    final MetaClass factoryClass = addFactoryDeclaration(injectable, processingContext);
+  private void declareAndRegisterConcreteInjectable(final Injectable injectable, final Map<MetaClass, MetaClass> scopeContexts,
+          @SuppressWarnings("rawtypes") final BlockBuilder registerFactoriesBody, final MetaClass factoryClass) {
     registerFactoryWithContext(injectable, factoryClass, scopeContexts, registerFactoriesBody);
     final boolean windowScoped = injectable.getWiringElementTypes().contains(WiringElementType.SharedSingleton);
     final boolean jsType = injectable.getWiringElementTypes().contains(WiringElementType.JsType);
@@ -568,24 +574,6 @@ public class IOCProcessor {
     }
 
     return annoToContextImpl;
-  }
-
-  private MetaClass addFactoryDeclaration(final Injectable injectable, final IOCProcessingContext processingContext) {
-    final String factoryName = injectable.getFactoryName();
-    final MetaClass typeCreatedByFactory = injectable.getInjectedType();
-    return addFactoryDeclaration(factoryName, typeCreatedByFactory, processingContext);
-  }
-
-  private MetaClass addFactoryDeclaration(final String factoryName, final MetaClass typeCreatedByFactory,
-          final IOCProcessingContext processingContext) {
-    final ClassStructureBuilder<?> builder = processingContext.getBootstrapBuilder();
-    final BuildMetaClass factory = ClassBuilder
-            .define(factoryName,
-                    parameterizedAs(Factory.class, typeParametersOf(typeCreatedByFactory)))
-            .publicScope().abstractClass().body().getClassDefinition();
-    builder.declaresInnerClass(new InnerClass(factory));
-
-    return factory;
   }
 
   private void processDependencies(final Collection<MetaClass> types, final DependencyGraphBuilder builder) {

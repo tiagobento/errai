@@ -19,7 +19,7 @@ package org.jboss.errai.apt.internal.generator;
 import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
-import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.common.apt.ErraiAptGenerators;
 
 import java.util.Collection;
 
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public final class RpcProxyLoaderAptGenerator extends ErraiAptGenerator {
+public final class RpcProxyLoaderAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final RpcProxyLoaderGenerator rpcProxyLoaderGenerator;
 

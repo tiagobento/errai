@@ -18,7 +18,7 @@ package org.jboss.errai.apt.internal.generator;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
-import org.jboss.errai.common.apt.ErraiAptGenerator;
+import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderGenerator;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public final class JaxrsProxyLoaderAptGenerator extends ErraiAptGenerator {
+public final class JaxrsProxyLoaderAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final JaxrsProxyLoaderGenerator jaxrsProxyLoaderGenerator;
 

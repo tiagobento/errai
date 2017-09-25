@@ -29,7 +29,6 @@ import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryBodyGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCProcessingContext;
 import org.jboss.errai.ioc.rebind.ioc.extension.IOCExtensionConfigurator;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.CustomFactoryInjectable;
-import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.InjectableType;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.InjectionSite;
@@ -77,7 +76,7 @@ public class LoggerFactoryIOCExtension implements IOCExtensionConfigurator {
           final FactoryBodyGenerator generator = new AbstractBodyGenerator() {
             @Override
             protected List<Statement> generateCreateInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-                    final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+                    final Injectable injectable, final InjectionContext injectionContext) {
               return Collections.singletonList(Stmt.nestedCall(loggerValue).returnValue());
             }
           };

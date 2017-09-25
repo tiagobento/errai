@@ -31,7 +31,6 @@ import org.jboss.errai.common.client.api.annotations.Property;
 import org.jboss.errai.common.client.ui.HasValue;
 import org.jboss.errai.common.client.ui.NativeHasValueAccessors;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator;
-import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.InjectionContext;
 
@@ -73,7 +72,7 @@ class ElementInjectionBodyGenerator extends AbstractBodyGenerator {
 
   @Override
   protected List<Statement> generateCreateInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
 
     final List<Statement> stmts = new ArrayList<>();
     final String elementVar = "element";

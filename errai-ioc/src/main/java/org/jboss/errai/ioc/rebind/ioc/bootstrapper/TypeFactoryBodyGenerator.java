@@ -29,7 +29,6 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.rebind.ioc.extension.IOCDecoratorExtension;
-import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.Dependency;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.DependencyType;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.FieldDependency;
@@ -75,20 +74,19 @@ import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryGenerator.getLo
 class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
 
   @Override
-  protected void preGenerationHook(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable,
-          final DependencyGraph graph, final InjectionContext injectionContext) {
+  protected void preGenerationHook(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable, final InjectionContext injectionContext) {
     runDecorators(injectable, injectionContext, bodyBlockBuilder);
   }
 
   @Override
   protected List<Statement> generateFactoryInitStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     return controller.getFactoryInitializaionStatements();
   }
 
   @Override
   protected List<Statement> generateCreateInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     final Multimap<DependencyType, Dependency> dependenciesByType = separateByType(injectable.getDependencies());
 
     final Collection<Dependency> constructorDependencies = dependenciesByType.get(DependencyType.Constructor);
@@ -108,19 +106,19 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
 
   @Override
   protected List<Statement> generateDestroyInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     final List<Statement> destructionStmts = new ArrayList<>();
 
     maybeInvokePreDestroys(injectable, destructionStmts, bodyBlockBuilder);
     destructionStmts
-            .addAll(super.generateDestroyInstanceStatements(bodyBlockBuilder, injectable, graph, injectionContext));
+            .addAll(super.generateDestroyInstanceStatements(bodyBlockBuilder, injectable, injectionContext));
 
     return destructionStmts;
   }
 
   @Override
   protected List<Statement> generateInvokePostConstructsStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final DependencyGraph graph, final InjectionContext injectionContext) {
+          final Injectable injectable, final InjectionContext injectionContext) {
     final List<Statement> stmts = new ArrayList<>();
     final Queue<MetaMethod> postConstructMethods = gatherPostConstructs(injectable);
     for (final MetaMethod postConstruct : postConstructMethods) {
@@ -232,7 +230,7 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
       annotatedItems = type.getParametersAnnotatedWith(annoType);
       break;
     case TYPE:
-      annotatedItems = (type.unsafeIsAnnotationPresent(annoType)) ? Collections.singletonList(type) : Collections.emptyList();
+      annotatedItems = (type.isAnnotationPresent(annoType)) ? Collections.singletonList(type) : Collections.emptyList();
       break;
     default:
       throw new RuntimeException("Not yet implemented.");

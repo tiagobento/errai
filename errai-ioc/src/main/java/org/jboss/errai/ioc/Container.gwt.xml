@@ -46,6 +46,7 @@
 
   <generate-with class="org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryGenerator">
     <when-type-assignable class="org.jboss.errai.ioc.client.container.Factory"/>
+    <when-property-is name="errai.useAptGenerators" value="false"/>
   </generate-with>
 
   <super-source path="compat"/>
