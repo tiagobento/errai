@@ -726,18 +726,21 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
   }
 
   public static AbstractStatementBuilder getAssignableTypesArrayStmt(final Injectable injectable) {
+    final MetaClass objectMetaclass = MetaClassFactory.get(Object.class);
     final Object[] assignableTypes =
             injectable.getAnnotatedObject()
-            .flatMap(annotated -> Optional.ofNullable(annotated.unsafeGetAnnotation(Typed.class)))
-            .map(typedAnno -> typedAnno.value())
+            .flatMap(annotated -> annotated.getAnnotation(Typed.class))
+            .map(s -> s.valueAsArray(MetaClass[].class))
             // Ensure that Object is an assignable type
             .map(beanTypes -> {
-              if (Arrays.stream(beanTypes).anyMatch(type -> Object.class.equals(type))) {
+              if (Arrays.stream(beanTypes).anyMatch(type -> {
+                return objectMetaclass.equals(type);
+              })) {
                 return (Object[]) beanTypes;
               }
               else {
-                final Class<?>[] copyWithObject = Arrays.copyOf(beanTypes, beanTypes.length+1);
-                copyWithObject[beanTypes.length] = Object.class;
+                final MetaClass[] copyWithObject = Arrays.copyOf(beanTypes, beanTypes.length+1);
+                copyWithObject[beanTypes.length] = objectMetaclass;
                 return (Object[]) copyWithObject;
               }
             })
