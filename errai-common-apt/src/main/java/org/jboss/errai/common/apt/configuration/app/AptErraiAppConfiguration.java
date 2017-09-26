@@ -76,4 +76,8 @@ public class AptErraiAppConfiguration implements ErraiAppConfiguration {
     return erraiAppAnnotation.value(ASYNC_BEAN_MANAGER);
   }
 
+  @Override
+  public boolean isAptEnvironment() {
+    return true;
+  }
 }

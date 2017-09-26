@@ -20,4 +20,7 @@ package org.jboss.errai.common.apt.configuration.app;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public interface ErraiAppConfiguration extends ErraiSeparateAppConfiguration.Ioc, ErraiSeparateAppConfiguration.Others {
+
+  boolean isAptEnvironment();
+
 }

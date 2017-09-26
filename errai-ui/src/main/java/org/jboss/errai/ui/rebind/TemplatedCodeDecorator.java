@@ -72,7 +72,6 @@ import org.jboss.errai.ui.shared.Template;
 import org.jboss.errai.ui.shared.TemplateStyleSheet;
 import org.jboss.errai.ui.shared.TemplateUtil;
 import org.jboss.errai.ui.shared.TemplateWidgetMapper;
-import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.DataField.ConflictStrategy;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.ForEvent;
@@ -477,16 +476,15 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
 
     final BlockBuilder<AnonymousClassStructureBuilder> listenerBuiler = ObjectBuilder.newInstanceOf(handlerType)
         .extend()
-        .publicOverridesMethod(handlerType.getMethods()[0].getName(), Parameter.of(eventType, "event"));
+        .publicOverridesMethod(handlerType.getDeclaredMethods()[0].getName(), Parameter.of(eventType, "event"));
 
 
     listenerBuiler.append(InjectUtil.invokePublicOrPrivateMethod(controller, method, Stmt.loadVariable("event")));
 
     final ObjectBuilder listenerInstance = listenerBuiler.finish().finish();
 
-    final MetaClass hasHandlerType = MetaClassFactory.get("com.google.gwt.event.dom.client.Has"
-        + handlerType.getName()
-        + "s");
+    final Class<?> hasHandlerTypeClass = loadHasHandlerTypeClass(handlerType);
+    final MetaClass hasHandlerTypeMetaClass = MetaClassFactory.get(hasHandlerTypeClass);
 
     for (final String name : targetDataFieldNames) {
       final MetaClass dataFieldType = dataFieldTypes.get(name);
@@ -520,8 +518,8 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
             eventSource, listenerInstance,
             Stmt.invokeStatic(eventType, "getType")));
       }
-      else if (dataFieldType.isAssignableTo(hasHandlerType)) {
-        final Statement widget = Cast.to(hasHandlerType, eventSource);
+      else if (dataFieldType.isAssignableTo(hasHandlerTypeMetaClass)) {
+        final Statement widget = Cast.to(hasHandlerTypeMetaClass, eventSource);
         initStmts.add(Stmt.nestedCall(widget).invoke("add" + handlerType.getName(),
             Cast.to(handlerType, listenerInstance)));
       }
@@ -540,11 +538,19 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
       } else {
         throw new GenerationException("@DataField [" + name + "] of type [" + dataFieldType.getName()
             + "] in class [" + declaringClass.getFullyQualifiedName()
-            + "] must implement the interface [" + hasHandlerType.getName()
+            + "] must implement the interface [" + hasHandlerTypeMetaClass.getName()
             + "] specified by @EventHandler method " + method.getName() + "(" + eventType.getName()
             + ")], be a DOM element (wrapped as either a JavaScriptObject or a native @JsType), "
             + "or be a @Templated bean.");
       }
+    }
+  }
+
+  private Class<?> loadHasHandlerTypeClass(final MetaClass handlerType) {
+    try {
+      return Class.forName("com.google.gwt.event.dom.client.Has" + handlerType.getName() + "s");
+    } catch (final ClassNotFoundException e) {
+      throw new RuntimeException(e);
     }
   }
 

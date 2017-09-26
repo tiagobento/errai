@@ -140,6 +140,11 @@ public class LiteralFactory {
       public String getCanonicalString(final Context context) {
         return APTAnnotationEncoder.encode(o).generate(context);
       }
+
+      @Override
+      public MetaClass getType() {
+        return o.annotationType();
+      }
     };
   }
 

@@ -149,6 +149,7 @@ public class APTAnnotation extends MetaAnnotation {
       return array.getClass();
     }
     case DECLARED:
+      //The flatName is of form Class$InnerClass
       final String fqcn = ((Symbol) ((DeclaredType) value).asElement()).flatName().toString();
       try {
         return Class.forName(fqcn);

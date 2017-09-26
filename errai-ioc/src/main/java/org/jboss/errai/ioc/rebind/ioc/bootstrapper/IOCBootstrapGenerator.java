@@ -128,6 +128,7 @@ public class IOCBootstrapGenerator {
             .blockBuilder(blockBuilder)
             .generatorContext(context)
             .metaClassFinder(metaClassFinder)
+            .erraiConfiguration(erraiConfiguration)
             .bootstrapClassInstance(classStructureBuilder.getClassDefinition())
             .bootstrapBuilder(classStructureBuilder)
             .build();

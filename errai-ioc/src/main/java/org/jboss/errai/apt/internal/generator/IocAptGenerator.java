@@ -42,13 +42,11 @@ import java.util.HashSet;
 public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final IOCGenerator iocGenerator;
-  private final ErraiAptConfiguration erraiModuleConfiguration;
 
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public IocAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
     this.iocGenerator = new IOCGenerator();
-    this.erraiModuleConfiguration = new ErraiAptConfiguration(this::findAnnotatedMetaClasses);
   }
 
   @Override
@@ -68,17 +66,6 @@ public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
     metaClasses.addAll(findAnnotatedMetaClasses(Singleton.class));
     metaClasses.addAll(findAnnotatedMetaClasses(EntryPoint.class));
     return metaClasses;
-  }
-
-  @Override
-  protected Collection<MetaClass> findAnnotatedMetaClasses(Class<? extends Annotation> annotation) {
-    final Collection<MetaClass> annotatedMetaClasses = new HashSet<>(super.findAnnotatedMetaClasses(annotation));
-
-    if (annotation.equals(Alternative.class)) {
-      annotatedMetaClasses.addAll(erraiModuleConfiguration.modules().getIocEnabledAlternatives());
-    }
-
-    return annotatedMetaClasses;
   }
 
   @Override

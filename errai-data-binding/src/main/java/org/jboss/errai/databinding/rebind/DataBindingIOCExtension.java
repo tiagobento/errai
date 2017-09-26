@@ -71,9 +71,8 @@ public class DataBindingIOCExtension implements IOCExtensionConfigurator {
   @Override
   public void afterInitialization(final IOCProcessingContext context, final InjectionContext injectionContext) {
 
-    //FIXME: tiago: duplicated logic
     final Collection<MetaClass> allBindableTypes = new ArrayList<>(context.metaClassFinder().findAnnotatedWith(Bindable.class));
-    allBindableTypes.addAll(new AptErraiModulesConfiguration(context.metaClassFinder()).getBindableTypes());
+    allBindableTypes.addAll(context.erraiConfiguration().modules().getBindableTypes());
 
     final Model anno = new Model() {
       @Override

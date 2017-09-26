@@ -51,4 +51,9 @@ public class ErraiAppPropertiesErraiAppConfiguration implements ErraiAppConfigur
     final String s = EnvUtil.getEnvironmentConfig().getFrameworkOrSystemProperty(ERRAI_IOC_ASYNC_BEAN_MANAGER);
     return s != null && Boolean.parseBoolean(s);
   }
+
+  @Override
+  public boolean isAptEnvironment() {
+    return false;
+  }
 }

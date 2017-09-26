@@ -16,13 +16,7 @@
 
 package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-
-import org.jboss.errai.codegen.Context;
+import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.codegen.InnerClass;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.BlockBuilder;
@@ -31,13 +25,12 @@ import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
+import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.common.client.api.Assert;
-
-import com.google.gwt.core.ext.GeneratorContext;
-import com.google.gwt.core.ext.TreeLogger;
 import org.jboss.errai.ioc.client.container.Factory;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
-import org.jboss.errai.ioc.rebind.ioc.injector.api.InjectionContext;
+
+import java.util.Stack;
 
 import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.typeParametersOf;
@@ -46,20 +39,20 @@ import static org.jboss.errai.codegen.meta.MetaClassFactory.typeParametersOf;
  * @author Mike Brock <cbrock@redhat.com>
  */
 public class IOCProcessingContext {
+
   protected final BuildMetaClass bootstrapClass;
   protected final ClassStructureBuilder bootstrapBuilder;
-
   protected final Stack<BlockBuilder<?>> blockBuilder;
-
   protected final GeneratorContext generatorContext;
-
   protected final MetaClassFinder metaClassFinder;
+  protected final ErraiConfiguration erraiConfiguration;
 
   private IOCProcessingContext(final Builder builder) {
     this.generatorContext = builder.generatorContext;
     this.bootstrapClass = builder.bootstrapClassInstance;
     this.bootstrapBuilder = builder.bootstrapBuilder;
     this.metaClassFinder = builder.metaClassFinder;
+    this.erraiConfiguration = builder.erraiConfiguration;
 
     this.blockBuilder = new Stack<>();
     this.blockBuilder.push(builder.blockBuilder);
@@ -68,7 +61,6 @@ public class IOCProcessingContext {
   public MetaClass buildFactoryMetaClass(final Injectable injectable) {
     final String factoryName = injectable.getFactoryName();
     final MetaClass typeCreatedByFactory = injectable.getInjectedType();
-    final ClassStructureBuilder<?> builder = this.getBootstrapBuilder();
     final BuildMetaClass factoryMetaClass = ClassBuilder.define(factoryName,
             parameterizedAs(Factory.class, typeParametersOf(typeCreatedByFactory)))
             .publicScope()
@@ -76,7 +68,10 @@ public class IOCProcessingContext {
             .body()
             .getClassDefinition();
 
-    builder.declaresInnerClass(new InnerClass(factoryMetaClass));
+    if (!erraiConfiguration.app().isAptEnvironment()) {
+      getBootstrapBuilder().declaresInnerClass(new InnerClass(factoryMetaClass));
+    }
+
     return factoryMetaClass;
   }
 
@@ -86,6 +81,7 @@ public class IOCProcessingContext {
     private ClassStructureBuilder bootstrapBuilder;
     private MetaClassFinder metaClassFinder;
     private BlockBuilder<?> blockBuilder;
+    private ErraiConfiguration erraiConfiguration;
 
     public static Builder create() {
       return new Builder();
@@ -101,7 +97,6 @@ public class IOCProcessingContext {
       return this;
     }
 
-
     public Builder bootstrapClassInstance(final BuildMetaClass bootstrapClassInstance) {
       this.bootstrapClassInstance = bootstrapClassInstance;
       return this;
@@ -114,6 +109,11 @@ public class IOCProcessingContext {
 
     public Builder blockBuilder(final BlockBuilder<?> blockBuilder) {
       this.blockBuilder = blockBuilder;
+      return this;
+    }
+
+    public Builder erraiConfiguration(final ErraiConfiguration erraiConfiguration) {
+      this.erraiConfiguration = erraiConfiguration;
       return this;
     }
 
@@ -153,5 +153,9 @@ public class IOCProcessingContext {
 
   public GeneratorContext getGeneratorContext() {
     return generatorContext;
+  }
+
+  public ErraiConfiguration erraiConfiguration() {
+    return erraiConfiguration;
   }
 }
