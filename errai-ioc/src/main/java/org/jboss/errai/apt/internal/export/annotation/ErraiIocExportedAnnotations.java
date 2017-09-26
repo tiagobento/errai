@@ -29,6 +29,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
 /**
@@ -54,4 +55,5 @@ public final class ErraiIocExportedAnnotations {
   private EntryPoint entryPoint;
   private SharedSingleton sharedSingleton;
   private IOCProducer iocProducer;
+  private Qualifier qualifier;
 }

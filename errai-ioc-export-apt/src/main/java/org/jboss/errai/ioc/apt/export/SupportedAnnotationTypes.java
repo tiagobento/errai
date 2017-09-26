@@ -35,4 +35,5 @@ interface SupportedAnnotationTypes {
   String IOC_PRODUCER = "org.jboss.errai.common.client.api.annotations.IOCProducer";
   String ENTRY_POINT = "org.jboss.errai.ioc.client.api.EntryPoint";
   String SHARED_SINGLETON = "org.jboss.errai.ioc.client.api.SharedSingleton";
+  String QUALIFIER = "javax.inject.Qualifier";
 }

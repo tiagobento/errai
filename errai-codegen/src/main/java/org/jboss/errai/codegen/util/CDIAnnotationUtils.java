@@ -442,7 +442,7 @@ public class CDIAnnotationUtils {
 
     public static Collection<MetaMethod> getAnnotationAttributes(final MetaClass annoClass) {
       return filterAnnotationMethods(Arrays.stream(annoClass.getDeclaredMethods()),
-              method -> !method.unsafeIsAnnotationPresent(Nonbinding.class) && method.isPublic()
+              method -> !method.isAnnotationPresent(Nonbinding.class) && method.isPublic()
                       && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
     }
 
@@ -454,7 +454,7 @@ public class CDIAnnotationUtils {
 
     public static Collection<MetaMethod> getNonBindingAttributes(final MetaClass annoClass) {
       return filterAnnotationMethods(Arrays.stream(annoClass.getDeclaredMethods()),
-              method -> method.unsafeIsAnnotationPresent(Nonbinding.class) && method.isPublic()
+              method -> method.isAnnotationPresent(Nonbinding.class) && method.isPublic()
                       && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
     }
 
