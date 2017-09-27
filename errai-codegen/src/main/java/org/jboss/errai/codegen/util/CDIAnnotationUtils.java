@@ -517,8 +517,8 @@ public class CDIAnnotationUtils {
     }
 
     if (anno1 instanceof APTAnnotation && anno2 instanceof APTAnnotation) {
-      for (Map.Entry<String, Object> e : ((APTAnnotation) anno1).values().entrySet()) {
-        final Object o = ((APTAnnotation) anno2).values().get(e.getKey());
+      for (Map.Entry<String, Object> e : anno1.values().entrySet()) {
+        final Object o = anno2.values().get(e.getKey());
         if (o == null || !o.equals(e.getValue())) {
           return false;
         }
@@ -529,7 +529,7 @@ public class CDIAnnotationUtils {
     final MetaAnnotation runtime = anno2 instanceof APTAnnotation ? anno1 : anno2;
 
     if (apt instanceof APTAnnotation && runtime instanceof RuntimeMetaAnnotation) {
-      for (Map.Entry<String, Object> entry : ((APTAnnotation) apt).values().entrySet()) {
+      for (Map.Entry<String, Object> entry : apt.values().entrySet()) {
         final String key = entry.getKey();
         if (runtime.annotationType().getMethod(key, new MetaClass[0]).isAnnotationPresent(Nonbinding.class)) {
           continue;

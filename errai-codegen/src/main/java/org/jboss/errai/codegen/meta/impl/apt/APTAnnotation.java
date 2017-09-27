@@ -16,17 +16,15 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
-import com.sun.tools.classfile.Type;
 import com.sun.tools.javac.code.Symbol;
 import org.apache.commons.lang3.ClassUtils;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 
+import javax.enterprise.util.Nonbinding;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
@@ -179,7 +177,15 @@ public class APTAnnotation extends MetaAnnotation {
     }
   }
 
+  @Override
   public Map<String, Object> values() {
-    return values;
+    return values.entrySet()
+            .stream()
+            .filter(e -> !isNonbinding(e.getKey()))
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  private boolean isNonbinding(final String methodName) {
+    return annotationType().getDeclaredMethod(methodName, new MetaClass[0]).isAnnotationPresent(Nonbinding.class);
   }
 }

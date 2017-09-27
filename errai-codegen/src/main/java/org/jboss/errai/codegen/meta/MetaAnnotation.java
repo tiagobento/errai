@@ -17,6 +17,7 @@
 package org.jboss.errai.codegen.meta;
 
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -54,4 +55,6 @@ public abstract class MetaAnnotation {
   public String toString() {
     return "@" + annotationType().getName();
   }
+
+  public abstract Map<String, Object> values();
 }

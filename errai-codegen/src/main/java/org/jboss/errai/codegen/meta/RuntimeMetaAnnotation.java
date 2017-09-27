@@ -16,9 +16,13 @@
 
 package org.jboss.errai.codegen.meta;
 
+import javax.enterprise.util.Nonbinding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -65,5 +69,20 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
 
   public Annotation getAnnotation() {
     return annotation;
+  }
+
+  @Override
+  public Map<String, Object> values() {
+    return Arrays.stream(annotation.annotationType().getDeclaredMethods())
+            .filter(m -> !m.isAnnotationPresent(Nonbinding.class))
+            .collect(toMap(Method::getName, this::methodValue));
+  }
+
+  private Object methodValue(final Method m) {
+    try {
+      return m.invoke(annotation);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

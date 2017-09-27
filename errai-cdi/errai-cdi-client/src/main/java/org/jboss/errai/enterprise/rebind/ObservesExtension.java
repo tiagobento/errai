@@ -25,14 +25,15 @@ import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.AnonymousClassStructureBuilder;
 import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.enterprise.client.cdi.AbstractCDIEventCallback;
-import org.jboss.errai.enterprise.client.cdi.EventQualifierSerializer;
 import org.jboss.errai.enterprise.client.cdi.JsTypeEventObserver;
 import org.jboss.errai.enterprise.client.cdi.api.CDI;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
@@ -44,11 +45,13 @@ import org.jboss.errai.ioc.rebind.ioc.injector.api.FactoryController;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
@@ -66,7 +69,7 @@ import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
  * @author Christian Sadilek <csadilek@redhat.com>
  * @author Max Barkley <mbarkley@redhat.com>
  */
-//@CodeDecorator
+@CodeDecorator
 public class ObservesExtension extends IOCDecoratorExtension<Observes> {
   public ObservesExtension(final Class<Observes> decoratesWith) {
     super(decoratesWith);
@@ -74,10 +77,8 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
 
   @Override
   public void generateDecorator(final Decorable decorable, final FactoryController controller) {
-    if (!EventQualifierSerializer.isSet()) {
-      NonGwtEventQualifierSerializerGenerator.loadAndSetEventQualifierSerializer();
-    }
 
+    final ErraiConfiguration erraiConfiguration = decorable.getInjectionContext().getProcessingContext().erraiConfiguration();
     final Context ctx = decorable.getCodegenContext();
     final MetaParameter parm = decorable.getAsParameter();
     final MetaMethod method = (MetaMethod) parm.getDeclaringMember();
@@ -86,9 +87,8 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
 
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
-    final List<Annotation> annotations = InjectUtil.extractQualifiers(parm);
-    final Annotation[] qualifiers = annotations.toArray(new Annotation[annotations.size()]);
-    final Set<String> qualifierNames = new HashSet<>(CDI.getQualifiersPart(qualifiers));
+    final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
+    final Set<String> qualifierNames = new HashSet<>(getMetaQualifiersPart(qualifiers));
     final boolean isEnclosingTypeDependent = enclosingTypeIsDependentScoped(decorable);
 
     if (qualifierNames.contains(Any.class.getName())) {
@@ -121,7 +121,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
         .appendAll(callbackStatements)
         .finish()
         .publicOverridesMethod("toString")
-        ._(Stmt.load("Observer: " + parmClassName + " " + Arrays.toString(qualifiers)).returnValue());
+        ._(Stmt.load("Observer: " + parmClassName + " " + Arrays.toString(qualifiers.toArray())).returnValue());
 
     final List<Statement> initStatements = new ArrayList<>();
     final List<Statement> destroyStatements = new ArrayList<>();
@@ -184,9 +184,8 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaParameter parm = decorable.getAsParameter();
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
-    final List<Annotation> annotations = InjectUtil.extractQualifiers(parm);
-    final Annotation[] qualifiers = annotations.toArray(new Annotation[annotations.size()]);
-    final Set<String> qualifierNames = new HashSet<>(CDI.getQualifiersPart(qualifiers));
+    final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
+    final Set<String> qualifierNames = new HashSet<>(getMetaQualifiersPart(qualifiers));
 
     final MetaClass callBackType = parameterizedAs(AbstractCDIEventCallback.class, typeParametersOf(eventType));
     AnonymousClassStructureBuilder callBack = Stmt.newObject(callBackType).extend();
@@ -211,7 +210,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
         .appendAll(fireEventStmts)
         .finish()
         .publicOverridesMethod("toString")
-        ._(Stmt.load("Observer: " + parmClassName + " " + Arrays.toString(qualifiers)).returnValue());
+        ._(Stmt.load("Observer: " + parmClassName + " " + Arrays.toString(qualifiers.toArray())).returnValue());
 
     return callBackBlock;
   }
@@ -240,5 +239,33 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
         ._(Stmt.load("JsTypeObserver: " + parmClassName).returnValue());
 
     return callBackBlock;
+  }
+
+  private static Set<String> getMetaQualifiersPart(final Collection<MetaAnnotation> qualifiers) {
+    Set<String> qualifiersPart = null;
+    if (qualifiers != null) {
+      for (final MetaAnnotation qualifier : qualifiers) {
+        if (qualifiersPart == null)
+          qualifiersPart = new HashSet<>(qualifiers.size());
+
+        qualifiersPart.add(asString(qualifier));
+      }
+    }
+    return qualifiersPart == null ? Collections.emptySet() : qualifiersPart;
+  }
+
+  private static String asString(final MetaAnnotation qualifier) {
+    final StringBuilder builder = new StringBuilder(qualifier.annotationType().getName());
+    final Map<String, Object> values = qualifier.values();
+
+    if (values.isEmpty()) {
+      builder.append('(');
+      for (final Map.Entry<String, Object> e : values.entrySet()) {
+        builder.append(e.getKey()).append('=').append(e.getValue()).append(',');
+      }
+      builder.replace(builder.length() - 1, builder.length(), ")");
+    }
+
+    return builder.toString();
   }
 }
