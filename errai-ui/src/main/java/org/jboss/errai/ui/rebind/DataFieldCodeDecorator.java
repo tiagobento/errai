@@ -96,7 +96,6 @@ public class DataFieldCodeDecorator extends IOCDecoratorExtension<DataField> {
   private void saveDataField(final Decorable decorable, final MetaClass type, final String name, final String fieldName, final Statement instance) {
     dataFieldMap(decorable.getInjectionContext(), decorable.getDecorableDeclaringType()).put(name, instance);
     dataFieldTypeMap(decorable.getInjectionContext(), decorable.getDecorableDeclaringType()).put(name, type);
-    //FIXME: tiago: attention
     dataFieldAnnotationMap(decorable.getInjectionContext(), decorable.getDecorableDeclaringType()).put(name, decorable.getAnnotation());
   }
 

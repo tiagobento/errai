@@ -36,10 +36,8 @@ import java.util.stream.StreamSupport;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Generates {@link Factory} subclasses by dispatching to the appropriate
- * {@link FactoryBodyGenerator} and writing the output.
- *
- * @author Max Barkley <mbarkley@redhat.com>
+ * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
+ * @author Tiago Bento <tfernand@redhat.com>
  */
 public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
 
@@ -47,6 +45,7 @@ public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
 
   private final FactoryGenerator factoryGenerator;
 
+  // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public FactoriesAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
     this.factoryGenerator = new FactoryGenerator();
