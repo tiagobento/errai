@@ -143,7 +143,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
 
     final MetaAnnotation anno = decorable.getAnnotation();
     final MetaClass templateProvider = anno.value("provider");
-    final boolean customProvider = templateProvider != MetaClassFactory.get(Templated.DEFAULT_PROVIDER.class);
+    final boolean customProvider = !templateProvider.equals(MetaClassFactory.get(Templated.DEFAULT_PROVIDER.class));
     final Optional<String> styleSheetPath = getTemplateStyleSheetPath(declaringClass);
     final boolean explicitStyleSheetPresent = styleSheetPath.filter(path -> Thread.currentThread().getContextClassLoader().getResource(path) != null).isPresent();
 
