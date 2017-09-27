@@ -37,6 +37,7 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
+ *
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {

@@ -19,6 +19,7 @@ package org.jboss.errai.enterprise.rebind;
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
+import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.util.ClassChangeUtil;
 import org.jboss.errai.common.metadata.RebindUtils;

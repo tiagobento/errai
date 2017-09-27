@@ -431,7 +431,7 @@ public class CDIAnnotationUtils {
 
     public static Set<MetaClass> getQualifiers() {
       final Set<Class<?>> qualifiersAsClasses = getQualifiersAsClasses();
-      final Set<MetaClass> qualifiersAsMetaClasses = qualifiersAsClasses.stream().map(c -> MetaClassFactory.get(c)).collect(Collectors.toSet());
+      final Set<MetaClass> qualifiersAsMetaClasses = qualifiersAsClasses.stream().map(MetaClassFactory::get).collect(Collectors.toSet());
 
       if (qualifiersAsClasses.size() > qualifiersAsMetaClasses.size()) {
         throw new RuntimeException("Lost some qualifiers when converting from Class to MetaClass");
