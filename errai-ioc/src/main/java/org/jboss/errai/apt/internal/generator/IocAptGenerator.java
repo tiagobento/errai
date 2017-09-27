@@ -16,13 +16,16 @@
 
 package org.jboss.errai.apt.internal.generator;
 
+import jsinterop.annotations.JsType;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.ErraiAptConfiguration;
 import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
+import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.ioc.client.api.EntryPoint;
 import org.jboss.errai.ioc.client.api.IOCProvider;
+import org.jboss.errai.ioc.client.api.SharedSingleton;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -65,6 +68,9 @@ public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
     metaClasses.addAll(findAnnotatedMetaClasses(Alternative.class));
     metaClasses.addAll(findAnnotatedMetaClasses(Singleton.class));
     metaClasses.addAll(findAnnotatedMetaClasses(EntryPoint.class));
+    metaClasses.addAll(findAnnotatedMetaClasses(IOCProducer.class));
+    metaClasses.addAll(findAnnotatedMetaClasses(SharedSingleton.class));
+    metaClasses.addAll(findAnnotatedMetaClasses(JsType.class));
     return metaClasses;
   }
 

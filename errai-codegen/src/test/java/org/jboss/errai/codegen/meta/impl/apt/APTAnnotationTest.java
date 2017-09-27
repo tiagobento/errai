@@ -69,6 +69,15 @@ public class APTAnnotationTest extends ErraiAptTest {
   }
 
   @Test
+  public void testStringArrayValueAsObject() {
+    final Optional<MetaAnnotation> annotation = new APTClass(
+            getTypeElement(TestAnnotatedClass3.class).asType()).getAnnotation(TestAnnotationWithArrayProperties.class);
+
+    Assert.assertTrue(annotation.isPresent());
+    Assert.assertEquals(singletonList("foo"), asList(annotation.get().value()));
+  }
+
+  @Test
   public void testClassArrayValue() {
     final Optional<MetaAnnotation> annotation = new APTClass(
             getTypeElement(TestAnnotatedClass3.class).asType()).getAnnotation(TestAnnotationWithArrayProperties.class);

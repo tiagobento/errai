@@ -66,7 +66,7 @@ import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
  * @author Christian Sadilek <csadilek@redhat.com>
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@CodeDecorator
+//@CodeDecorator
 public class ObservesExtension extends IOCDecoratorExtension<Observes> {
   public ObservesExtension(final Class<Observes> decoratesWith) {
     super(decoratesWith);

@@ -41,9 +41,8 @@ public class ServiceCodeDecorator extends IOCDecoratorExtension<Service> {
   @Override
   public void generateDecorator(final Decorable decorable, final FactoryController controller) {
     MetaAnnotation serviceAnno = decorable.getAnnotation();
-    /**
-     * Figure out the service name;
-     */
+
+    // Figure out the service name;
     final String svcName = serviceAnno.value().equals("") ? decorable.getName() : serviceAnno.value();
 
     boolean local = false;

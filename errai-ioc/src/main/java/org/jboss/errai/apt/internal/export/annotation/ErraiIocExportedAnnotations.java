@@ -16,6 +16,7 @@
 
 package org.jboss.errai.apt.internal.export.annotation;
 
+import jsinterop.annotations.JsType;
 import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.api.EntryPoint;
@@ -56,4 +57,5 @@ public final class ErraiIocExportedAnnotations {
   private SharedSingleton sharedSingleton;
   private IOCProducer iocProducer;
   private Qualifier qualifier;
+  private JsType jsType;
 }
