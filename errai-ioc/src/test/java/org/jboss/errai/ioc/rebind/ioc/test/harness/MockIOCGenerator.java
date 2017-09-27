@@ -52,7 +52,7 @@ public class MockIOCGenerator {
 
     final IOCBootstrapGenerator bootstrapGenerator = new IOCBootstrapGenerator(
             ann -> ClassScanner.getTypesAnnotatedWith(ann, packages, context), context,
-            new ErraiAppPropertiesConfiguration(), IocRelevantClassesUtil.findRelevantClasses());
+            new ErraiAppPropertiesConfiguration(), (a) -> IocRelevantClassesUtil.findRelevantClasses());
 
     final String classStr = bootstrapGenerator.generate(packageName, className);
 

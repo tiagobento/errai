@@ -17,6 +17,7 @@
 package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
 
 import com.google.gwt.core.ext.GeneratorContext;
+import jsinterop.annotations.JsType;
 import org.jboss.errai.codegen.Context;
 import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
@@ -79,12 +80,12 @@ public class IOCBootstrapGenerator {
   private static final Logger log = LoggerFactory.getLogger(IOCBootstrapGenerator.class);
 
   private static final Object generatorLock = new Object();
-  private final Collection<MetaClass> relevantClasses;
+  private final IocRelevantClasses relevantClasses;
 
   public IOCBootstrapGenerator(final MetaClassFinder metaClassFinder,
           final GeneratorContext context,
           final ErraiConfiguration erraiConfiguration,
-          final Collection<MetaClass> relevantClasses) {
+          final IocRelevantClasses relevantClasses) {
 
     this.metaClassFinder = metaClassFinder;
     this.context = context;
@@ -180,7 +181,7 @@ public class IOCBootstrapGenerator {
     log.debug("Process dependency graph...");
     start = System.currentTimeMillis();
 
-    iocProcessor.process(iocProcessingContext, relevantClasses);
+    iocProcessor.process(iocProcessingContext, relevantClasses.find(getRelevantAnnotations(injectionContext)));
     log.debug("Processed dependency graph in {}ms", System.currentTimeMillis() - start);
 
     doAfterRunnbales(blockBuilder);
@@ -193,6 +194,12 @@ public class IOCBootstrapGenerator {
     log.debug("Generated BootstrapperImpl String in {}ms", System.currentTimeMillis() - start);
 
     return bootstrapperImplString;
+  }
+
+  private Collection<Class<? extends Annotation>> getRelevantAnnotations(InjectionContext injectionContext) {
+    final Collection<Class<? extends Annotation>> annotations = new ArrayList<>(injectionContext.getAllElementBindingRegisteredAnnotations());
+    annotations.add(JsType.class);
+    return annotations;
   }
 
   private void doAfterRunnbales(final BlockBuilder<?> blockBuilder) {

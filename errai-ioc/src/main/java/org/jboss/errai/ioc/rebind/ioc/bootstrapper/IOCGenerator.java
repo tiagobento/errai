@@ -73,13 +73,14 @@ public class IOCGenerator extends AbstractAsyncGenerator {
     final MetaClassFinder metaClassFinder = ann -> findMetaClasses(context, translatablePackages, ann);
     final ErraiConfiguration erraiConfiguration = new ErraiAppPropertiesConfiguration();
 
-    return generate(context, metaClassFinder, erraiConfiguration, IocRelevantClassesUtil.findRelevantClasses());
+    return generate(context, metaClassFinder, erraiConfiguration,
+            (annotations) -> IocRelevantClassesUtil.findRelevantClasses());
   }
 
   public String generate(final GeneratorContext context,
           final MetaClassFinder metaClassFinder,
           final ErraiConfiguration erraiConfiguration,
-          final Collection<MetaClass> relevantClasses) {
+          final IocRelevantClasses relevantClasses) {
 
     return new IOCBootstrapGenerator(metaClassFinder, context, erraiConfiguration, relevantClasses).generate(
             packageName, classSimpleName);

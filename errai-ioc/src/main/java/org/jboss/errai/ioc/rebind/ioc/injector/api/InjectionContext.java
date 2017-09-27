@@ -427,8 +427,8 @@ public class InjectionContext {
     }
   }
 
-  public Collection<Map.Entry<WiringElementType, Class<? extends Annotation>>> getAllElementMappings() {
-    return unmodifiableCollection(elementBindings.entries());
+  public Collection<Class<? extends Annotation>> getAllElementBindingRegisteredAnnotations() {
+    return elementBindings.values();
   }
 
   public void setAttribute(final String name, final Object value) {
