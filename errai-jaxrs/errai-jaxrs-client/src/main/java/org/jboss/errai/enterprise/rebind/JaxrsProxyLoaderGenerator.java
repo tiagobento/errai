@@ -49,6 +49,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -148,11 +149,11 @@ public class JaxrsProxyLoaderGenerator extends AbstractAsyncGenerator {
     return false;
   }
 
-  private Collection<MetaClass> getMetaClasses(final GeneratorContext context,
+  private Set<MetaClass> getMetaClasses(final GeneratorContext context,
           final Class<? extends Annotation> annotation,
           final Set<String> translatablePackages) {
 
-    return ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context);
+    return new HashSet<>(ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context));
   }
 
   public String getPackageName() {

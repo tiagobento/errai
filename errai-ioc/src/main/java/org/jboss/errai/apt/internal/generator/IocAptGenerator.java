@@ -40,8 +40,9 @@ public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
 
   @Override
   public String generate() {
-    final ErraiConfiguration erraiConfiguration = new ErraiAptConfiguration(this::findAnnotatedMetaClasses);
-    return iocGenerator.generate(null, this::findAnnotatedMetaClasses, erraiConfiguration, new IocRelevantClassesApt(this::findAnnotatedMetaClasses));
+    final ErraiConfiguration erraiConfiguration = new ErraiAptConfiguration(metaClassFinder());
+    return iocGenerator.generate(null, metaClassFinder(), erraiConfiguration,
+            new IocRelevantClassesApt(metaClassFinder()));
   }
 
   @Override

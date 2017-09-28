@@ -16,16 +16,12 @@
 
 package org.jboss.errai.apt.internal.generator;
 
-import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.rebind.BindableProxyLoaderGenerator;
-
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
@@ -40,13 +36,16 @@ public class BindableProxyLoaderAptGenerator extends ErraiAptGenerators.SingleFi
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public BindableProxyLoaderAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
-    this.erraiModuleConfiguration = new AptErraiModulesConfiguration(this::findAnnotatedMetaClasses);
+    this.erraiModuleConfiguration = new AptErraiModulesConfiguration(metaClassFinder());
     this.bindableProxyLoaderGenerator = new BindableProxyLoaderGenerator();
   }
 
   @Override
   public String generate() {
-    return bindableProxyLoaderGenerator.generate(this::findAnnotatedMetaClasses);
+    final MetaClassFinder metaClassFinder = metaClassFinder().extend(Bindable.class,
+            erraiModuleConfiguration::getBindableTypes);
+
+    return bindableProxyLoaderGenerator.generate(metaClassFinder);
   }
 
   @Override
@@ -57,18 +56,6 @@ public class BindableProxyLoaderAptGenerator extends ErraiAptGenerators.SingleFi
   @Override
   public String getClassSimpleName() {
     return bindableProxyLoaderGenerator.getClassSimpleName();
-  }
-
-  @Override
-  public Collection<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
-
-    final Collection<MetaClass> annotatedMetaClasses = new HashSet<>(super.findAnnotatedMetaClasses(annotation));
-
-    if (annotation.equals(Bindable.class)) {
-      annotatedMetaClasses.addAll(erraiModuleConfiguration.getBindableTypes());
-    }
-
-    return annotatedMetaClasses;
   }
 
 }

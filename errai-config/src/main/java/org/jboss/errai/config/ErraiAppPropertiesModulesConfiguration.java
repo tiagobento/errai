@@ -19,18 +19,25 @@ package org.jboss.errai.config;
 import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.client.api.annotations.NonPortable;
-import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.metadata.MetaDataScanner;
 import org.jboss.errai.common.metadata.ScannerSingleton;
-import org.jboss.errai.config.util.ClassScanner;
+import org.jboss.errai.config.rebind.EnvUtil;
+import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -98,37 +105,80 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
 
   @Override
   public Set<MetaClass> getBindableTypes() {
-    return PropertiesUtil.getPropertyValues(BINDABLE_TYPES, "\\s")
-            .stream()
-            .map(String::trim)
-            .filter(s -> !s.contains("*"))
-            .map(MetaClassFactory::get)
-            .collect(toSet());
+    final Set<MetaClass> bindableTypes = new HashSet<>();
+
+    for (final URL url : EnvUtil.getErraiAppPropertiesFilesUrls()) {
+      InputStream inputStream = null;
+      try {
+        log.debug("Checking " + url.getFile() + " for bindable types...");
+        inputStream = url.openStream();
+
+        final ResourceBundle props = new PropertyResourceBundle(inputStream);
+        for (final String key : props.keySet()) {
+          if (key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)) {
+            final Set<String> patterns = new LinkedHashSet<>();
+
+            for (final String s : props.getString(key).split(" ")) {
+              final String singleValue = s.trim();
+              if (singleValue.endsWith("*")) {
+                patterns.add(singleValue);
+              }
+              else {
+                try {
+                  bindableTypes.add(MetaClassFactory.get(s.trim()));
+                } catch (final Exception e) {
+                  throw new RuntimeException("Could not find class defined in ErraiApp.properties as bindable type: " + s);
+                }
+              }
+            }
+
+            if (!patterns.isEmpty()) {
+              final SimplePackageFilter filter = new SimplePackageFilter(patterns);
+              MetaClassFactory
+                      .getAllCachedClasses()
+                      .stream()
+                      .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
+                      .collect(toCollection(() -> bindableTypes));
+            }
+            break;
+          }
+        }
+      } catch (final IOException e) {
+        throw new RuntimeException("Error reading ErraiApp.properties", e);
+      } finally {
+        if (inputStream != null) {
+          try {
+            inputStream.close();
+          } catch (final IOException e) {
+            log.warn("Failed to close input stream", e);
+          }
+        }
+      }
+    }
+
+    return bindableTypes;
   }
+
+
 
   @Override
   public Set<MetaClass> getSerializableTypes() {
-    final Set<MetaClass> serializableTypes = new HashSet<>(ClassScanner.getTypesAnnotatedWith(Portable.class));
-    serializableTypes.addAll(PropertiesUtil.getPropertyValues(SERIALIZABLE_TYPES, "\\s")
-            .stream()
-            .map(String::trim)
-            .filter(s -> !s.contains("*"))
-            .map(MetaClassFactory::get)
-            .collect(toSet()));
-
+    final Set<MetaClass> serializableTypes = new HashSet<>();
+    serializableTypes.addAll(EnvUtil.getEnvironmentConfig().getExposedClasses());
+    serializableTypes.addAll(EnvUtil.getEnvironmentConfig().getPortableSuperTypes());
     return serializableTypes;
   }
 
   @Override
   public Set<MetaClass> getNonSerializableTypes() {
-    final Set<MetaClass> nonSerializableTypes = new HashSet<>(ClassScanner.getTypesAnnotatedWith(NonPortable.class));
-    nonSerializableTypes.addAll(PropertiesUtil.getPropertyValues(NONSERIALIZABLE_TYPES, "\\s")
-            .stream()
-            .map(String::trim)
-            .filter(s -> !s.contains("*"))
-            .map(MetaClassFactory::get)
-            .collect(toSet()));
+    return Collections.emptySet();
+  }
 
-    return nonSerializableTypes;
+  private static boolean validateWildcard(MetaClass bindable) {
+    if (bindable.isFinal()) {
+      log.debug("@Bindable types cannot be final, ignoring: {}", bindable.getFullyQualifiedName());
+      return false;
+    }
+    return true;
   }
 }

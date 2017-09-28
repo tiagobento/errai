@@ -27,11 +27,13 @@ import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.annotations.LocalEvent;
+import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.enterprise.client.cdi.AbstractCDIEventCallback;
 import org.jboss.errai.enterprise.client.cdi.JsTypeEventObserver;
@@ -80,6 +82,8 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
   public void generateDecorator(final Decorable decorable, final FactoryController controller) {
 
     final ErraiConfiguration erraiConfiguration = decorable.getInjectionContext().getProcessingContext().erraiConfiguration();
+    final MetaClassFinder metaClassFinder = decorable.getInjectionContext().getProcessingContext().metaClassFinder();
+
     final Context ctx = decorable.getCodegenContext();
     final MetaParameter parm = decorable.getAsParameter();
     final MetaMethod method = (MetaMethod) parm.getDeclaringMember();
@@ -90,7 +94,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
     final Set<String> qualifierNames = new HashSet<>(getMetaQualifiersPart(qualifiers));
-    final boolean isEnclosingTypeDependent = enclosingTypeIsDependentScoped(decorable);
+    final boolean isEnclosingTypeDependent = decorable.isEnclosingTypeDependent();
 
     if (qualifierNames.contains(Any.class.getName())) {
       qualifierNames.remove(Any.class.getName());
@@ -134,7 +138,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
       subscribeMethod = "subscribeJsType";
       callBackBlock = getJsTypeSubscriptionCallback(decorable, controller);
     }
-    else if (isPortableType(erraiConfiguration, eventType) && !eventType.isAnnotationPresent(LocalEvent.class)) {
+    else if (isPortableType(metaClassFinder, erraiConfiguration, eventType) && !eventType.isAnnotationPresent(LocalEvent.class)) {
       subscribeMethod = "subscribe";
       callBackBlock = getSubscriptionCallback(decorable, controller);
     }
@@ -153,7 +157,8 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
       initStatements.add(subscribeStatement);
     }
 
-    for (final MetaClass cls : allPortableSubclasses(erraiConfiguration, eventType)) {
+    for (final MetaClass cls : allPortableConcreteSubtypes(erraiConfiguration,
+            metaClassFinder, eventType)) {
       if (!cls.isAnnotationPresent(LocalEvent.class)) {
         final ContextualStatementBuilder routingSubStmt = Stmt.invokeStatic(ErraiBus.class, "get").invoke("subscribe",
                 CDI.getSubjectNameByType(cls.getFullyQualifiedName()), Stmt.loadStatic(CDI.class, "ROUTING_CALLBACK"));
@@ -174,22 +179,6 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     } else {
       controller.addFactoryInitializationStatements(initStatements);
     }
-  }
-
-  private Set<MetaClass> allPortableSubclasses(ErraiConfiguration erraiConfiguration, MetaClass eventType) {
-    return erraiConfiguration.modules()
-            .getSerializableTypes()
-            .stream()
-            .filter(s -> s.isAssignableTo(eventType))
-            .collect(toSet());
-  }
-
-  private boolean isPortableType(ErraiConfiguration erraiConfiguration, MetaClass eventType) {
-    return erraiConfiguration.modules().getSerializableTypes().contains(eventType);
-  }
-
-  private boolean enclosingTypeIsDependentScoped(final Decorable decorable) {
-    return decorable.isEnclosingTypeDependent();
   }
 
   private BlockBuilder<AnonymousClassStructureBuilder> getSubscriptionCallback(final Decorable decorable, final FactoryController controller) {
@@ -280,5 +269,35 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     }
 
     return builder.toString();
+  }
+
+
+  private Set<MetaClass> allPortableConcreteSubtypes(final ErraiConfiguration erraiConfiguration,
+          final MetaClassFinder metaClassFinder,
+          final MetaClass metaClass) {
+
+    return allPortableTypes(metaClassFinder, erraiConfiguration)
+            .stream()
+            .filter(s -> !s.isInterface())
+            .filter(s -> s.isAssignableTo(metaClass))
+            .collect(toSet());
+  }
+
+  private boolean isPortableType(final MetaClassFinder metaClassFinder, final ErraiConfiguration erraiConfiguration,
+          final MetaClass metaClass) {
+
+    return metaClass.instanceOf(String.class) || allPortableTypes(metaClassFinder, erraiConfiguration).contains(metaClass) || isBuiltinPortable(metaClass);
+  }
+
+  private Set<MetaClass> allPortableTypes(final MetaClassFinder metaClassFinder,
+          final ErraiConfiguration erraiConfiguration) {
+
+    //FIXME: tiago: are @Remote types also portable? See RpcTypesProvider
+    return metaClassFinder.extend(Portable.class, erraiConfiguration.modules()::getSerializableTypes)
+            .findAnnotatedWith(Portable.class);
+  }
+
+  private boolean isBuiltinPortable(final MetaClass metaClass) {
+    return false; //FIXME: tiago: implement
   }
 }

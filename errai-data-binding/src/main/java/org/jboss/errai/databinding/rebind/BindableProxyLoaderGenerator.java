@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -164,15 +165,20 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
     return false;
   }
 
-  private Collection<MetaClass> findAnnotatedElements(final GeneratorContext context,
+  private Set<MetaClass> findAnnotatedElements(final GeneratorContext context,
           final Set<String> translatablePackages,
           final Class<? extends Annotation> annotation) {
 
     if (annotation.equals(Bindable.class)) {
-      return DataBindingUtil.getAllBindableTypes(context);
+      final Set<MetaClass> annotatedBindableTypes = new HashSet<>(ClassScanner.getTypesAnnotatedWith(Bindable.class,
+              translatablePackages, context));
+
+      final Set<MetaClass> bindableTypes = new HashSet<>(annotatedBindableTypes);
+      bindableTypes.addAll(DataBindingUtil.getConfiguredBindableTypes());
+      return bindableTypes;
     }
 
-    return ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context);
+    return new HashSet<>(ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context));
   }
 
   public String getPackageName() {

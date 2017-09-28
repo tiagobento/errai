@@ -19,20 +19,22 @@ package org.jboss.errai.codegen.meta;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class TestMetaClassFinder implements MetaClassFinder {
 
-  private final Collection<MetaClass> metaClasses;
+  private final Set<MetaClass> metaClasses;
 
   public TestMetaClassFinder(final MetaClass... metaClasses) {
-    this.metaClasses = Arrays.asList(metaClasses);
+    this.metaClasses = new HashSet<>(Arrays.asList(metaClasses));
   }
 
   @Override
-  public Collection<MetaClass> findAnnotatedWith(final Class<? extends Annotation> annotationClass) {
+  public Set<MetaClass> findAnnotatedWith(final Class<? extends Annotation> annotationClass) {
     return metaClasses;
   }
 }

@@ -141,7 +141,7 @@ public final class ErraiAptExportedTypes {
     return exportFile.exportedTypes.stream().map(Element::asType);
   }
 
-  public Collection<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
+  public Set<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
     return exportedClassesByAnnotationClassName.getOrDefault(annotation.getName(), emptySet())
             .stream()
             .filter(s -> s.getKind().equals(TypeKind.DECLARED))

@@ -54,7 +54,7 @@ public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.Sin
   }
 
   private Collection<MetaClass> qualifiers() {
-    final Collection<MetaClass> annotatedMetaClasses = new ArrayList<>(this.findAnnotatedMetaClasses(Qualifier.class));
+    final Collection<MetaClass> annotatedMetaClasses = new ArrayList<>(metaClassFinder().findAnnotatedWith(Qualifier.class));
     annotatedMetaClasses.add(MetaClassFactory.get(Named.class));
     return annotatedMetaClasses;
   }

@@ -36,9 +36,11 @@ import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * The main generator class for the Errai IOC framework.
@@ -86,7 +88,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
             packageName, classSimpleName);
   }
 
-  private Collection<MetaClass> findMetaClasses(final GeneratorContext context,
+  private Set<MetaClass> findMetaClasses(final GeneratorContext context,
           final Set<String> translatablePackages,
           final Class<? extends Annotation> annotation) {
 
@@ -95,14 +97,14 @@ public class IOCGenerator extends AbstractAsyncGenerator {
             translatablePackages, context);
 
     if (!typesAnnotatedWith.isEmpty()) {
-      return typesAnnotatedWith;
+      return new HashSet<>(typesAnnotatedWith);
     }
 
     return ScannerSingleton.getOrCreateInstance()
             .getTypesAnnotatedWith(annotation)
             .stream()
             .map(MetaClassFactory::get)
-            .collect(toList());
+            .collect(toSet());
   }
 
   @Override

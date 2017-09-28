@@ -19,6 +19,7 @@ package org.jboss.errai.jsinterop.demo.client.local;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.jboss.errai.common.client.dom.Window;
 import org.jboss.errai.common.configuration.ErraiApp;
 import org.jboss.errai.common.client.dom.Document;
 import org.jboss.errai.ioc.client.api.EntryPoint;
@@ -30,12 +31,9 @@ public class AppSetup {
   @Inject
   private IpsumListDisplay display;
 
-  @Inject
-  private Document doc;
-
   @PostConstruct
   public void setup() {
-    doc.getElementById("rootPanel").appendChild(display.getElement());
+    Window.getDocument().getElementById("rootPanel").appendChild(display.getElement());
   }
 
 }

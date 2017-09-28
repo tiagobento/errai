@@ -30,6 +30,7 @@ import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -51,7 +52,7 @@ public class MockIOCGenerator {
     final GeneratorContext context = GeneratorContextBuilder.newCoreBasedBuilder().buildGeneratorContext();
 
     final IOCBootstrapGenerator bootstrapGenerator = new IOCBootstrapGenerator(
-            ann -> ClassScanner.getTypesAnnotatedWith(ann, packages, context), context,
+            ann -> new HashSet<>(ClassScanner.getTypesAnnotatedWith(ann, packages, context)), context,
             new ErraiAppPropertiesConfiguration(), (a) -> IocRelevantClassesUtil.findRelevantClasses());
 
     final String classStr = bootstrapGenerator.generate(packageName, className);

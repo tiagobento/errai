@@ -17,10 +17,12 @@
 package org.jboss.errai.common.apt;
 
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFinder;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -37,8 +39,8 @@ public class ErraiAptGenerators {
 
     public abstract Collection<ErraiAptGeneratedSourceFile> files();
 
-    protected Collection<MetaClass> findAnnotatedMetaClasses(final Class<? extends Annotation> annotation) {
-      return exportedTypes.findAnnotatedMetaClasses(annotation);
+    public MetaClassFinder metaClassFinder() {
+      return exportedTypes::findAnnotatedMetaClasses;
     }
 
     public int priority() {
@@ -48,7 +50,7 @@ public class ErraiAptGenerators {
 
   public static abstract class SingleFile extends Any {
 
-    public SingleFile(ErraiAptExportedTypes exportedTypes) {
+    public SingleFile(final ErraiAptExportedTypes exportedTypes) {
       super(exportedTypes);
     }
 
@@ -66,7 +68,7 @@ public class ErraiAptGenerators {
   }
 
   public static abstract class MultipleFiles extends Any {
-    public MultipleFiles(ErraiAptExportedTypes exportedTypes) {
+    public MultipleFiles(final ErraiAptExportedTypes exportedTypes) {
       super(exportedTypes);
     }
   }

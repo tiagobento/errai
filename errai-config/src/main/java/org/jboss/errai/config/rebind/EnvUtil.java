@@ -18,12 +18,10 @@ package org.jboss.errai.config.rebind;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.client.api.annotations.LocalEvent;
 import org.jboss.errai.common.client.api.annotations.NonPortable;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.client.types.TypeHandlerFactory;
 import org.jboss.errai.common.metadata.ErraiAppPropertiesFiles;
-import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.common.rebind.CacheStore;
 import org.jboss.errai.common.rebind.CacheUtil;
 import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
@@ -126,7 +124,6 @@ public abstract class EnvUtil {
     final Map<String, String> mappingAliases = new HashMap<>();
     final Set<MetaClass> exposedClasses = new HashSet<>();
     final Set<MetaClass> nonportableClasses = new HashSet<>();
-    final Set<String> explicitTypes = new HashSet<>();
     final Set<MetaClass> portableNonExposed = new HashSet<>();
 
     nonportableClasses.addAll(ClassScanner.getTypesAnnotatedWith(NonPortable.class));
@@ -135,7 +132,7 @@ public abstract class EnvUtil {
     addExposedInnerClasses(exposedClasses, exposedFromScanner);
     exposedClasses.addAll(exposedFromScanner);
 
-    processErraiAppPropertiesFiles(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, explicitTypes);
+    processErraiAppPropertiesFiles(frameworkProps, mappingAliases, exposedClasses, nonportableClasses);
     processEnvironmentConfigExtensions(exposedClasses);
 
     // must do this before filling in interfaces and supertypes!
@@ -145,7 +142,7 @@ public abstract class EnvUtil {
       fillInInterfacesAndSuperTypes(portableNonExposed, cls);
     }
 
-    return new EnvironmentConfig(mappingAliases, exposedClasses, portableNonExposed, explicitTypes, frameworkProps);
+    return new EnvironmentConfig(mappingAliases, exposedClasses, portableNonExposed, frameworkProps);
   }
 
   private static void processEnvironmentConfigExtensions(final Set<MetaClass> exposedClasses) {
@@ -169,7 +166,7 @@ public abstract class EnvUtil {
   }
 
   private static void processErraiAppPropertiesFiles(final Map<String, String> frameworkProps, final Map<String, String> mappingAliases,
-          final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final Set<String> explicitTypes) {
+          final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses) {
     for (final URL url : getErraiAppPropertiesFilesUrls()) {
       InputStream inputStream = null;
       try {
@@ -177,7 +174,7 @@ public abstract class EnvUtil {
         inputStream = url.openStream();
 
         final ResourceBundle props = new PropertyResourceBundle(inputStream);
-        processErraiAppPropertiesBundle(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, explicitTypes, props);
+        processErraiAppPropertiesBundle(frameworkProps, mappingAliases, exposedClasses, nonportableClasses, props);
       }
       catch (final IOException e) {
         throw new RuntimeException("error reading ErraiApp.properties", e);
@@ -196,27 +193,25 @@ public abstract class EnvUtil {
   }
 
   private static void processErraiAppPropertiesBundle(final Map<String, String> frameworkProps, final Map<String, String> mappingAliases,
-          final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final Set<String> explicitTypes,
-          final ResourceBundle props) {
+          final Set<MetaClass> exposedClasses, final Set<MetaClass> nonportableClasses, final ResourceBundle props) {
 
     for (final String key : props.keySet()) {
       final String value = props.getString(key);
       updateFrameworkProperties(frameworkProps, key, value);
 
       if (key.equals(ErraiAppPropertiesModulesConfiguration.SERIALIZABLE_TYPES)) {
-        addSerializableTypes(exposedClasses, explicitTypes, value);
+        addSerializableTypes(exposedClasses, value);
       }
       else if (key.equals(ErraiAppPropertiesModulesConfiguration.NONSERIALIZABLE_TYPES)) {
         addNonSerializableTypes(exposedClasses, nonportableClasses, value);
       }
       else if (key.equals(CONFIG_ERRAI_MAPPING_ALIASES)) {
-        addMappingAliases(mappingAliases, explicitTypes, value);
+        addMappingAliases(mappingAliases, value);
       }
     }
   }
 
-  private static void addMappingAliases(final Map<String, String> mappingAliases, final Set<String> explicitTypes,
-          final String value) {
+  private static void addMappingAliases(final Map<String, String> mappingAliases, final String value) {
     for (final String s : value.split(" ")) {
       try {
         final String[] mapping = s.split("->");
@@ -229,8 +224,6 @@ public abstract class EnvUtil {
         final Class<?> toMapping = Class.forName(mapping[1].trim());
 
         mappingAliases.put(fromMapping.getName(), toMapping.getName());
-        explicitTypes.add(fromMapping.getName());
-        explicitTypes.add(toMapping.getName());
       }
       catch (final Exception e) {
         throw new RuntimeException("could not find class defined in ErraiApp.properties for mapping: " + s, e);
@@ -266,8 +259,7 @@ public abstract class EnvUtil {
     }
   }
 
-  private static void addSerializableTypes(final Set<MetaClass> exposedClasses, final Set<String> explicitTypes,
-          final String value) {
+  private static void addSerializableTypes(final Set<MetaClass> exposedClasses, final String value) {
     final Set<String> patterns = new LinkedHashSet<>();
     for (final String s : value.split(" ")) {
       final String singleValue = s.trim();
@@ -280,7 +272,6 @@ public abstract class EnvUtil {
       else {
         try {
           exposedClasses.add(MetaClassFactory.get(singleValue));
-          explicitTypes.add(singleValue);
         }
         catch (final Exception e) {
           throw new RuntimeException("could not find class defined in ErraiApp.properties for serialization: "
@@ -373,42 +364,15 @@ public abstract class EnvUtil {
 
   public static boolean isPortableType(final Class<?> cls) {
     final MetaClass mc = MetaClassFactory.get(cls);
-    return isUserPortableType(mc) || isString(mc) || isBuiltinPortableType(cls);
+    return isPortableType(mc);
   }
 
   public static boolean isPortableType(final MetaClass mc) {
-    return isUserPortableType(mc) || isString(mc) || isBuiltinPortableType(mc.unsafeAsClass());
+    final Set<MetaClass> allSerializableTypes = new ErraiAppPropertiesModulesConfiguration().getSerializableTypes();
+    return mc.isAnnotationPresent(Portable.class)
+            || allSerializableTypes .contains(mc)
+            || String.class.getName().equals(mc.getFullyQualifiedName())
+            || TypeHandlerFactory.getHandler(mc.unsafeAsClass()) != null;
   }
 
-  private static boolean isUserPortableType(final MetaClass mc) {
-    return mc.isAnnotationPresent(Portable.class) || getEnvironmentConfig().getExposedClasses().contains(mc)
-        || getEnvironmentConfig().getPortableSuperTypes().contains(mc);
-  }
-
-  private static boolean isString(final MetaClass mc) {
-    return String.class.getName().equals(mc.getFullyQualifiedName());
-  }
-
-  private static boolean isBuiltinPortableType(final Class<?> cls) {
-    return TypeHandlerFactory.getHandler(cls) != null;
-  }
-
-  public static boolean isLocalEventType(final Class<?> cls) {
-    return cls.isAnnotationPresent(LocalEvent.class);
-  }
-
-  public static Set<Class<?>> getAllPortableConcreteSubtypes(final Class<?> clazz) {
-    final Set<Class<?>> portableSubtypes = new HashSet<>();
-    if (isPortableType(clazz)) {
-      portableSubtypes.add(clazz);
-    }
-
-    for (final Class<?> subType : ScannerSingleton.getOrCreateInstance().getSubTypesOf(clazz)) {
-      if (isPortableType(subType)) {
-        portableSubtypes.add(subType);
-      }
-    }
-
-    return portableSubtypes;
-  }
 }

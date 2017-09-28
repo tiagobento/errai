@@ -46,8 +46,11 @@ import org.jboss.errai.codegen.meta.MetaConstructor;
 import org.jboss.errai.codegen.meta.MetaField;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
+import org.jboss.errai.codegen.meta.MetaParameterizedType;
+import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.util.PrivateAccessUtil;
 import org.jboss.errai.common.metadata.RebindUtils;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.util.ClassScanner;
@@ -263,14 +266,14 @@ public class DataBindingUtil {
         final MetaParameter mp = (MetaParameter) annotated;
 
         assertTypeIsDataBinder(mp.getType());
-        dataModelType = (MetaClass) mp.getType().getParameterizedType().getTypeParameters()[0];
+        dataModelType = getFirstErasedTypeParameterClass(mp.getType());
         dataBinderRef = getAccessStatementForAutoBoundDataBinder(decorable, controller);
       }
       else {
         final MetaField field = (MetaField) allAnnotated.iterator().next();
 
         assertTypeIsDataBinder(field.getType());
-        dataModelType = (MetaClass) field.getType().getParameterizedType().getTypeParameters()[0];
+        dataModelType = getFirstErasedTypeParameterClass(field.getType());
         dataBinderRef = DecorableType.FIELD.getAccessStatement(field, decorable.getFactoryMetaClass());
         if (!field.isPublic()) {
           controller.addExposedField(field);
@@ -292,6 +295,16 @@ public class DataBindingUtil {
     }
 
     return (dataBinderRef != null) ? new DataBinderRef(dataModelType, dataBinderRef) : null;
+  }
+
+  private static MetaClass getFirstErasedTypeParameterClass(final MetaClass metaClass) {
+    final MetaType typeParameter = metaClass.getParameterizedType().getTypeParameters()[0];
+
+    if (typeParameter instanceof MetaParameterizedType) {
+      return (MetaClass) ((MetaParameterizedType) typeParameter).getRawType();
+    }
+
+    return (MetaClass) typeParameter;
   }
 
   private static Statement getAccessStatementForAutoBoundDataBinder(final Decorable decorable, final FactoryController controller) {
@@ -357,23 +370,6 @@ public class DataBindingUtil {
     }
   }
 
-  /**
-   * Returns all bindable types on the classpath.
-   *
-   * @param context
-   *          the current generator context
-   *
-   * @return a set of meta classes representing the all bindable types (both
-   *         annotated and configured in ErraiApp.properties).
-   */
-  public static Set<MetaClass> getAllBindableTypes(final GeneratorContext context) {
-    final Collection<MetaClass> annotatedBindableTypes = ClassScanner.getTypesAnnotatedWith(Bindable.class,
-            RebindUtils.findTranslatablePackages(context), context);
-
-    final Set<MetaClass> bindableTypes = new HashSet<>(annotatedBindableTypes);
-    bindableTypes.addAll(DataBindingUtil.getConfiguredBindableTypes());
-    return bindableTypes;
-  }
 
   private static Set<MetaClass> configuredBindableTypes = null;
 
@@ -386,7 +382,7 @@ public class DataBindingUtil {
     if (configuredBindableTypes != null) {
       configuredBindableTypes = refreshConfiguredBindableTypes();
     } else {
-      configuredBindableTypes = findConfiguredBindableTypes();
+      configuredBindableTypes = new ErraiAppPropertiesConfiguration().modules().getBindableTypes();
     }
 
     return configuredBindableTypes;
@@ -402,66 +398,4 @@ public class DataBindingUtil {
     return refreshedTypes;
   }
 
-  private static Set<MetaClass> findConfiguredBindableTypes() {
-    final Set<MetaClass> bindableTypes = new HashSet<>();
-
-    for (final URL url : EnvUtil.getErraiAppPropertiesFilesUrls()) {
-      InputStream inputStream = null;
-      try {
-        log.debug("Checking " + url.getFile() + " for bindable types...");
-        inputStream = url.openStream();
-
-        final ResourceBundle props = new PropertyResourceBundle(inputStream);
-        for (final String key : props.keySet()) {
-          if (key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)) {
-            final Set<String> patterns = new LinkedHashSet<>();
-
-            for (final String s : props.getString(key).split(" ")) {
-              final String singleValue = s.trim();
-              if (singleValue.endsWith("*")) {
-                patterns.add(singleValue);
-              }
-              else {
-                try {
-                  bindableTypes.add(MetaClassFactory.get(s.trim()));
-                } catch (final Exception e) {
-                  throw new RuntimeException("Could not find class defined in ErraiApp.properties as bindable type: " + s);
-                }
-              }
-            }
-
-            if (!patterns.isEmpty()) {
-              final SimplePackageFilter filter = new SimplePackageFilter(patterns);
-              MetaClassFactory
-                  .getAllCachedClasses()
-                  .stream()
-                  .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
-                  .collect(toCollection(() -> bindableTypes));
-            }
-            break;
-          }
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Error reading ErraiApp.properties", e);
-      } finally {
-        if (inputStream != null) {
-          try {
-            inputStream.close();
-          } catch (final IOException e) {
-            log.warn("Failed to close input stream", e);
-          }
-        }
-      }
-    }
-
-    return bindableTypes;
-  }
-
-  private static boolean validateWildcard(MetaClass bindable) {
-    if (bindable.isFinal()) {
-      log.debug("@Bindable types cannot be final, ignoring: {}", bindable.getFullyQualifiedName());
-      return false;
-    }
-    return true;
-  }
 }
