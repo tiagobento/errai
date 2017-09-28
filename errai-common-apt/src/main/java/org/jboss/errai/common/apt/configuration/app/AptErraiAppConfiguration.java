@@ -19,6 +19,7 @@ package org.jboss.errai.common.apt.configuration.app;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.common.configuration.ErraiApp;
+import org.jboss.errai.config.ErraiAppConfiguration;
 
 import java.util.List;
 import java.util.Optional;

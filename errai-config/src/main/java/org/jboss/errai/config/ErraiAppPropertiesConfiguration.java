@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration;
-
-import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
-import org.jboss.errai.common.apt.configuration.app.ErraiAppConfiguration;
-import org.jboss.errai.common.apt.configuration.module.ErraiModulesConfiguration;
+package org.jboss.errai.config;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

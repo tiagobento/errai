@@ -33,7 +33,7 @@ import org.jboss.errai.ioc.client.container.async.AsyncBeanManagerImpl;
 
 import java.io.PrintWriter;
 
-import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
+import static org.jboss.errai.config.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
 
 /**
  * @author Mike Brock

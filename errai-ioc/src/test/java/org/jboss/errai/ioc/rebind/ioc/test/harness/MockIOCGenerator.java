@@ -26,7 +26,7 @@ import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCBootstrapGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClassesUtil;
-import org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration.ErraiAppPropertiesConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 
 import java.io.File;
 import java.io.FileOutputStream;

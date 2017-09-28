@@ -14,35 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
-
-import org.jboss.errai.codegen.meta.MetaClass;
-
-import java.util.Set;
+package org.jboss.errai.config;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-interface ErraiSeparateModuleConfiguration {
+public interface ErraiModulesConfiguration extends ErraiSeparateModuleConfiguration.Ioc,
+        ErraiSeparateModuleConfiguration.DataBinding, ErraiSeparateModuleConfiguration.Marshalling {
 
-  interface DataBinding {
-
-    Set<MetaClass> getBindableTypes();
-  }
-
-  interface Marshalling {
-
-    Set<MetaClass> getSerializableTypes();
-
-    Set<MetaClass> getNonSerializableTypes();
-  }
-
-  interface Ioc {
-
-    Set<MetaClass> getIocEnabledAlternatives();
-
-    Set<MetaClass> getIocBlacklist();
-
-    Set<MetaClass> getIocWhitelist();
-  }
 }

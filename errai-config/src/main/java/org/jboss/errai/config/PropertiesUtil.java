@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.util;
+package org.jboss.errai.config;
+
+import org.jboss.errai.common.metadata.ScannerSingleton;
 
 import java.util.Collection;
 import java.util.HashSet;
-
-import org.jboss.errai.common.metadata.ScannerSingleton;
 
 /**
  * A utility class for tasks regarding the properties defined in

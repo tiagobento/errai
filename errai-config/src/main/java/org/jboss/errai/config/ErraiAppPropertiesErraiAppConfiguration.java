@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration;
+package org.jboss.errai.config;
 
-import org.jboss.errai.common.apt.configuration.app.ErraiAppConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 
 /**

@@ -113,6 +113,7 @@
     <module>errai-data-binding-export-apt</module>
     <module>errai-ioc-export-apt</module>
     <module>errai-navigation-export-apt</module>
+    <module>errai-marshalling-export-apt</module>
   </modules>
 
   <repositories>

@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.app;
+package org.jboss.errai.marshalling.apt.export;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-interface ErraiSeparateAppConfiguration {
+interface SupportedAnnotationTypes {
 
-  interface Others {
-
-    boolean isUserEnabledOnHostPage();
-
-    boolean isWebSocketServerEnabled();
-
-    String getApplicationContext();
-  }
-
-  interface Ioc {
-
-    boolean isAutoDiscoverServicesEnabled();
-
-    boolean asyncBeanManager();
-  }
+  String PORTABLE = "org.jboss.errai.common.client.api.annotations.Portable";
+  String NON_PORTABLE = "org.jboss.errai.common.client.api.annotations.NonPortable";
 }

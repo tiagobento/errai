@@ -23,7 +23,7 @@ import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
+import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
@@ -32,7 +32,7 @@ import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
-import org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration.ErraiAppPropertiesConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;

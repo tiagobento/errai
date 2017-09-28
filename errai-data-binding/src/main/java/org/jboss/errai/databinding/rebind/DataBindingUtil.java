@@ -48,6 +48,7 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.util.PrivateAccessUtil;
 import org.jboss.errai.common.metadata.RebindUtils;
+import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.databinding.client.api.Bindable;
@@ -412,7 +413,7 @@ public class DataBindingUtil {
 
         final ResourceBundle props = new PropertyResourceBundle(inputStream);
         for (final String key : props.keySet()) {
-          if (key.equals(EnvUtil.CONFIG_ERRAI_BINDABLE_TYPES)) {
+          if (key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)) {
             final Set<String> patterns = new LinkedHashSet<>();
 
             for (final String s : props.getString(key).split(" ")) {

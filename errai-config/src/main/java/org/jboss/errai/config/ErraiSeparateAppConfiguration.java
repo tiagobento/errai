@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration;
-
-import org.jboss.errai.common.apt.configuration.app.ErraiAppConfiguration;
-import org.jboss.errai.common.apt.configuration.module.ErraiModulesConfiguration;
+package org.jboss.errai.config;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface ErraiConfiguration {
-  ErraiModulesConfiguration modules();
+interface ErraiSeparateAppConfiguration {
 
-  ErraiAppConfiguration app();
+  interface Others {
+
+    boolean isUserEnabledOnHostPage();
+
+    boolean isWebSocketServerEnabled();
+
+    String getApplicationContext();
+  }
+
+  interface Ioc {
+
+    boolean isAutoDiscoverServicesEnabled();
+
+    boolean asyncBeanManager();
+  }
 }

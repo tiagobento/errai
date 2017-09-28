@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
+package org.jboss.errai.config;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface ErraiModulesConfiguration extends ErraiSeparateModuleConfiguration.Ioc,
-        ErraiSeparateModuleConfiguration.DataBinding, ErraiSeparateModuleConfiguration.Marshalling {
+public interface ErraiAppConfiguration extends ErraiSeparateAppConfiguration.Ioc, ErraiSeparateAppConfiguration.Others {
+
+  boolean isAptEnvironment();
 
 }

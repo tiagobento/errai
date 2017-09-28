@@ -26,6 +26,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toSet;
 import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
 import static javax.lang.model.element.ElementKind.METHOD;
+import static javax.lang.model.element.ElementKind.PARAMETER;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -84,6 +86,8 @@ public class ErraiModule {
       return Stream.of(APTClassUtil.types.asElement(element.asType()));
     } else if (element.getKind().equals(METHOD) || element.getKind().equals(CONSTRUCTOR)) {
       return ((ExecutableElement) element).getParameters().stream();
+    } else if (element.getKind().equals(PARAMETER)) {
+      return Stream.of(element);
     } else {
       return Stream.of();
     }
@@ -95,6 +99,8 @@ public class ErraiModule {
       return isUnderModulePackage((Symbol) element);
     } else if (element.getKind().isField()) {
       return isUnderModulePackage(((Symbol.VarSymbol) element).owner);
+    } else if (element.getKind().equals(PARAMETER)) {
+      return isUnderModulePackage(((Symbol) element).getEnclosingElement().getEnclosingElement());
     } else {
       return false;
     }

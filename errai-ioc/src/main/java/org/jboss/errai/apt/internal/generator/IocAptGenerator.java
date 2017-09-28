@@ -20,7 +20,7 @@ import org.jboss.errai.apt.internal.generator.util.IocRelevantClassesApt;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.ErraiAptConfiguration;
-import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
+import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
 
 /**

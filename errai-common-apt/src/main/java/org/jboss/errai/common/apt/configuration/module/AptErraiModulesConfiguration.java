@@ -19,8 +19,12 @@ package org.jboss.errai.common.apt.configuration.module;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
+import org.jboss.errai.common.client.api.annotations.NonPortable;
+import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.ErraiModulesConfiguration;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -41,9 +45,11 @@ import static org.jboss.errai.common.configuration.ErraiModule.Property.SERIALIZ
 public class AptErraiModulesConfiguration implements ErraiModulesConfiguration {
 
   private final Set<MetaAnnotation> erraiModules;
+  private final MetaClassFinder metaClassFinder;
 
   public AptErraiModulesConfiguration(final MetaClassFinder metaClassFinder) {
-    erraiModules = metaClassFinder.findAnnotatedWith(ErraiModule.class)
+    this.metaClassFinder = metaClassFinder;
+    this.erraiModules = metaClassFinder.findAnnotatedWith(ErraiModule.class)
             .stream()
             .map(module -> module.getAnnotation(ErraiModule.class))
             .map(Optional::get)
@@ -57,12 +63,18 @@ public class AptErraiModulesConfiguration implements ErraiModulesConfiguration {
 
   @Override
   public Set<MetaClass> getSerializableTypes() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(SERIALIZABLE_TYPES, MetaClass[].class)));
+    final Set<MetaClass> serializableTypes = new HashSet<>(metaClassFinder.findAnnotatedWith(Portable.class));
+    serializableTypes.addAll(
+        getConfiguredArrayProperty(a -> stream(a.valueAsArray(SERIALIZABLE_TYPES, MetaClass[].class))));
+    return serializableTypes;
   }
 
   @Override
   public Set<MetaClass> getNonSerializableTypes() {
-    return getConfiguredArrayProperty(a -> stream(a.valueAsArray(NON_SERIALIZABLE_TYPES, MetaClass[].class)));
+    final Set<MetaClass> nonSerializableTypes = new HashSet<>(metaClassFinder.findAnnotatedWith(NonPortable.class));
+    nonSerializableTypes.addAll(
+            getConfiguredArrayProperty(a -> stream(a.valueAsArray(NON_SERIALIZABLE_TYPES, MetaClass[].class))));
+    return nonSerializableTypes;
   }
 
   @Override

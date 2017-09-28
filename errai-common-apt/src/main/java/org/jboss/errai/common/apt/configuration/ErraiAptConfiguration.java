@@ -17,10 +17,11 @@
 package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.common.apt.configuration.app.ErraiAppConfiguration;
 import org.jboss.errai.common.apt.configuration.app.AptErraiAppConfiguration;
-import org.jboss.errai.common.apt.configuration.module.ErraiModulesConfiguration;
 import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;
+import org.jboss.errai.config.ErraiAppConfiguration;
+import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.config.ErraiModulesConfiguration;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

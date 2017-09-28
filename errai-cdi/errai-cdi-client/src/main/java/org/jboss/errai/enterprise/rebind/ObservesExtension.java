@@ -31,8 +31,8 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
-import org.jboss.errai.common.apt.configuration.ErraiConfiguration;
-import org.jboss.errai.config.rebind.EnvUtil;
+import org.jboss.errai.common.client.api.annotations.LocalEvent;
+import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.enterprise.client.cdi.AbstractCDIEventCallback;
 import org.jboss.errai.enterprise.client.cdi.JsTypeEventObserver;
 import org.jboss.errai.enterprise.client.cdi.api.CDI;
@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.typeParametersOf;
 import static org.jboss.errai.codegen.util.Stmt.castTo;
@@ -133,7 +134,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
       subscribeMethod = "subscribeJsType";
       callBackBlock = getJsTypeSubscriptionCallback(decorable, controller);
     }
-    else if (EnvUtil.isPortableType(eventType) && !EnvUtil.isLocalEventType(eventType)) {
+    else if (isPortableType(erraiConfiguration, eventType) && !eventType.isAnnotationPresent(LocalEvent.class)) {
       subscribeMethod = "subscribe";
       callBackBlock = getSubscriptionCallback(decorable, controller);
     }
@@ -152,12 +153,12 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
       initStatements.add(subscribeStatement);
     }
 
-    for (final Class<?> cls : EnvUtil.getAllPortableConcreteSubtypes(eventType.unsafeAsClass())) {
-      if (!EnvUtil.isLocalEventType(cls)) {
+    for (final MetaClass cls : allPortableSubclasses(erraiConfiguration, eventType)) {
+      if (!cls.isAnnotationPresent(LocalEvent.class)) {
         final ContextualStatementBuilder routingSubStmt = Stmt.invokeStatic(ErraiBus.class, "get").invoke("subscribe",
-                CDI.getSubjectNameByType(cls.getName()), Stmt.loadStatic(CDI.class, "ROUTING_CALLBACK"));
+                CDI.getSubjectNameByType(cls.getFullyQualifiedName()), Stmt.loadStatic(CDI.class, "ROUTING_CALLBACK"));
         if (isEnclosingTypeDependent) {
-          final String subscrHandle = subscrVar + "For" + cls.getSimpleName();
+          final String subscrHandle = subscrVar + "For" + cls.getName();
           initStatements.add(controller.setReferenceStmt(subscrHandle, routingSubStmt));
           destroyStatements.add(
                   Stmt.nestedCall(controller.getReferenceStmt(subscrHandle, Subscription.class)).invoke("remove"));
@@ -173,6 +174,18 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     } else {
       controller.addFactoryInitializationStatements(initStatements);
     }
+  }
+
+  private Set<MetaClass> allPortableSubclasses(ErraiConfiguration erraiConfiguration, MetaClass eventType) {
+    return erraiConfiguration.modules()
+            .getSerializableTypes()
+            .stream()
+            .filter(s -> s.isAssignableTo(eventType))
+            .collect(toSet());
+  }
+
+  private boolean isPortableType(ErraiConfiguration erraiConfiguration, MetaClass eventType) {
+    return erraiConfiguration.modules().getSerializableTypes().contains(eventType);
   }
 
   private boolean enclosingTypeIsDependentScoped(final Decorable decorable) {

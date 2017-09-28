@@ -14,33 +14,37 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.rebind.ioc.bootstrapper.configuration;
+package org.jboss.errai.config;
 
 import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.apt.configuration.module.ErraiModulesConfiguration;
+import org.jboss.errai.common.client.api.annotations.NonPortable;
+import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.metadata.MetaDataScanner;
 import org.jboss.errai.common.metadata.ScannerSingleton;
+import org.jboss.errai.config.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static org.jboss.errai.ioc.util.PropertiesUtil.getPropertyValues;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfiguration {
 
-  private static final String QUALIFYING_METADATA_FACTORY_PROPERTY = "errai.ioc.QualifyingMetaDataFactory";
-  private static final String ENABLED_ALTERNATIVES_PROPERTY = "errai.ioc.enabled.alternatives";
-  private static final String WHITELIST_PROPERTY = "errai.ioc.whitelist";
-  private static final String BLACKLIST_PROPERTY = "errai.ioc.blacklist";
+  public static final String SERIALIZABLE_TYPES = "errai.marshalling.serializableTypes";
+  public static final String NONSERIALIZABLE_TYPES = "errai.marshalling.nonserializableTypes";
+  private static final String QUALIFYING_METADATA_FACTORY = "errai.ioc.QualifyingMetaDataFactory";
+  public static final String IOC_ENABLED_ALTERNATIVES = "errai.ioc.enabled.alternatives";
+  private static final String IOC_WHITELIST_PROPERTY = "errai.ioc.whitelist";
+  private static final String IOC_BLACKLIST_PROPERTY = "errai.ioc.blacklist";
+  public static final String BINDABLE_TYPES = "errai.ui.bindableTypes";
 
   private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesModulesConfiguration.class);
 
@@ -52,20 +56,20 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
       log.info("Checking ErraiApp.properties for configured types ...");
 
       //FIXME: tiago: unused property?
-      final Collection<String> qualifyingMetadataFactoryProperties = props.get(QUALIFYING_METADATA_FACTORY_PROPERTY);
+      final Collection<String> qualifyingMetadataFactoryProperties = props.get(QUALIFYING_METADATA_FACTORY);
 
       if (qualifyingMetadataFactoryProperties.size() > 1) {
-        throw new RuntimeException(
-                "the property '" + QUALIFYING_METADATA_FACTORY_PROPERTY + "' is set in more than one place");
+        throw new RuntimeException("the property '" + QUALIFYING_METADATA_FACTORY + "' is set in more than one place");
       }
     }
   }
 
-  //FIXME: tiago: wildcard doens't work on this implementation
+  //FIXME: tiago: wildcards doesn't work on this implementation
 
   @Override
   public Set<MetaClass> getIocEnabledAlternatives() {
-    return getPropertyValues(ENABLED_ALTERNATIVES_PROPERTY, "\\s").stream()
+    return PropertiesUtil.getPropertyValues(IOC_ENABLED_ALTERNATIVES, "\\s")
+            .stream()
             .map(String::trim)
             .filter(s -> !s.contains("*"))
             .map(MetaClassFactory::get)
@@ -74,7 +78,8 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
 
   @Override
   public Set<MetaClass> getIocBlacklist() {
-    return getPropertyValues(BLACKLIST_PROPERTY, "\\s").stream()
+    return PropertiesUtil.getPropertyValues(IOC_BLACKLIST_PROPERTY, "\\s")
+            .stream()
             .map(String::trim)
             .filter(s -> !s.contains("*"))
             .map(MetaClassFactory::get)
@@ -83,7 +88,8 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
 
   @Override
   public Set<MetaClass> getIocWhitelist() {
-    return getPropertyValues(WHITELIST_PROPERTY, "\\s").stream()
+    return PropertiesUtil.getPropertyValues(IOC_WHITELIST_PROPERTY, "\\s")
+            .stream()
             .map(String::trim)
             .filter(s -> !s.contains("*"))
             .map(MetaClassFactory::get)
@@ -92,16 +98,37 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
 
   @Override
   public Set<MetaClass> getBindableTypes() {
-    return Collections.emptySet(); //FIXME: tiago: implement
+    return PropertiesUtil.getPropertyValues(BINDABLE_TYPES, "\\s")
+            .stream()
+            .map(String::trim)
+            .filter(s -> !s.contains("*"))
+            .map(MetaClassFactory::get)
+            .collect(toSet());
   }
 
   @Override
   public Set<MetaClass> getSerializableTypes() {
-    return Collections.emptySet(); //FIXME: tiago: implement
+    final Set<MetaClass> serializableTypes = new HashSet<>(ClassScanner.getTypesAnnotatedWith(Portable.class));
+    serializableTypes.addAll(PropertiesUtil.getPropertyValues(SERIALIZABLE_TYPES, "\\s")
+            .stream()
+            .map(String::trim)
+            .filter(s -> !s.contains("*"))
+            .map(MetaClassFactory::get)
+            .collect(toSet()));
+
+    return serializableTypes;
   }
 
   @Override
   public Set<MetaClass> getNonSerializableTypes() {
-    return Collections.emptySet();  //FIXME: tiago: implement
+    final Set<MetaClass> nonSerializableTypes = new HashSet<>(ClassScanner.getTypesAnnotatedWith(NonPortable.class));
+    nonSerializableTypes.addAll(PropertiesUtil.getPropertyValues(NONSERIALIZABLE_TYPES, "\\s")
+            .stream()
+            .map(String::trim)
+            .filter(s -> !s.contains("*"))
+            .map(MetaClassFactory::get)
+            .collect(toSet()));
+
+    return nonSerializableTypes;
   }
 }

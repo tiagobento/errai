@@ -26,6 +26,7 @@ import org.jboss.errai.common.metadata.ErraiAppPropertiesFiles;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.common.rebind.CacheStore;
 import org.jboss.errai.common.rebind.CacheUtil;
+import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.slf4j.Logger;
@@ -74,11 +75,7 @@ public abstract class EnvUtil {
     }
   }
 
-  public static final String CONFIG_ERRAI_SERIALIZABLE_TYPE = "errai.marshalling.serializableTypes";
-  public static final String CONFIG_ERRAI_NONSERIALIZABLE_TYPE = "errai.marshalling.nonserializableTypes";
   public static final String CONFIG_ERRAI_MAPPING_ALIASES = "errai.marshalling.mappingAliases";
-  public static final String CONFIG_ERRAI_IOC_ENABLED_ALTERNATIVES = "errai.ioc.enabled.alternatives";
-  public static final String CONFIG_ERRAI_BINDABLE_TYPES = "errai.ui.bindableTypes";
 
   private static volatile Boolean _isJUnitTest;
 
@@ -206,10 +203,10 @@ public abstract class EnvUtil {
       final String value = props.getString(key);
       updateFrameworkProperties(frameworkProps, key, value);
 
-      if (key.equals(CONFIG_ERRAI_SERIALIZABLE_TYPE)) {
+      if (key.equals(ErraiAppPropertiesModulesConfiguration.SERIALIZABLE_TYPES)) {
         addSerializableTypes(exposedClasses, explicitTypes, value);
       }
-      else if (key.equals(CONFIG_ERRAI_NONSERIALIZABLE_TYPE)) {
+      else if (key.equals(ErraiAppPropertiesModulesConfiguration.NONSERIALIZABLE_TYPES)) {
         addNonSerializableTypes(exposedClasses, nonportableClasses, value);
       }
       else if (key.equals(CONFIG_ERRAI_MAPPING_ALIASES)) {
@@ -327,10 +324,10 @@ public abstract class EnvUtil {
   }
 
   private static boolean isListValuedProperty(final String key) {
-    return key.equals(CONFIG_ERRAI_IOC_ENABLED_ALTERNATIVES)
-            || key.equals(CONFIG_ERRAI_BINDABLE_TYPES)
-            || key.equals(CONFIG_ERRAI_SERIALIZABLE_TYPE)
-            || key.equals(CONFIG_ERRAI_NONSERIALIZABLE_TYPE)
+    return key.equals(ErraiAppPropertiesModulesConfiguration.IOC_ENABLED_ALTERNATIVES)
+            || key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)
+            || key.equals(ErraiAppPropertiesModulesConfiguration.SERIALIZABLE_TYPES)
+            || key.equals(ErraiAppPropertiesModulesConfiguration.NONSERIALIZABLE_TYPES)
             || key.equals(CONFIG_ERRAI_MAPPING_ALIASES);
   }
 
@@ -400,10 +397,6 @@ public abstract class EnvUtil {
     return cls.isAnnotationPresent(LocalEvent.class);
   }
 
-  public static boolean isLocalEventType(final MetaClass cls) {
-    return cls.isAnnotationPresent(LocalEvent.class);
-  }
-
   public static Set<Class<?>> getAllPortableConcreteSubtypes(final Class<?> clazz) {
     final Set<Class<?>> portableSubtypes = new HashSet<>();
     if (isPortableType(clazz)) {
@@ -418,20 +411,4 @@ public abstract class EnvUtil {
 
     return portableSubtypes;
   }
-
-  public static Set<Class<?>> getAllPortableSubtypes(final Class<?> clazz) {
-    final Set<Class<?>> portableSubtypes = new HashSet<>();
-    if (clazz.isInterface() || isPortableType(clazz)) {
-      portableSubtypes.add(clazz);
-    }
-
-    for (final Class<?> subType : ScannerSingleton.getOrCreateInstance().getSubTypesOf(clazz)) {
-      if (clazz.isInterface() || isPortableType(subType)) {
-        portableSubtypes.add(subType);
-      }
-    }
-
-    return portableSubtypes;
-  }
-
 }

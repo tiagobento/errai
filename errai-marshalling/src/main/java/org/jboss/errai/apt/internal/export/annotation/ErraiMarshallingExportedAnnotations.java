@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.app;
+package org.jboss.errai.apt.internal.export.annotation;
+
+import org.jboss.errai.common.client.api.annotations.NonPortable;
+import org.jboss.errai.common.client.api.annotations.Portable;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface ErraiAppConfiguration extends ErraiSeparateAppConfiguration.Ioc, ErraiSeparateAppConfiguration.Others {
+public final class ErraiMarshallingExportedAnnotations {
 
-  boolean isAptEnvironment();
+  private ErraiMarshallingExportedAnnotations() {
+  }
 
+  private Portable portable;
+  private NonPortable nonPortable;
 }
+
