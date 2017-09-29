@@ -45,7 +45,7 @@ public class AnnotationSerializer {
   }
 
   private static String asString(final MetaAnnotation qualifier) {
-    final StringBuilder builder = new StringBuilder(qualifier.annotationType().getName());
+    final StringBuilder builder = new StringBuilder(qualifier.annotationType().getFullyQualifiedName());
     final Map<String, Object> values = qualifier.values();
 
     if (values.isEmpty()) {
