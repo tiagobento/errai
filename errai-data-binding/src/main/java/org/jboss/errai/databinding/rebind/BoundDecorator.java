@@ -77,11 +77,20 @@ public class BoundDecorator extends IOCDecoratorExtension<Bound> {
 
   @Override
   public void generateDecorator(final Decorable decorable, final FactoryController controller) {
+
+    final Set<MetaClass> allConfiguredBindableTypes = decorable.getInjectionContext()
+            .getProcessingContext()
+            .erraiConfiguration()
+            .modules()
+            .getBindableTypes();
+
     final MetaClass targetClass = decorable.getEnclosingInjectable().getInjectedType();
     final List<Statement> statements = new ArrayList<Statement>();
     final boolean hasRunForType =  processedTypes.contains(targetClass);
 
-    final DataBindingUtil.DataBinderRef binderLookup = DataBindingUtil.lookupDataBinderRef(decorable, controller);
+    final DataBindingUtil.DataBinderRef binderLookup = DataBindingUtil.lookupDataBinderRef(decorable, controller,
+            allConfiguredBindableTypes);
+
     if (binderLookup != null) {
       // Generate a reference to the bean's @AutoBound data binder
       if (!hasRunForType) {
@@ -97,7 +106,10 @@ public class BoundDecorator extends IOCDecoratorExtension<Bound> {
       final MetaAnnotation bound = decorable.getAnnotation();
       final boolean propertyIsEmpty = bound.value("property").equals("");
       String property = propertyIsEmpty ? decorable.getName() : bound.value("property");
-      if (!DataBindingValidator.isValidPropertyChain(binderLookup.getDataModelType(), property)) {
+
+      if (!DataBindingValidator.isValidPropertyChain(binderLookup.getDataModelType(), property,
+              allConfiguredBindableTypes)) {
+
         if (propertyIsEmpty && binderLookup.getDataModelType().equals(getValueType(decorable.getType()))) {
           property = "this";
         }

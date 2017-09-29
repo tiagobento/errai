@@ -122,7 +122,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
   }
 
   private static void addCleanup(final Decorable decorable, final FactoryController controller, final List<Statement> destructionStmts) {
-    final DataBindingUtil.DataBinderRef dataBinder = DataBindingUtil.lookupDataBinderRef(decorable, controller);
+    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller);
 
     if (!controller.hasAttribute(STYLE_BINDING_HOUSEKEEPING_ATTR)) {
       destructionStmts.add(
@@ -169,7 +169,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
     }
 
 
-    final DataBindingUtil.DataBinderRef dataBinder = DataBindingUtil.lookupDataBinderRef(decorable, controller);
+    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller);
 
     final List<Statement> initStmts = new ArrayList<Statement>();
     final List<Statement> destructionStmts = new ArrayList<Statement>();
@@ -213,5 +213,9 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
 
     controller.addInitializationStatements(initStmts);
     controller.addDestructionStatements(destructionStmts);
+  }
+
+  private static DataBindingUtil.DataBinderRef lookupDataBinderRef(final Decorable decorable, final FactoryController controller) {
+    return DataBindingUtil.lookupDataBinderRef(decorable, controller, DataBindingUtil.getConfiguredBindableTypes());
   }
 }

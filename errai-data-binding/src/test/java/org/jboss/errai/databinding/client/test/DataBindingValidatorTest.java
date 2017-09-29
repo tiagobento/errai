@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.databinding.client.TestModel;
+import org.jboss.errai.databinding.rebind.DataBindingUtil;
 import org.jboss.errai.databinding.rebind.DataBindingValidator;
 import org.junit.Test;
 
@@ -37,52 +38,55 @@ public class DataBindingValidatorTest {
 
   @Test
   public void testLeadingDotFails() {
-    assertFalse(DataBindingValidator.isValidPropertyChain(testClass, ".name"));
+    assertFalse(isValidPropertyChain(testClass, ".name"));
   }
   
   @Test
   public void testTrailingDotFails() {
-    assertFalse(DataBindingValidator.isValidPropertyChain(testClass, "name."));
+    assertFalse(isValidPropertyChain(testClass, "name."));
   }
   
   @Test
   public void testNonBindableTypeFails() {
-    assertFalse(DataBindingValidator.isValidPropertyChain(MetaClassFactory.get(String.class), "length"));
+    assertFalse(isValidPropertyChain(MetaClassFactory.get(String.class), "length"));
   }
   
   @Test
   public void testSinglePropertyPasses() {
-    assertTrue(DataBindingValidator.isValidPropertyChain(testClass, "value"));
+    assertTrue(isValidPropertyChain(testClass, "value"));
   }
   
   @Test
   public void testPropertyChainPasses() {
-    assertTrue(DataBindingValidator.isValidPropertyChain(testClass, "child.child.value"));
+    assertTrue(isValidPropertyChain(testClass, "child.child.value"));
   }
   
   @Test
   public void testPropertyChainFails() {
-    assertFalse(DataBindingValidator.isValidPropertyChain(testClass, "child.value.value"));
+    assertFalse(isValidPropertyChain(testClass, "child.value.value"));
   }
   
   @Test
   public void testDoubleDotInChainFails() {
-    assertFalse(DataBindingValidator.isValidPropertyChain(testClass, "child.child..value"));
+    assertFalse(isValidPropertyChain(testClass, "child.child..value"));
   }
   
   @Test
   public void testLeadingAndTrailingDotInChainFails() {
-    assertFalse(DataBindingValidator.isValidPropertyChain(testClass, ".child.child.value."));
+    assertFalse(isValidPropertyChain(testClass, ".child.child.value."));
   }
   
   @Test(expected=NullPointerException.class)
   public void testExceptionOnNullType() {
-    DataBindingValidator.isValidPropertyChain(null, "child");
+    isValidPropertyChain(null, "child");
   }
 
   @Test(expected=NullPointerException.class)
   public void testExceptionOnNullPropertyChain() {
-    DataBindingValidator.isValidPropertyChain(testClass, null);
+    isValidPropertyChain(testClass, null);
   }
 
+  private static boolean isValidPropertyChain(final MetaClass bindableType, final String propertyChain) {
+    return DataBindingValidator.isValidPropertyChain(bindableType, propertyChain, DataBindingUtil.getConfiguredBindableTypes());
+  }
 }
