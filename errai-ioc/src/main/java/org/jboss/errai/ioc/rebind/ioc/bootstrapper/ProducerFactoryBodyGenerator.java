@@ -33,6 +33,7 @@ import javax.enterprise.inject.Disposes;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 import org.jboss.errai.codegen.meta.MetaField;
@@ -140,7 +141,7 @@ public class ProducerFactoryBodyGenerator extends AbstractBodyGenerator {
     if (paramDep.getInjectable().isContextual()) {
       final MetaParameter param = paramDep.getParameter();
       final MetaClass[] typeArgs = getTypeArguments(param.getType());
-      final Annotation[] annotations = param.unsafeGetAnnotations();
+      final Collection<MetaAnnotation> annotations = param.getAnnotations();
       producerParamCreationStmt = castTo(paramDep.getInjectable().getInjectedType(),
               loadVariable("contextManager").invoke("getContextualInstance", paramDep.getInjectable().getFactoryName(), typeArgs, annotations));
     }

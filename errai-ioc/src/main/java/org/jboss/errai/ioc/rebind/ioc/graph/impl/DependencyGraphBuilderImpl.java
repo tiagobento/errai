@@ -207,7 +207,7 @@ public final class DependencyGraphBuilderImpl implements DependencyGraphBuilder 
     if (producerMemberDep.producingMember instanceof MetaMethod) {
       final MetaMethod specializedMethod = GraphUtil.getOverridenMethod((MetaMethod) producerMemberDep.producingMember);
       final MetaClass specializingType = producerMemberDep.producingMember.getDeclaringClass();
-      if (specializedMethod != null && specializedMethod.unsafeIsAnnotationPresent(Produces.class)) {
+      if (specializedMethod != null && specializedMethod.isAnnotationPresent(Produces.class)) {
         updateLinksToSpecialized(specialization, toBeRemoved, specializedMethod, specializingType);
       }
     } else {
@@ -287,7 +287,7 @@ public final class DependencyGraphBuilderImpl implements DependencyGraphBuilder 
       producedReferences.add(lookupInjectableReference(method.getReturnType(), qualFactory.forSource(method)));
     }
     for (final MetaField field : specialized.type.getDeclaredFields()) {
-      if (field.unsafeIsAnnotationPresent(Produces.class)) {
+      if (field.isAnnotationPresent(Produces.class)) {
         producedReferences.add(lookupInjectableReference(field.getType(), qualFactory.forSource(field)));
       }
     }
