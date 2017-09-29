@@ -27,8 +27,8 @@ public class AnnotationSerializer {
     return qualifiers.toArray(new String[qualifiers.size()]);
   }
 
-  public static Set<String> serialize(final Spliterator<MetaAnnotation> qualifiers) {
-    return serialize(StreamSupport.stream(qualifiers, false).collect(Collectors.toList()));
+  public static String[] serialize(final Spliterator<MetaAnnotation> qualifiers) {
+    return serialize(StreamSupport.stream(qualifiers, false).collect(Collectors.toList())).toArray(new String[0]);
   }
 
   public static Set<String> serialize(final Collection<MetaAnnotation> qualifiers) {
