@@ -2,6 +2,7 @@ package org.jboss.errai.codegen.util;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -44,14 +45,16 @@ public class AnnotationSerializer {
     return qualifiersPart == null ? Collections.emptySet() : qualifiersPart;
   }
 
-  private static String asString(final MetaAnnotation qualifier) {
+  public static String asString(final MetaAnnotation qualifier) {
     final StringBuilder builder = new StringBuilder(qualifier.annotationType().getFullyQualifiedName());
     final Map<String, Object> values = qualifier.values();
 
-    if (values.isEmpty()) {
+    if (!values.isEmpty()) {
       builder.append('(');
       for (final Map.Entry<String, Object> e : values.entrySet()) {
-        builder.append(e.getKey()).append('=').append(e.getValue()).append(',');
+        Object value = e.getValue();
+        String stringValue = value.getClass().isArray() ? Arrays.toString((Object[]) value) : value.toString();
+        builder.append(e.getKey()).append('=').append(stringValue).append(',');
       }
       builder.replace(builder.length() - 1, builder.length(), ")");
     }

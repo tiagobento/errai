@@ -512,7 +512,7 @@ public class CDIAnnotationUtils {
 
   public static boolean equals(final MetaAnnotation anno1, final MetaAnnotation anno2) {
 
-      if (anno1 instanceof RuntimeMetaAnnotation && anno2 instanceof RuntimeMetaAnnotation) {
+    if (anno1 instanceof RuntimeMetaAnnotation && anno2 instanceof RuntimeMetaAnnotation) {
       return equals(((RuntimeMetaAnnotation) anno1).getAnnotation(), ((RuntimeMetaAnnotation) anno2).getAnnotation());
     }
 

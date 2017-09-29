@@ -48,7 +48,9 @@ public abstract class MetaAnnotation {
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof MetaAnnotation && annotationType().equals(((MetaAnnotation) o).annotationType());
+    return o instanceof MetaAnnotation
+            && annotationType().equals(((MetaAnnotation) o).annotationType())
+            && values().equals(((MetaAnnotation) o).values());
   }
 
   @Override
