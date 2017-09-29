@@ -29,16 +29,14 @@ import javax.inject.Qualifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
-import static org.jboss.errai.codegen.meta.MetaClassFactory.typeParametersOf;
-import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
-
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.SingleFile {
+
+  private static final Logger log = LoggerFactory.getLogger(QualifierEqualityFactoryAptGenerator.class);
 
   private final QualifierEqualityFactoryGenerator qualifierEqualityFactoryGenerator;
 
@@ -50,11 +48,17 @@ public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.Sin
 
   @Override
   public String generate() {
-    return qualifierEqualityFactoryGenerator.generate(qualifiers());
+    log.info("Generating {}...", getClassSimpleName());
+    final String generatedSource = qualifierEqualityFactoryGenerator.generate(qualifiers());
+    log.info("Generated {}", getClassSimpleName());
+    return generatedSource;
   }
 
   private Collection<MetaClass> qualifiers() {
-    final Collection<MetaClass> annotatedMetaClasses = new ArrayList<>(metaClassFinder().findAnnotatedWith(Qualifier.class));
+
+    final Collection<MetaClass> annotatedMetaClasses = new ArrayList<>(
+            metaClassFinder().findAnnotatedWith(Qualifier.class));
+
     annotatedMetaClasses.add(MetaClassFactory.get(Named.class));
     return annotatedMetaClasses;
   }

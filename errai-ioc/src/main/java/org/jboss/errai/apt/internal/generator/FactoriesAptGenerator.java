@@ -29,8 +29,11 @@ import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCProcessingContext;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.InjectionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -41,6 +44,8 @@ import static java.util.stream.Collectors.toList;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
+
+  private static final Logger log = LoggerFactory.getLogger(FactoriesAptGenerator.class);
 
   private static IOCProcessingContext processingContext;
 
@@ -59,11 +64,15 @@ public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
 
   @Override
   public Collection<ErraiAptGeneratedSourceFile> files() {
-    final DependencyGraph dependencyGraph = FactoryGenerator.assertGraphSetAndGet();
+    log.info("Generating Factories...");
 
-    return StreamSupport.stream(dependencyGraph.spliterator(), false)
+    final DependencyGraph dependencyGraph = FactoryGenerator.assertGraphSetAndGet();
+    final List<ErraiAptGeneratedSourceFile> generatedSources = StreamSupport.stream(dependencyGraph.spliterator(), false)
             .map(this::generatedFactoryClass)
             .collect(toList());
+
+    log.info("Generated {} factories", generatedSources.size());
+    return generatedSources;
   }
 
   private ErraiAptGeneratedSourceFile generatedFactoryClass(final Injectable injectable) {

@@ -96,18 +96,20 @@ public class QualifierEqualityFactoryGenerator extends Generator {
     }
 
     final TypeOracle oracle = generatorContext.getTypeOracle();
+
+    final long start = System.currentTimeMillis();
+    log.info("Generating QualifierEqualityFactory...");
     final String csq = generate(TranslatableAnnotationUtils.getTranslatableQualifiers(oracle));
+    log.info("Generated QualifierEqualityFactory in " + (System.currentTimeMillis() - start) + "ms");
 
     RebindUtils.writeStringToJavaSourceFileInErraiCacheDir(PACKAGE_NAME, CLASS_NAME, csq);
 
     printWriter.append(csq);
-
     generatorContext.commit(logger, printWriter);
   }
 
   public String generate(final Iterable<MetaClass> translatableQualifiers) {
-    final long start = System.currentTimeMillis();
-    log.info("Generating QualifierEqualityFactory...");
+
 
     final ClassStructureBuilder<? extends ClassStructureBuilder<?>> builder
         = ClassBuilder.define(PACKAGE_NAME + "." + CLASS_NAME).publicScope()
@@ -171,10 +173,7 @@ public class QualifierEqualityFactoryGenerator extends Generator {
                 ._(Stmt.loadVariable("a1").invoke("annotationType").invoke("hashCode").returnValue())
                 .finish()).finish();
 
-    final String generatedSource = builder.toJavaString();
-
-    log.info("Generated QualifierEqualityFactory in " + (System.currentTimeMillis() - start) + "ms");
-    return generatedSource;
+    return builder.toJavaString();
   }
 
   private Statement generateComparatorFor(final MetaClass MC_annotationClass, final Collection<MetaMethod> methods) {
