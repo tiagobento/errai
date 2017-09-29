@@ -96,7 +96,7 @@ public class ElementProviderExtension implements IOCExtensionConfigurator {
       return customElementTags;
     }
 
-    return Elemental2TagMapping.getTags(type.unsafeAsClass());
+    return Elemental2TagMapping.getTags(type);
   }
 
   private static ExactTypeInjectableProvider exactTypeInjectableProvider(final InjectionContext injectionContext,

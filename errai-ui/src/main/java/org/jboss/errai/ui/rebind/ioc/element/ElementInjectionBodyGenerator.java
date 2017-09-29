@@ -23,6 +23,7 @@ import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
+import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
@@ -123,12 +124,11 @@ class ElementInjectionBodyGenerator extends AbstractBodyGenerator {
          */
         return true;
       } else {
-        final Stream<Annotation> getAnnos = Arrays.stream(getValue.unsafeGetAnnotations());
-        final Stream<Annotation> setAnnos = Arrays.stream(setValue.unsafeGetAnnotations());
+        final Stream<MetaAnnotation> getAnnos = getValue.getAnnotations().stream();
+        final Stream<MetaAnnotation> setAnnos = setValue.getAnnotations().stream();
 
-        final Predicate<Annotation> testForOverlayOrProperty = anno -> anno.annotationType()
-                .getPackage()
-                .getName()
+        final Predicate<MetaAnnotation> testForOverlayOrProperty = anno -> anno.annotationType()
+                .getPackageName()
                 .equals("jsinterop.annotations");
 
         return getAnnos.anyMatch(testForOverlayOrProperty) || setAnnos.anyMatch(testForOverlayOrProperty);
