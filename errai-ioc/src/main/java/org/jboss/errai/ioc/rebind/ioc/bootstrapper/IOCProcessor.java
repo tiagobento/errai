@@ -41,6 +41,7 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
+import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
@@ -48,6 +49,7 @@ import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.ioc.client.Bootstrapper;
+import org.jboss.errai.ioc.client.JsArray;
 import org.jboss.errai.ioc.client.WindowInjectionContext;
 import org.jboss.errai.ioc.client.WindowInjectionContextStorage;
 import org.jboss.errai.ioc.client.api.ContextualTypeProvider;
@@ -475,9 +477,8 @@ public class IOCProcessor {
             .finish()
       .publicOverridesMethod("getQualifiers")
             .append(loadLiteral(null).returnValue())
-            //FIXME: tiago: use implementation
-//            .append(Stmt.nestedCall(Stmt.newObject(parameterizedAs(JsArray.class,  typeParametersOf(String.class)),
-//                    Stmt.loadLiteral(AnnotationSerializer.serialize(injectable.getQualifier().iterator())))).returnValue())
+            .append(Stmt.nestedCall(Stmt.newObject(parameterizedAs(JsArray.class,  typeParametersOf(String.class)),
+                    Stmt.loadLiteral(AnnotationSerializer.serialize(injectable.getQualifier().spliterator())))).returnValue())
             .finish();
 
     return jsTypeProvider.finish();

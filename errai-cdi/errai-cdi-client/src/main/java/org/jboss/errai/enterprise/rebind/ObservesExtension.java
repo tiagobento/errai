@@ -31,6 +31,7 @@ import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
+import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.annotations.LocalEvent;
@@ -52,9 +53,6 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +96,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
-    final Set<String> qualifierNames = new HashSet<>(getMetaQualifiersPart(qualifiers));
+    final Set<String> qualifierNames = AnnotationSerializer.serialize(qualifiers);
     final boolean isEnclosingTypeDependent = decorable.isEnclosingTypeDependent();
 
     if (qualifierNames.contains(Any.class.getName())) {
@@ -192,7 +190,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
-    final Set<String> qualifierNames = new HashSet<>(getMetaQualifiersPart(qualifiers));
+    final Set<String> qualifierNames = AnnotationSerializer.serialize(qualifiers);
 
     final MetaClass callBackType = parameterizedAs(AbstractCDIEventCallback.class, typeParametersOf(eventType));
     AnonymousClassStructureBuilder callBack = Stmt.newObject(callBackType).extend();
@@ -247,35 +245,6 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
 
     return callBackBlock;
   }
-
-  private static Set<String> getMetaQualifiersPart(final Collection<MetaAnnotation> qualifiers) {
-    Set<String> qualifiersPart = null;
-    if (qualifiers != null) {
-      for (final MetaAnnotation qualifier : qualifiers) {
-        if (qualifiersPart == null)
-          qualifiersPart = new HashSet<>(qualifiers.size());
-
-        qualifiersPart.add(asString(qualifier));
-      }
-    }
-    return qualifiersPart == null ? Collections.emptySet() : qualifiersPart;
-  }
-
-  private static String asString(final MetaAnnotation qualifier) {
-    final StringBuilder builder = new StringBuilder(qualifier.annotationType().getName());
-    final Map<String, Object> values = qualifier.values();
-
-    if (values.isEmpty()) {
-      builder.append('(');
-      for (final Map.Entry<String, Object> e : values.entrySet()) {
-        builder.append(e.getKey()).append('=').append(e.getValue()).append(',');
-      }
-      builder.replace(builder.length() - 1, builder.length(), ")");
-    }
-
-    return builder.toString();
-  }
-
 
   private Set<MetaClass> allPortableConcreteSubtypes(final ErraiConfiguration erraiConfiguration,
           final MetaClassFinder metaClassFinder,
