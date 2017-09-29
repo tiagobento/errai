@@ -476,7 +476,6 @@ public class IOCProcessor {
             .append(Stmt.loadLiteral(injectable.getFactoryName()).returnValue())
             .finish()
       .publicOverridesMethod("getQualifiers")
-            .append(loadLiteral(null).returnValue())
             .append(Stmt.nestedCall(Stmt.newObject(parameterizedAs(JsArray.class,  typeParametersOf(String.class)),
                     Stmt.loadLiteral(AnnotationSerializer.serialize(injectable.getQualifier().spliterator())))).returnValue())
             .finish();
