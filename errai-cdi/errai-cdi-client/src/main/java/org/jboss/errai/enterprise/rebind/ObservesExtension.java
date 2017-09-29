@@ -27,6 +27,7 @@ import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
@@ -34,6 +35,8 @@ import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.annotations.LocalEvent;
 import org.jboss.errai.common.client.api.annotations.Portable;
+import org.jboss.errai.common.client.types.TypeHandler;
+import org.jboss.errai.common.client.types.TypeHandlerFactory;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.enterprise.client.cdi.AbstractCDIEventCallback;
 import org.jboss.errai.enterprise.client.cdi.JsTypeEventObserver;
@@ -51,11 +54,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.typeParametersOf;
@@ -298,6 +303,25 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
   }
 
   private boolean isBuiltinPortable(final MetaClass metaClass) {
-    return false; //FIXME: tiago: implement
+    final Map<MetaClass, MetaClass> inheritanceMap = TypeHandlerFactory.inheritanceMap()
+            .entrySet()
+            .stream()
+            .collect(toMap(e -> MetaClassFactory.get(e.getKey()), e -> MetaClassFactory.get(e.getValue())));
+
+    final Map<MetaClass, Map<MetaClass, TypeHandler>> handlers = TypeHandlerFactory.handlers()
+            .entrySet()
+            .stream()
+            .collect(toMap(e -> MetaClassFactory.get(e.getKey()), s -> s.getValue()
+                    .entrySet()
+                    .stream()
+                    .collect(toMap(x -> MetaClassFactory.get(x.getKey()), Map.Entry::getValue))));
+
+    if (!handlers.containsKey(metaClass) && inheritanceMap.containsKey(metaClass)) {
+      return isBuiltinPortable(inheritanceMap.get(metaClass));
+    }
+    else {
+      return handlers.get(metaClass) != null;
+    }
+
   }
 }
