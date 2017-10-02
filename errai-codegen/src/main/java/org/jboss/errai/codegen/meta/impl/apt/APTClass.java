@@ -611,6 +611,7 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
     case INT:
     case LONG:
     case SHORT:
+    case VOID:
       return true;
     case ARRAY:
       return getComponentType().isPublic();

@@ -331,26 +331,9 @@ public class InjectionContext {
     return unmodifiableCollection(elementBindings.get(type));
   }
 
-  public boolean isAnyKnownElementType(final HasAnnotations hasAnnotations) {
-    return isAnyOfElementTypes(hasAnnotations, WiringElementType.values());
-  }
 
-  public boolean isAnyOfElementTypes(final HasAnnotations hasAnnotations, final WiringElementType... types) {
-    for (final WiringElementType t : types) {
-      if (isElementType(t, hasAnnotations))
-        return true;
-    }
-    return false;
-  }
-
-  public boolean isElementType(final WiringElementType type, final HasAnnotations hasAnnotations) {
-    final MetaAnnotation matchingAnnotation = getMatchingAnnotationForElementType(type, hasAnnotations);
-    if (matchingAnnotation != null && type == WiringElementType.NotSupported) {
-      log.error(hasAnnotations + " was annotated with " + matchingAnnotation.annotationType().getName()
-          + " which is not supported in client-side Errai code!");
-    }
-
-    return matchingAnnotation != null;
+  public boolean isElementType(final WiringElementType type, final MetaClass annotationType) {
+    return getAnnotationsForElementType(type).stream().anyMatch(annotationType::instanceOf);
   }
 
   public boolean isElementType(final WiringElementType type, final Class<? extends Annotation> annotation) {
