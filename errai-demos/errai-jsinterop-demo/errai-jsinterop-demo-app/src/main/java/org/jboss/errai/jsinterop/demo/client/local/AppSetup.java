@@ -31,9 +31,12 @@ public class AppSetup {
   @Inject
   private IpsumListDisplay display;
 
+  @Inject
+  private Document doc;
+
   @PostConstruct
   public void setup() {
-    Window.getDocument().getElementById("rootPanel").appendChild(display.getElement());
+    doc.getElementById("rootPanel").appendChild(display.getElement());
   }
 
 }

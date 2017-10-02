@@ -33,7 +33,6 @@ import org.jboss.errai.common.client.dom.Div;
 import org.jboss.errai.common.client.dom.Document;
 import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.common.client.dom.NumberInput;
-import org.jboss.errai.common.client.dom.Window;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.databinding.client.components.ListContainer;
@@ -72,6 +71,9 @@ public class IpsumListDisplay implements IsElement {
   @Inject
   private IpsumService ipsumService;
 
+  @Inject
+  private Document doc;
+
   @PostConstruct
   private void init() {
     removeAllElementChildren(list.getElement());
@@ -108,7 +110,7 @@ public class IpsumListDisplay implements IsElement {
     Arrays
       .stream(paragraphs)
       .map(paragraph -> {
-        final HTMLElement p = Window.getDocument().createElement("p");
+        final HTMLElement p = doc.createElement("p");
         p.setTextContent(paragraph);
         return p;
       })
