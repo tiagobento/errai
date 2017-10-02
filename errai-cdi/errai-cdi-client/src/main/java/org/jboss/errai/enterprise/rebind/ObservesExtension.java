@@ -19,6 +19,8 @@ package org.jboss.errai.enterprise.rebind;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.bus.client.ErraiBus;
 import org.jboss.errai.bus.client.api.Subscription;
+import org.jboss.errai.bus.rebind.RpcTypesProvider;
+import org.jboss.errai.bus.server.annotations.Remote;
 import org.jboss.errai.codegen.Context;
 import org.jboss.errai.codegen.Parameter;
 import org.jboss.errai.codegen.Statement;
@@ -53,10 +55,11 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -266,9 +269,13 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
   private Set<MetaClass> allPortableTypes(final MetaClassFinder metaClassFinder,
           final ErraiConfiguration erraiConfiguration) {
 
-    //FIXME: tiago: are @Remote types also portable? See RpcTypesProvider
-    return metaClassFinder.extend(Portable.class, erraiConfiguration.modules()::getSerializableTypes)
+    return metaClassFinder.extend(Portable.class, () -> allRemoteTypesReturnTypesAndParametersTypes(metaClassFinder))
+            .extend(Portable.class, erraiConfiguration.modules()::getSerializableTypes)
             .findAnnotatedWith(Portable.class);
+  }
+
+  private Collection<MetaClass> allRemoteTypesReturnTypesAndParametersTypes(final MetaClassFinder metaClassFinder) {
+    return new RpcTypesProvider().returnTypesAndParametersTypes(metaClassFinder.findAnnotatedWith(Remote.class));
   }
 
   private boolean isBuiltinPortable(final MetaClass metaClass) {
