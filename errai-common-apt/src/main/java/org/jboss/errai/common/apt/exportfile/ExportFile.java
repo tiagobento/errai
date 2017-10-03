@@ -49,6 +49,7 @@ public class ExportFile {
 
     exportedTypes.stream()
             .map(Element::asType)
+            .distinct()
             .map(APTClass::new)
             .forEach(exportedType -> classBuilder.publicField(fieldName(exportedType), exportedType).finish());
 
@@ -56,6 +57,11 @@ public class ExportFile {
   }
 
   private String fieldName(final MetaClass exportedType) {
+
+    if (exportedType.isPrimitive()) {
+      return exportedType.getName() + "_";
+    }
+
     return exportedType.getCanonicalName().replace(".", "_");
   }
 
