@@ -82,15 +82,13 @@ public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
 
   private String generateSources(final MetaClass factoryMetaClass, final Injectable injectable) {
     final InjectionContext injectionContext = FactoryGenerator.assertInjectionContextSetAndGet();
-    String generate;
     try {
-      generate = factoryGenerator.generate(factoryMetaClass.getFullyQualifiedName(), injectable, injectionContext);
+      return factoryGenerator.generate(factoryMetaClass.getFullyQualifiedName(), injectable, injectionContext);
     } catch (final Exception e) {
       System.out.println("Error generating " + factoryMetaClass.toString());
       e.printStackTrace();
-      generate = "";
+      return "";
     }
-    return generate;
   }
 
   @Override

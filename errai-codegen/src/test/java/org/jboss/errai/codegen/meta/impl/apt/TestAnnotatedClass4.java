@@ -16,9 +16,15 @@
 
 package org.jboss.errai.codegen.meta.impl.apt;
 
+import static org.jboss.errai.codegen.meta.impl.apt.TestEnum.Bar;
+import static org.jboss.errai.codegen.meta.impl.apt.TestEnum.Foo;
+
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@TestAnnotation(value = "foo", clazz = Long.class, enun = TestEnum.Bar, ann = @TestInnerAnnotation("foo"))
-class TestAnnotatedClass2 {
+@TestAnnotationWithArrayProperties(value = "foo",
+                                   classes = { String.class, Long.class },
+                                   enums = { Foo, Bar },
+                                   annotations = { @TestInnerAnnotation("foo"), @TestInnerAnnotation("bar") })
+class TestAnnotatedClass4 {
 }

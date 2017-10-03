@@ -50,6 +50,7 @@ import org.jboss.errai.codegen.exception.GenerationException;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.MetaEnum;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
@@ -369,8 +370,8 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
         final MetaAnnotation dataField = entry.getValue();
         Statement dataFieldMetaInstance;
         final MetaAnnotation[] attributeRules = dataField.valueAsArray("attributeRules", MetaAnnotation[].class);
-        final ConflictStrategy defaultStrategy = dataField.value("defaultStrategy");
-        if (attributeRules.length == 0 && defaultStrategy.equals(ConflictStrategy.USE_TEMPLATE)) {
+        final MetaEnum defaultStrategy = dataField.value("defaultStrategy");
+        if (attributeRules.length == 0 && defaultStrategy.instanceOf(ConflictStrategy.USE_TEMPLATE)) {
           dataFieldMetaInstance = newObject(DataFieldMeta.class);
         }
         else {

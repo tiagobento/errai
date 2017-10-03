@@ -24,6 +24,7 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.BlockBuilderImpl;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.meta.MetaEnum;
 import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.codegen.util.Implementations;
 import org.jboss.errai.codegen.util.Stmt;
@@ -248,7 +249,8 @@ public class IOCBootstrapGenerator {
     //Configure IocBootstrapTasks
     for (final MetaClass metaClass : metaClassFinder.findAnnotatedWith(IOCBootstrapTask.class)) {
       final MetaAnnotation task = metaClass.getAnnotation(IOCBootstrapTask.class).get();
-      if (task.value() == TaskOrder.Before) {
+      final MetaEnum taskOrder = task.value();
+      if (taskOrder.instanceOf(TaskOrder.Before)) {
         beforeTasks.add(metaClass);
       } else {
         afterTasks.add(metaClass);

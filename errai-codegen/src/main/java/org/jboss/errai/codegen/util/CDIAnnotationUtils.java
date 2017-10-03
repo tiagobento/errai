@@ -25,7 +25,7 @@ import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
-import org.jboss.errai.codegen.meta.RuntimeMetaAnnotation;
+import org.jboss.errai.codegen.meta.RuntimeAnnotation;
 import org.jboss.errai.codegen.meta.impl.apt.APTAnnotation;
 import org.jboss.errai.common.client.util.AnnotationPropertyAccessor;
 import org.jboss.errai.common.client.util.AnnotationPropertyAccessorBuilder;
@@ -512,8 +512,8 @@ public class CDIAnnotationUtils {
 
   public static boolean equals(final MetaAnnotation anno1, final MetaAnnotation anno2) {
 
-    if (anno1 instanceof RuntimeMetaAnnotation && anno2 instanceof RuntimeMetaAnnotation) {
-      return equals(((RuntimeMetaAnnotation) anno1).getAnnotation(), ((RuntimeMetaAnnotation) anno2).getAnnotation());
+    if (anno1 instanceof RuntimeAnnotation && anno2 instanceof RuntimeAnnotation) {
+      return equals(((RuntimeAnnotation) anno1).getAnnotation(), ((RuntimeAnnotation) anno2).getAnnotation());
     }
 
     if (anno1 instanceof APTAnnotation && anno2 instanceof APTAnnotation) {
@@ -528,7 +528,7 @@ public class CDIAnnotationUtils {
     final MetaAnnotation apt = anno1 instanceof APTAnnotation ? anno1 : anno2;
     final MetaAnnotation runtime = anno2 instanceof APTAnnotation ? anno1 : anno2;
 
-    if (apt instanceof APTAnnotation && runtime instanceof RuntimeMetaAnnotation) {
+    if (apt instanceof APTAnnotation && runtime instanceof RuntimeAnnotation) {
       for (Map.Entry<String, Object> entry : apt.values().entrySet()) {
         final String key = entry.getKey();
         if (runtime.annotationType().getMethod(key, new MetaClass[0]).isAnnotationPresent(Nonbinding.class)) {
@@ -547,8 +547,8 @@ public class CDIAnnotationUtils {
 
 
   public static int hashCode(final MetaAnnotation a) {
-    if (a instanceof RuntimeMetaAnnotation) {
-      return hashCode(((RuntimeMetaAnnotation) a).getAnnotation());
+    if (a instanceof RuntimeAnnotation) {
+      return hashCode(((RuntimeAnnotation) a).getAnnotation());
     }
 
     int result = 0;

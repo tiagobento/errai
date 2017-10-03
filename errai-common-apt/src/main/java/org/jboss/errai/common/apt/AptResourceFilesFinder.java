@@ -17,16 +17,24 @@
 package org.jboss.errai.common.apt;
 
 import javax.annotation.processing.Filer;
-import javax.tools.FileObject;
+import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class AptResourceFilesFinder implements ResourceFilesFinder {
+
+  private static final List<JavaFileManager.Location> locationsToSearch = Arrays.asList(StandardLocation.SOURCE_PATH);
+
   private final Filer filer;
 
   public AptResourceFilesFinder(final Filer filer) {
@@ -40,17 +48,32 @@ public class AptResourceFilesFinder implements ResourceFilesFinder {
     final String packageName = path.substring(0, lastSlashIndex).replace("/", ".");
     final String fileName = path.substring(lastSlashIndex + 1);
 
+    return locationsToSearch.stream()
+            .map(location -> getUri(location, packageName, fileName))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst()
+            .filter(s -> new File(s).exists())
+            .flatMap(this::getUrl)
+            .orElse(null);
+  }
+
+  private Optional<URL> getUrl(final URI uri) {
     try {
-      final FileObject resource = filer.getResource(StandardLocation.SOURCE_PATH, packageName, fileName);
+      return Optional.of(uri.toURL());
+    } catch (final MalformedURLException e) {
+      return Optional.empty();
+    }
+  }
 
-      if (!new File(resource.toUri()).exists()) {
-        return null;
-      }
+  private Optional<URI> getUri(final JavaFileManager.Location location,
+          final String packageName,
+          final String fileName) {
 
-      return resource.toUri().toURL();
-
-    } catch (IOException e) {
-      return null;
+    try {
+      return Optional.ofNullable(filer.getResource(location, packageName, fileName).toUri());
+    } catch (final IOException e) {
+      return Optional.empty();
     }
   }
 }

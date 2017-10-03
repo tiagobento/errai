@@ -19,6 +19,7 @@ package org.jboss.errai.codegen.meta.impl.apt;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@TestAnnotation(value = "foo", clazz = Long.class, enun = TestEnum.Bar, ann = @TestInnerAnnotation("foo"))
-class TestAnnotatedClass2 {
+public @interface TestInnerAnnotation {
+
+  String value() default "";
 }

@@ -14,11 +14,31 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.codegen.meta.impl.apt;
+package org.jboss.errai.codegen.meta;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@TestAnnotation(value = "foo", clazz = Long.class, enun = TestEnum.Bar, ann = @TestInnerAnnotation("foo"))
-class TestAnnotatedClass2 {
+public class RuntimeEnum extends MetaEnum {
+
+  private final Enum enumInstance;
+
+  public RuntimeEnum(final Enum enumInstance) {
+    this.enumInstance = enumInstance;
+  }
+
+  @Override
+  public boolean instanceOf(final Enum e) {
+    return enumInstance.equals(e);
+  }
+
+  @Override
+  public MetaClass getDeclaringClass() {
+    return MetaClassFactory.get(enumInstance.getDeclaringClass());
+  }
+
+  @Override
+  public String name() {
+    return enumInstance.name();
+  }
 }

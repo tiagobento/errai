@@ -31,7 +31,7 @@ import org.jboss.errai.codegen.exception.GenerationException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
-import org.jboss.errai.codegen.meta.RuntimeMetaAnnotation;
+import org.jboss.errai.codegen.meta.RuntimeAnnotation;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.Decorable;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.FactoryController;
@@ -120,7 +120,7 @@ public class TemplatedCodeDecoratorTest {
     when(templatedClass.getName()).thenReturn("TestTemplated");
     when(templatedClass.getMethodsAnnotatedWith(EventHandler.class)).thenReturn(Collections.emptyList());
 
-    when(decorable.getAnnotation()).thenReturn(new RuntimeMetaAnnotation(defaultTemplatedAnno));
+    when(decorable.getAnnotation()).thenReturn(new RuntimeAnnotation(defaultTemplatedAnno));
     when(decorable.getDecorableDeclaringType()).thenReturn(templatedClass);
     when(decorable.getType()).thenReturn(templatedClass);
     when(decorable.getInjectionContext()).thenReturn(context);

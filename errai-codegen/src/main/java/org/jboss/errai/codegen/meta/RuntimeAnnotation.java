@@ -27,11 +27,11 @@ import static java.util.stream.Collectors.toMap;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class RuntimeMetaAnnotation extends MetaAnnotation {
+public class RuntimeAnnotation extends MetaAnnotation {
 
   private final Annotation annotation;
 
-  public RuntimeMetaAnnotation(final Annotation annotation) {
+  public RuntimeAnnotation(final Annotation annotation) {
     this.annotation = annotation;
   }
 
@@ -52,11 +52,15 @@ public class RuntimeMetaAnnotation extends MetaAnnotation {
     if (value instanceof Class[]) {
       return Arrays.stream((Class[]) value).map(MetaClassFactory::get).toArray(MetaClass[]::new);
     } else if (value instanceof Annotation[]) {
-      return Arrays.stream((Annotation[]) value).map(RuntimeMetaAnnotation::new).toArray(MetaAnnotation[]::new);
+      return Arrays.stream((Annotation[]) value).map(RuntimeAnnotation::new).toArray(MetaAnnotation[]::new);
+    } else if (value instanceof MetaEnum[]) {
+      return Arrays.stream((Enum[]) value).map(RuntimeEnum::new).toArray(MetaEnum[]::new);
     } else if (value instanceof Class) {
       return MetaClassFactory.get((Class) value);
     } else if (value instanceof Annotation) {
-      return new RuntimeMetaAnnotation((Annotation) value);
+      return new RuntimeAnnotation((Annotation) value);
+    } else if (value instanceof Enum) {
+      return new RuntimeEnum((Enum) value);
     } else {
       return value;
     }
