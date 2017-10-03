@@ -16,7 +16,7 @@
 
 package org.jboss.errai.apt.internal.generator;
 
-import org.jboss.errai.codegen.meta.MetaClassFinder;
+import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;

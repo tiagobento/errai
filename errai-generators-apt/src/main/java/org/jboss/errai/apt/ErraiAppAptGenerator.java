@@ -19,8 +19,9 @@ package org.jboss.errai.apt;
 import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 import org.jboss.errai.common.apt.AnnotatedSourceElementsFinder;
 import org.jboss.errai.common.apt.AptAnnotatedSourceElementsFinder;
+import org.jboss.errai.common.apt.AptResourceFilesFinder;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
-import org.jboss.errai.common.apt.ErraiAptGeneratedSourceFile;
+import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -78,7 +79,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
       final Elements elements = processingEnv.getElementUtils();
       APTClassUtil.init(types, elements);
 
-      this.erraiAptExportedTypes = new ErraiAptExportedTypes(types, elements, annotatedElementsFinder);
+      this.erraiAptExportedTypes = new ErraiAptExportedTypes(types, elements, annotatedElementsFinder, new AptResourceFilesFinder(processingEnv.getFiler()));
 
       findGenerators(elements).stream().flatMap(generator -> generator.files().stream()).forEach(this::saveFile);
       System.out.println("Successfully generated files using Errai APT Generators");

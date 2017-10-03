@@ -76,8 +76,8 @@ public class ErraiModuleTest extends ErraiAptTest {
     final Optional<ExportFile> exportFile = erraiModule.newExportFile(testAnnotation);
 
     Assert.assertTrue(exportFile.isPresent());
-    Assert.assertEquals(1, exportFile.get().exportedTypes.size());
-    Assert.assertTrue(exportFile.get().exportedTypes.contains(testExportedType));
+    Assert.assertEquals(1, exportFile.get().exportedTypes().size());
+    Assert.assertTrue(exportFile.get().exportedTypes().contains(testExportedType));
   }
 
   @Test

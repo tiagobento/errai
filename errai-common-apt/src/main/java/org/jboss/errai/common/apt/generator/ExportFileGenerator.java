@@ -72,13 +72,13 @@ public class ExportFileGenerator {
 
   private void generateSourceAndSave(final ExportFile exportFile, final Filer filer) {
     try {
-      final Element[] originatingElements = exportFile.exportedTypes.toArray(new Element[0]);
+      final Element[] originatingElements = exportFile.exportedTypes().toArray(new Element[0]);
       final JavaFileObject sourceFile = filer.createSourceFile(exportFile.getFullClassName(), originatingElements);
 
       try (Writer writer = sourceFile.openWriter()) {
         writer.write(exportFile.generateSource());
       }
-      System.out.println("Successfully generated export file [" + exportFile.simpleClassName + "]");
+      System.out.println("Successfully generated export file [" + exportFile.simpleClassName() + "]");
     } catch (final IOException e) {
       throw new RuntimeException("Error writing generated export file", e);
     }

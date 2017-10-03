@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt;
+package org.jboss.errai.common.apt.generator;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

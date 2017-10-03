@@ -16,12 +16,14 @@
 
 package org.jboss.errai.apt.internal.generator;
 
-import org.jboss.errai.apt.internal.generator.util.IocRelevantClassesApt;
+import org.jboss.errai.apt.internal.generator.util.AptIocRelevantClassesFinder;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
+import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.common.apt.configuration.ErraiAptConfiguration;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
+import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClassesFinder;
 
 /**
  * IMPORTANT: Do not move this class. ErraiAppAptGenerator depends on it being in this exact package.
@@ -31,18 +33,21 @@ import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
 public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final IOCGenerator iocGenerator;
+  private final ResourceFilesFinder resourceFilesFinder;
 
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
   public IocAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
+    this.resourceFilesFinder = exportedTypes.resourceFilesFinder();
     this.iocGenerator = new IOCGenerator();
   }
 
   @Override
   public String generate() {
     final ErraiConfiguration erraiConfiguration = new ErraiAptConfiguration(metaClassFinder());
-    return iocGenerator.generate(null, metaClassFinder(), erraiConfiguration,
-            new IocRelevantClassesApt(metaClassFinder()));
+    final IocRelevantClassesFinder relevantClasses = new AptIocRelevantClassesFinder(metaClassFinder());
+
+    return iocGenerator.generate(null, metaClassFinder(), erraiConfiguration, relevantClasses, resourceFilesFinder);
   }
 
   @Override

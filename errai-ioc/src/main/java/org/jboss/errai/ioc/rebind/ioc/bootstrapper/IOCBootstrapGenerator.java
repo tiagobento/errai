@@ -24,12 +24,13 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.BlockBuilderImpl;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.meta.MetaClassFinder;
+import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.codegen.util.Implementations;
 import org.jboss.errai.codegen.util.Stmt;
-import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.common.server.api.ErraiBootstrapFailure;
+import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
@@ -69,6 +70,8 @@ import static org.jboss.errai.codegen.util.Stmt.loadVariable;
  * @author Mike Brock <cbrock@redhat.com>
  */
 public class IOCBootstrapGenerator {
+  private static final Logger log = LoggerFactory.getLogger(IOCBootstrapGenerator.class);
+
   private final MetaClassFinder metaClassFinder;
   private final GeneratorContext context;
 
@@ -76,17 +79,19 @@ public class IOCBootstrapGenerator {
   private final List<MetaClass> afterTasks = new ArrayList<>();
 
   private final ErraiConfiguration erraiConfiguration;
+  private final IocRelevantClassesFinder relevantClasses;
+  private final ResourceFilesFinder resourceFilesFinder;
 
-  private static final Logger log = LoggerFactory.getLogger(IOCBootstrapGenerator.class);
 
   private static final Object generatorLock = new Object();
-  private final IocRelevantClasses relevantClasses;
 
   public IOCBootstrapGenerator(final MetaClassFinder metaClassFinder,
+          final ResourceFilesFinder resourceFilesFinder,
           final GeneratorContext context,
           final ErraiConfiguration erraiConfiguration,
-          final IocRelevantClasses relevantClasses) {
+          final IocRelevantClassesFinder relevantClasses) {
 
+    this.resourceFilesFinder = resourceFilesFinder;
     this.metaClassFinder = metaClassFinder;
     this.context = context;
     this.erraiConfiguration = erraiConfiguration;
@@ -130,6 +135,7 @@ public class IOCBootstrapGenerator {
             .generatorContext(context)
             .metaClassFinder(metaClassFinder)
             .erraiConfiguration(erraiConfiguration)
+            .resourceFilesFinder(resourceFilesFinder)
             .bootstrapClassInstance(classStructureBuilder.getClassDefinition())
             .bootstrapBuilder(classStructureBuilder)
             .build();

@@ -17,11 +17,10 @@
 package org.jboss.errai.common.apt.configuration.module;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
-import org.jboss.errai.codegen.meta.TestMetaClassFinder;
+import org.jboss.errai.common.apt.TestMetaClassFinder;
 import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocWhitelisted1;
 import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocAlternative2;
 import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.Serializable2;
-import org.jboss.errai.common.client.api.annotations.Portable;
 import org.junit.Assert;
 import org.junit.Test;
 

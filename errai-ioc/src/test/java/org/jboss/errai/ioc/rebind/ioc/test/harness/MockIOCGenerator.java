@@ -16,17 +16,16 @@
 
 package org.jboss.errai.ioc.rebind.ioc.test.harness;
 
-
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.dev.javac.testing.GeneratorContextBuilder;
 import org.jboss.errai.codegen.util.ClassChangeUtil;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.common.metadata.RebindUtils;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCBootstrapGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClassesUtil;
-import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,8 +51,9 @@ public class MockIOCGenerator {
     final GeneratorContext context = GeneratorContextBuilder.newCoreBasedBuilder().buildGeneratorContext();
 
     final IOCBootstrapGenerator bootstrapGenerator = new IOCBootstrapGenerator(
-            ann -> new HashSet<>(ClassScanner.getTypesAnnotatedWith(ann, packages, context)), context,
-            new ErraiAppPropertiesConfiguration(), (a) -> IocRelevantClassesUtil.findRelevantClasses());
+            ann -> new HashSet<>(ClassScanner.getTypesAnnotatedWith(ann, packages, context)),
+            Thread.currentThread().getContextClassLoader()::getResource, context, new ErraiAppPropertiesConfiguration(),
+            (a) -> IocRelevantClassesUtil.findRelevantClasses());
 
     final String classStr = bootstrapGenerator.generate(packageName, className);
 

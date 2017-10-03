@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.apt.internal.generator.util;
+package org.jboss.errai.common.apt;
 
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClasses;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class IocRelevantClassesApt implements IocRelevantClasses {
+public class TestMetaClassFinder implements MetaClassFinder {
 
-  private final MetaClassFinder metaClassFinder;
+  private final Set<MetaClass> metaClasses;
 
-  public IocRelevantClassesApt(final MetaClassFinder metaClassFinder) {
-    this.metaClassFinder = metaClassFinder;
+  public TestMetaClassFinder(final MetaClass... metaClasses) {
+    this.metaClasses = new HashSet<>(Arrays.asList(metaClasses));
   }
 
   @Override
-  public Collection<MetaClass> find(final Collection<Class<? extends Annotation>> annotations) {
-    return annotations.stream().flatMap(s -> metaClassFinder.findAnnotatedWith(s).stream()).collect(toSet());
+  public Set<MetaClass> findAnnotatedWith(final Class<? extends Annotation> annotationClass) {
+    return metaClasses;
   }
 }

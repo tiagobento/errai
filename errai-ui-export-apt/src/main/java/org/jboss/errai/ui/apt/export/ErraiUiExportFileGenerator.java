@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.codegen.meta;
+package org.jboss.errai.ui.apt.export;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import org.jboss.errai.common.apt.generator.AbstractErraiModuleExportFileGenerator;
+
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+
+import static org.jboss.errai.ui.apt.export.SupportedAnnotationTypes.TEMPLATED;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class TestMetaClassFinder implements MetaClassFinder {
-
-  private final Set<MetaClass> metaClasses;
-
-  public TestMetaClassFinder(final MetaClass... metaClasses) {
-    this.metaClasses = new HashSet<>(Arrays.asList(metaClasses));
-  }
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedAnnotationTypes({ TEMPLATED })
+public class ErraiUiExportFileGenerator extends AbstractErraiModuleExportFileGenerator {
 
   @Override
-  public Set<MetaClass> findAnnotatedWith(final Class<? extends Annotation> annotationClass) {
-    return metaClasses;
+  protected String getCamelCaseErraiModuleName() {
+    return "ui";
   }
 }

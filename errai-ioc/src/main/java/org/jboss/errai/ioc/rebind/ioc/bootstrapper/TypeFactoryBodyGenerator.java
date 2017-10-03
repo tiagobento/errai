@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static org.jboss.errai.codegen.util.PrivateAccessUtil.getPrivateFieldAccessorName;
 import static org.jboss.errai.codegen.util.PrivateAccessUtil.getPrivateMethodName;
 import static org.jboss.errai.codegen.util.Stmt.castTo;
@@ -97,7 +99,7 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
     final List<Statement> createInstanceStatements = new ArrayList<>();
 
     constructInstance(injectable, constructorDependencies, createInstanceStatements);
-    injectFieldDependencies(injectable, fieldDependencies, createInstanceStatements, bodyBlockBuilder);
+    injectFieldDependencies(fieldDependencies, createInstanceStatements);
     injectSetterMethodDependencies(injectable, setterDependencies, createInstanceStatements, bodyBlockBuilder);
     addInitializationStatements(createInstanceStatements);
     addReturnStatement(createInstanceStatements);
@@ -311,8 +313,9 @@ class TypeFactoryBodyGenerator extends AbstractBodyGenerator {
     return postConstructs;
   }
 
-  private void injectFieldDependencies(final Injectable injectable, final Collection<Dependency> fieldDependencies,
-          final List<Statement> createInstanceStatements, final ClassStructureBuilder<?> bodyBlockBuilder) {
+  private void injectFieldDependencies(final Collection<Dependency> fieldDependencies,
+          final List<Statement> createInstanceStatements) {
+
     for (final Dependency dep : fieldDependencies) {
       final FieldDependency fieldDep = FieldDependency.class.cast(dep);
       final MetaField field = fieldDep.getField();

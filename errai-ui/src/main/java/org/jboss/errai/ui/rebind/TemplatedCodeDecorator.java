@@ -57,6 +57,7 @@ import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.common.client.api.annotations.BrowserEvent;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.jboss.errai.common.client.ui.HasValue;
@@ -139,13 +140,17 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
 
   @Override
   public void generateDecorator(final Decorable decorable, final FactoryController controller) {
+    final ResourceFilesFinder resourceFilesFinder = decorable.getInjectionContext()
+            .getProcessingContext()
+            .resourceFilesFinder();
+
     final MetaClass declaringClass = decorable.getDecorableDeclaringType();
 
     final MetaAnnotation anno = decorable.getAnnotation();
     final MetaClass templateProvider = anno.value("provider");
     final boolean customProvider = !templateProvider.equals(MetaClassFactory.get(Templated.DEFAULT_PROVIDER.class));
     final Optional<String> styleSheetPath = getTemplateStyleSheetPath(declaringClass);
-    final boolean explicitStyleSheetPresent = styleSheetPath.filter(path -> Thread.currentThread().getContextClassLoader().getResource(path) != null).isPresent();
+    final boolean explicitStyleSheetPresent = styleSheetPath.filter(path -> resourceFilesFinder.getResource(path) != null).isPresent();
 
     if (declaringClass.isAssignableTo(Composite.class)) {
       logger.warn("The @Templated class, {}, extends Composite. This will not be supported in future versions.", declaringClass.getFullyQualifiedName());
@@ -157,7 +162,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
 
     final List<Statement> initStmts = new ArrayList<>();
 
-    generateTemplatedInitialization(decorable, controller, initStmts, customProvider);
+    generateTemplatedInitialization(decorable, controller, initStmts, customProvider, resourceFilesFinder);
 
     if (customProvider) {
       final Statement init =
@@ -181,6 +186,7 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
     controller.addInitializationStatementsToEnd(Collections.<Statement>singletonList(invokeStatic(StyleBindingsRegistry.class, "get")
         .invoke("updateStyles", Refs.get("instance"))));
   }
+
 
   /**
    * Generates a {@link DestructionCallback} for the {@link Templated} component.
@@ -217,16 +223,18 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
    */
   @SuppressWarnings("serial")
   private void generateTemplatedInitialization(final Decorable decorable,
-                                               final FactoryController controller,
-                                               final List<Statement> initStmts,
-                                               final boolean customProvider) {
+          final FactoryController controller,
+          final List<Statement> initStmts,
+          final boolean customProvider,
+          final ResourceFilesFinder resourceFilesFinder) {
 
     final Map<MetaClass, BuildMetaClass> constructed = getConstructedTemplateTypes(decorable);
     final MetaClass declaringClass = decorable.getDecorableDeclaringType();
 
     if (!constructed.containsKey(declaringClass)) {
       final String templateVarName = "templateFor" + decorable.getDecorableDeclaringType().getName();
-      final Optional<String> resolvedStylesheetPath = getResolvedStyleSheetPath(getTemplateStyleSheetPath(declaringClass), declaringClass);
+      final Optional<String> resolvedStylesheetPath = getResolvedStyleSheetPath(getTemplateStyleSheetPath(declaringClass), declaringClass,
+              resourceFilesFinder);
       final boolean lessStylesheet = resolvedStylesheetPath.filter(path -> path.endsWith(".less")).isPresent();
 
       /*
@@ -328,19 +336,18 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
   }
 
   private Optional<String> getResolvedStyleSheetPath(final Optional<String> declaredStylesheetPath,
-          final MetaClass declaringClass) {
+          final MetaClass declaringClass, final ResourceFilesFinder resourceFilesFinder) {
     if (declaredStylesheetPath.isPresent()) {
       return declaredStylesheetPath;
     }
     else {
       final String simpleName = declaringClass.getName();
       final String unsuffixedPath = declaringClass.getPackageName().replace('.', '/') + "/" + simpleName;
-      final boolean cssSheetExists = (Thread.currentThread().getContextClassLoader().getResource(unsuffixedPath + ".css") != null);
-      if (cssSheetExists) {
+
+      if (resourceFilesFinder.getResource(unsuffixedPath + ".css") != null) {
         return Optional.of(unsuffixedPath + ".css");
       }
-      final boolean lessSheetExists = (Thread.currentThread().getContextClassLoader().getResource(unsuffixedPath + ".less") != null);
-      if (lessSheetExists) {
+      if (resourceFilesFinder.getResource(unsuffixedPath + ".less") != null) {
         return Optional.of(unsuffixedPath + ".less");
       }
 

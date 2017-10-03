@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.rebind.ioc.bootstrapper;
+package org.jboss.errai.common.apt;
 
-import org.jboss.errai.codegen.meta.MetaClass;
-
-import java.lang.annotation.Annotation;
-import java.util.Collection;
+import java.net.URL;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @FunctionalInterface
-public interface IocRelevantClasses {
-  Collection<MetaClass> find(final Collection<Class<? extends Annotation>> annotations);
+public interface ResourceFilesFinder {
+  URL getResource(final String path);
 }

@@ -23,8 +23,9 @@ import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.meta.MetaClassFinder;
+import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
+import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.ioc.client.container.Factory;
@@ -46,6 +47,7 @@ public class IOCProcessingContext {
   protected final GeneratorContext generatorContext;
   protected final MetaClassFinder metaClassFinder;
   protected final ErraiConfiguration erraiConfiguration;
+  protected final ResourceFilesFinder resourceFilesFinder;
 
   private IOCProcessingContext(final Builder builder) {
     this.generatorContext = builder.generatorContext;
@@ -53,6 +55,7 @@ public class IOCProcessingContext {
     this.bootstrapBuilder = builder.bootstrapBuilder;
     this.metaClassFinder = builder.metaClassFinder;
     this.erraiConfiguration = builder.erraiConfiguration;
+    this.resourceFilesFinder = builder.resourcesFilesFinder;
 
     this.blockBuilder = new Stack<>();
     this.blockBuilder.push(builder.blockBuilder);
@@ -82,6 +85,7 @@ public class IOCProcessingContext {
     private MetaClassFinder metaClassFinder;
     private BlockBuilder<?> blockBuilder;
     private ErraiConfiguration erraiConfiguration;
+    private ResourceFilesFinder resourcesFilesFinder;
 
     public static Builder create() {
       return new Builder();
@@ -117,11 +121,18 @@ public class IOCProcessingContext {
       return this;
     }
 
+    public Builder resourceFilesFinder(final ResourceFilesFinder resourceFilesFinder) {
+      this.resourcesFilesFinder = resourceFilesFinder;
+      return this;
+    }
+
     public IOCProcessingContext build() {
       Assert.notNull("bootstrapClassInstance cannot be null", bootstrapClassInstance);
       Assert.notNull("bootstrapBuilder cannot be null", bootstrapBuilder);
       Assert.notNull("blockBuilder cannot be null", blockBuilder);
       Assert.notNull("metaClassFinder cannot be null", metaClassFinder);
+      Assert.notNull("erraiConfiguration cannot be null", erraiConfiguration);
+      Assert.notNull("resourceFilesFinder cannot be null", resourcesFilesFinder);
 
       return new IOCProcessingContext(this);
     }
@@ -157,5 +168,9 @@ public class IOCProcessingContext {
 
   public ErraiConfiguration erraiConfiguration() {
     return erraiConfiguration;
+  }
+
+  public ResourceFilesFinder resourceFilesFinder() {
+    return resourceFilesFinder;
   }
 }

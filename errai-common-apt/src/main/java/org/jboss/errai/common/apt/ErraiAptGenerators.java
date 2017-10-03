@@ -16,13 +16,10 @@
 
 package org.jboss.errai.common.apt;
 
-import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.codegen.meta.MetaClassFinder;
+import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

@@ -22,24 +22,24 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.codegen.meta.MetaClassFinder;
-import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.common.apt.MetaClassFinder;
+import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.common.metadata.ScannerSingleton;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
+import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
-import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -74,18 +74,20 @@ public class IOCGenerator extends AbstractAsyncGenerator {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
     final MetaClassFinder metaClassFinder = ann -> findMetaClasses(context, translatablePackages, ann);
     final ErraiConfiguration erraiConfiguration = new ErraiAppPropertiesConfiguration();
+    final IocRelevantClassesFinder iocRelevantClasses = ann -> IocRelevantClassesUtil.findRelevantClasses();
+    final ResourceFilesFinder resourceFilesFinder = Thread.currentThread().getContextClassLoader()::getResource;
 
-    return generate(context, metaClassFinder, erraiConfiguration,
-            (annotations) -> IocRelevantClassesUtil.findRelevantClasses());
+    return generate(context, metaClassFinder, erraiConfiguration, iocRelevantClasses, resourceFilesFinder);
   }
 
   public String generate(final GeneratorContext context,
           final MetaClassFinder metaClassFinder,
           final ErraiConfiguration erraiConfiguration,
-          final IocRelevantClasses relevantClasses) {
+          final IocRelevantClassesFinder relevantClasses,
+          final ResourceFilesFinder resourceFilesFinder) {
 
-    return new IOCBootstrapGenerator(metaClassFinder, context, erraiConfiguration, relevantClasses).generate(
-            packageName, classSimpleName);
+    return new IOCBootstrapGenerator(metaClassFinder, resourceFilesFinder, context, erraiConfiguration, relevantClasses)
+            .generate(packageName, classSimpleName);
   }
 
   private Set<MetaClass> findMetaClasses(final GeneratorContext context,

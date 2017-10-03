@@ -17,7 +17,7 @@
 package org.jboss.errai.common.apt.configuration.app;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
-import org.jboss.errai.codegen.meta.TestMetaClassFinder;
+import org.jboss.errai.common.apt.TestMetaClassFinder;
 import org.junit.Assert;
 import org.junit.Test;
 
