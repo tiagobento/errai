@@ -18,7 +18,6 @@ package org.jboss.errai.common.apt;
 
 import javax.annotation.processing.Filer;
 import javax.tools.JavaFileManager;
-import javax.tools.StandardLocation;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,12 +27,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static javax.tools.StandardLocation.CLASS_PATH;
+import static javax.tools.StandardLocation.SOURCE_PATH;
+
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public class AptResourceFilesFinder implements ResourceFilesFinder {
 
-  private static final List<JavaFileManager.Location> locationsToSearch = Arrays.asList(StandardLocation.SOURCE_PATH);
+  private static final List<JavaFileManager.Location> locationsToSearch = Arrays.asList(SOURCE_PATH, CLASS_PATH);
 
   private final Filer filer;
 
