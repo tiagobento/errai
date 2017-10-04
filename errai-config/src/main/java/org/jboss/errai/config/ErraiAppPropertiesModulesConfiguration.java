@@ -103,63 +103,75 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
             .collect(toSet());
   }
 
+  private static Set<MetaClass> configuredBindableTypes = null;
+
   @Override
-  public Set<MetaClass> getBindableTypes() {
-    final Set<MetaClass> bindableTypes = new HashSet<>();
+  public synchronized Set<MetaClass> getBindableTypes() {
+    if (configuredBindableTypes != null) {
+      final Set<MetaClass> refreshedTypes = new HashSet<>(configuredBindableTypes.size());
 
-    for (final URL url : EnvUtil.getErraiAppPropertiesFilesUrls()) {
-      InputStream inputStream = null;
-      try {
-        log.debug("Checking " + url.getFile() + " for bindable types...");
-        inputStream = url.openStream();
+      for (final MetaClass clazz : configuredBindableTypes) {
+        refreshedTypes.add(MetaClassFactory.get(clazz.getFullyQualifiedName()));
+      }
 
-        final ResourceBundle props = new PropertyResourceBundle(inputStream);
-        for (final String key : props.keySet()) {
-          if (key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)) {
-            final Set<String> patterns = new LinkedHashSet<>();
+      configuredBindableTypes = refreshedTypes;
+    } else {
 
-            for (final String s : props.getString(key).split(" ")) {
-              final String singleValue = s.trim();
-              if (singleValue.endsWith("*")) {
-                patterns.add(singleValue);
-              }
-              else {
-                try {
-                  bindableTypes.add(MetaClassFactory.get(s.trim()));
-                } catch (final Exception e) {
-                  throw new RuntimeException("Could not find class defined in ErraiApp.properties as bindable type: " + s);
+      final Set<MetaClass> bindableTypes = new HashSet<>();
+
+      for (final URL url : EnvUtil.getErraiAppPropertiesFilesUrls()) {
+        InputStream inputStream = null;
+        try {
+          log.debug("Checking " + url.getFile() + " for bindable types...");
+          inputStream = url.openStream();
+
+          final ResourceBundle props = new PropertyResourceBundle(inputStream);
+          for (final String key : props.keySet()) {
+            if (key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)) {
+              final Set<String> patterns = new LinkedHashSet<>();
+
+              for (final String s : props.getString(key).split(" ")) {
+                final String singleValue = s.trim();
+                if (singleValue.endsWith("*")) {
+                  patterns.add(singleValue);
+                } else {
+                  try {
+                    bindableTypes.add(MetaClassFactory.get(s.trim()));
+                  } catch (final Exception e) {
+                    throw new RuntimeException(
+                            "Could not find class defined in ErraiApp.properties as bindable type: " + s);
+                  }
                 }
               }
-            }
 
-            if (!patterns.isEmpty()) {
-              final SimplePackageFilter filter = new SimplePackageFilter(patterns);
-              MetaClassFactory
-                      .getAllCachedClasses()
-                      .stream()
-                      .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
-                      .collect(toCollection(() -> bindableTypes));
+              if (!patterns.isEmpty()) {
+                final SimplePackageFilter filter = new SimplePackageFilter(patterns);
+                MetaClassFactory.getAllCachedClasses()
+                        .stream()
+                        .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
+                        .collect(toCollection(() -> bindableTypes));
+              }
+              break;
             }
-            break;
           }
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Error reading ErraiApp.properties", e);
-      } finally {
-        if (inputStream != null) {
-          try {
-            inputStream.close();
-          } catch (final IOException e) {
-            log.warn("Failed to close input stream", e);
+        } catch (final IOException e) {
+          throw new RuntimeException("Error reading ErraiApp.properties", e);
+        } finally {
+          if (inputStream != null) {
+            try {
+              inputStream.close();
+            } catch (final IOException e) {
+              log.warn("Failed to close input stream", e);
+            }
           }
         }
       }
+
+      configuredBindableTypes = bindableTypes;
     }
 
-    return bindableTypes;
+    return configuredBindableTypes;
   }
-
-
 
   @Override
   public Set<MetaClass> getSerializableTypes() {
