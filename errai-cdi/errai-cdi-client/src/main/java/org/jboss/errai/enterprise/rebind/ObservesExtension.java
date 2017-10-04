@@ -252,17 +252,22 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
           final MetaClassFinder metaClassFinder,
           final MetaClass metaClass) {
 
-    return allPortableTypes(metaClassFinder, erraiConfiguration)
-            .stream()
+    final Set<MetaClass> allPortableConcreteSubtypes = allPortableTypes(metaClassFinder, erraiConfiguration).stream()
             .filter(s -> !s.isInterface())
             .filter(s -> s.isAssignableTo(metaClass))
             .collect(toSet());
+
+    if (isPortableType(metaClassFinder, erraiConfiguration, metaClass)) {
+      allPortableConcreteSubtypes.add(metaClass);
+    }
+
+    return allPortableConcreteSubtypes;
   }
 
   private boolean isPortableType(final MetaClassFinder metaClassFinder, final ErraiConfiguration erraiConfiguration,
           final MetaClass metaClass) {
 
-    return metaClass.instanceOf(String.class) || allPortableTypes(metaClassFinder, erraiConfiguration).contains(metaClass) || isBuiltinPortable(metaClass);
+    return metaClass.instanceOf(String.class) || isBuiltinPortable(metaClass) || allPortableTypes(metaClassFinder, erraiConfiguration).contains(metaClass);
   }
 
   private Set<MetaClass> allPortableTypes(final MetaClassFinder metaClassFinder,
@@ -293,10 +298,9 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
 
     if (!handlers.containsKey(metaClass) && inheritanceMap.containsKey(metaClass)) {
       return isBuiltinPortable(inheritanceMap.get(metaClass));
-    }
-    else {
+    } else {
       return handlers.get(metaClass) != null;
     }
-
   }
+
 }
