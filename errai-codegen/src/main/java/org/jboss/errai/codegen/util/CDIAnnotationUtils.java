@@ -452,18 +452,6 @@ public class CDIAnnotationUtils {
                       && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
     }
 
-    public static Collection<MetaMethod> getNonBindingAttributes(final MetaClass annoClass) {
-      return filterAnnotationMethods(Arrays.stream(annoClass.getDeclaredMethods()),
-              method -> method.isAnnotationPresent(Nonbinding.class) && method.isPublic()
-                      && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
-    }
-
-    public static Collection<Method> getNonBindingAttributes(final Class<?> annoClass) {
-      return filterAnnotationMethods(Arrays.stream(annoClass.getDeclaredMethods()),
-              method -> method.isAnnotationPresent(Nonbinding.class) && isPublic(method.getModifiers())
-                      && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
-    }
-
     private static <T, M> Collection<M> filterAnnotationMethods(final Stream<M> methods, final Predicate<M> methodPredicate) {
       return methods.filter(methodPredicate).collect(Collectors.toList());
     }

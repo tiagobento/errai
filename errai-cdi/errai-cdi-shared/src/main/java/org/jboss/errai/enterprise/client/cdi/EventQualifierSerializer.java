@@ -31,7 +31,7 @@ import org.jboss.errai.common.client.util.SharedAnnotationSerializer;
 public abstract class EventQualifierSerializer {
 
   public static final String SERIALIZER_CLASS_NAME = "EventQualifierSerializerImpl";
-  public static final String SERIALIZER_PACKAGE_NAME = "org.jboss.errai.cdi";
+  public static final String SERIALIZER_PACKAGE_NAME = "org.jboss.errai.enterprise.client.cdi";
 
   private static EventQualifierSerializer instance;
 

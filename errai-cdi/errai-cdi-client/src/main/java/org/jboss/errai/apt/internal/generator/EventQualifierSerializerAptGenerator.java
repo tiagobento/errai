@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright (C) 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.ioc.rebind.ioc.bootstrapper.QualifierEqualityFactoryGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.errai.enterprise.client.cdi.EventQualifierSerializer;
+import org.jboss.errai.enterprise.rebind.EventQualifierSerializerGenerator;
 
 import javax.inject.Named;
 import javax.inject.Qualifier;
-import java.util.Collection;
+import java.util.Set;
 
 import static java.util.Collections.singleton;
 
@@ -35,38 +34,33 @@ import static java.util.Collections.singleton;
  *
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.SingleFile {
+public class EventQualifierSerializerAptGenerator extends ErraiAptGenerators.SingleFile {
 
-  private static final Logger log = LoggerFactory.getLogger(QualifierEqualityFactoryAptGenerator.class);
-
-  private final QualifierEqualityFactoryGenerator qualifierEqualityFactoryGenerator;
+  private final EventQualifierSerializerGenerator eventQualifierSerializerGenerator;
 
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
-  public QualifierEqualityFactoryAptGenerator(ErraiAptExportedTypes exportedTypes) {
+  public EventQualifierSerializerAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
-    this.qualifierEqualityFactoryGenerator = new QualifierEqualityFactoryGenerator();
+    this.eventQualifierSerializerGenerator = new EventQualifierSerializerGenerator();
   }
 
   @Override
   public String generate() {
-    log.info("Generating {}...", getClassSimpleName());
-    final String generatedSource = qualifierEqualityFactoryGenerator.generate(qualifiers());
-    log.info("Generated {}", getClassSimpleName());
-    return generatedSource;
+    return eventQualifierSerializerGenerator.generate(qualifiers());
   }
 
-  private Collection<MetaClass> qualifiers() {
+  private Set<MetaClass> qualifiers() {
     return metaClassFinder().extend(Qualifier.class, () -> singleton(MetaClassFactory.get(Named.class)))
             .findAnnotatedWith(Qualifier.class);
   }
 
   @Override
   public String getPackageName() {
-    return QualifierEqualityFactoryGenerator.PACKAGE_NAME;
+    return EventQualifierSerializer.SERIALIZER_PACKAGE_NAME;
   }
 
   @Override
   public String getClassSimpleName() {
-    return QualifierEqualityFactoryGenerator.CLASS_NAME;
+    return EventQualifierSerializer.SERIALIZER_CLASS_NAME;
   }
 }

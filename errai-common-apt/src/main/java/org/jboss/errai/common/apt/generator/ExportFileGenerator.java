@@ -78,9 +78,8 @@ public class ExportFileGenerator {
       try (Writer writer = sourceFile.openWriter()) {
         writer.write(exportFile.generateSource());
       }
-      System.out.println("Successfully generated export file [" + exportFile.simpleClassName() + "]");
     } catch (final IOException e) {
-      throw new RuntimeException("Error writing generated export file", e);
+      throw new RuntimeException("Error writing generated export file " + exportFile.getFullClassName(), e);
     }
   }
 }
