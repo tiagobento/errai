@@ -30,11 +30,12 @@ import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.metadata.RebindUtils;
+import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
 import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
@@ -76,7 +77,9 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-    return generate((annotation) -> findAnnotatedElements(context, translatablePackages, annotation));
+    final Set<MetaClass> allConfiguredBindableTypes = new ErraiAppPropertiesModulesConfiguration().getBindableTypes();
+
+    return generate((annotation) -> findAnnotatedElements(context, translatablePackages, annotation, allConfiguredBindableTypes));
   }
 
   public String generate(final MetaClassFinder metaClassFinder) {
@@ -167,14 +170,15 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
 
   private Set<MetaClass> findAnnotatedElements(final GeneratorContext context,
           final Set<String> translatablePackages,
-          final Class<? extends Annotation> annotation) {
+          final Class<? extends Annotation> annotation,
+          final Set<MetaClass> allConfiguredBindableTypes) {
 
     if (annotation.equals(Bindable.class)) {
-      final Set<MetaClass> annotatedBindableTypes = new HashSet<>(ClassScanner.getTypesAnnotatedWith(Bindable.class,
-              translatablePackages, context));
+      final Set<MetaClass> annotatedBindableTypes = new HashSet<>(
+              ClassScanner.getTypesAnnotatedWith(Bindable.class, translatablePackages, context));
 
       final Set<MetaClass> bindableTypes = new HashSet<>(annotatedBindableTypes);
-      bindableTypes.addAll(DataBindingUtil.getConfiguredBindableTypes());
+      bindableTypes.addAll(allConfiguredBindableTypes);
       return bindableTypes;
     }
 

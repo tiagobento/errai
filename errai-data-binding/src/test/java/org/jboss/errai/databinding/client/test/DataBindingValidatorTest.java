@@ -21,10 +21,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.config.ErraiAppConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
 import org.jboss.errai.databinding.client.TestModel;
 import org.jboss.errai.databinding.rebind.DataBindingUtil;
 import org.jboss.errai.databinding.rebind.DataBindingValidator;
 import org.junit.Test;
+
+import java.util.Set;
 
 /**
  * Tests for the {@link DataBindingValidator} rebind utility.
@@ -33,8 +37,10 @@ import org.junit.Test;
  * @author Jonathan Fuerth <jfuerth@redhat.com>
  */
 public class DataBindingValidatorTest {
-  
-  MetaClass testClass = MetaClassFactory.get(TestModel.class);
+
+  private static final Set<MetaClass> ALL_CONFIGURED_BINDABLE_TYPES = new ErraiAppPropertiesModulesConfiguration().getBindableTypes();
+
+  private final MetaClass testClass = MetaClassFactory.get(TestModel.class);
 
   @Test
   public void testLeadingDotFails() {
@@ -87,6 +93,6 @@ public class DataBindingValidatorTest {
   }
 
   private static boolean isValidPropertyChain(final MetaClass bindableType, final String propertyChain) {
-    return DataBindingValidator.isValidPropertyChain(bindableType, propertyChain, DataBindingUtil.getConfiguredBindableTypes());
+    return DataBindingValidator.isValidPropertyChain(bindableType, propertyChain, ALL_CONFIGURED_BINDABLE_TYPES);
   }
 }

@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.codegen.Parameter;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
+import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
@@ -46,6 +47,7 @@ import org.jboss.errai.ui.shared.api.style.StyleBindingsRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.jboss.errai.codegen.meta.MetaClassFactory.parameterizedAs;
 import static org.jboss.errai.codegen.meta.MetaClassFactory.typeParametersOf;
@@ -65,12 +67,15 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
   private static final String DATA_BINDING_CONFIG_ATTR = "StyleBinding:DataBinderConfigured";
   private static final String STYLE_BINDING_HOUSEKEEPING_ATTR = "StyleBinding:HousekeepingReg";
 
-  public StyleBindingCodeDecorator(Class<StyleBinding> decoratesWith) {
+  public StyleBindingCodeDecorator(final Class<StyleBinding> decoratesWith) {
     super(decoratesWith);
   }
 
   private static void bindHandlingMethod(final Decorable decorable,
-          final FactoryController controller, final MetaParameter parameter) {
+          final FactoryController controller,
+          final MetaParameter parameter,
+          final Set<MetaClass> allConfiguredBindableTypes) {
+
     final Statement elementAccessor;
     if (MetaClassFactory.get(Element.class).isAssignableFrom(parameter.getType())) {
       elementAccessor = Refs.get("element");
@@ -113,7 +118,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
                     controller.getReferenceStmt(registrationHandleVar, RefHolder.class).invoke("get"))
             .invoke("cleanup"));
     if (enclosingTypeIsDependent) {
-      addCleanup(decorable, controller, destructionStmts);
+      addCleanup(decorable, controller, destructionStmts, allConfiguredBindableTypes);
       controller.addInitializationStatements(initStmts);
     } else {
       controller.addFactoryInitializationStatements(initStmts);
@@ -121,8 +126,13 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
     controller.addDestructionStatements(destructionStmts);
   }
 
-  private static void addCleanup(final Decorable decorable, final FactoryController controller, final List<Statement> destructionStmts) {
-    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller);
+  private static void addCleanup(final Decorable decorable,
+          final FactoryController controller,
+          final List<Statement> destructionStmts,
+          final Set<MetaClass> allConfiguredBindableTypes) {
+
+    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller,
+            allConfiguredBindableTypes);
 
     if (!controller.hasAttribute(STYLE_BINDING_HOUSEKEEPING_ATTR)) {
       destructionStmts.add(
@@ -135,9 +145,15 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
   }
 
   @Override
-  public void generateDecorator(Decorable decorable, FactoryController controller) {
-    final Statement valueAccessor;
+  public void generateDecorator(final Decorable decorable, final FactoryController controller) {
 
+    final Set<MetaClass> allConfiguredBindableTypes = decorable.getInjectionContext()
+            .getProcessingContext()
+            .erraiConfiguration()
+            .modules()
+            .getBindableTypes();
+
+    final Statement valueAccessor;
     switch (decorable.decorableType()) {
     case METHOD:
       final MetaMethod method = decorable.getAsMethod();
@@ -147,7 +163,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
       }
       else if (method.getReturnType().isVoid() && parameters.length == 1) {
         // this method returns void and accepts exactly one parm. assume it's a handler method.
-        bindHandlingMethod(decorable, controller, parameters[0]);
+        bindHandlingMethod(decorable, controller, parameters[0], allConfiguredBindableTypes);
         return;
       }
       else {
@@ -169,7 +185,8 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
     }
 
 
-    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller);
+    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller,
+            allConfiguredBindableTypes);
 
     final List<Statement> initStmts = new ArrayList<Statement>();
     final List<Statement> destructionStmts = new ArrayList<Statement>();
@@ -209,13 +226,16 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
               + ", with style binding " + decorable.getAnnotation().annotationType().getName());
     }
 
-    addCleanup(decorable, controller, destructionStmts);
+    addCleanup(decorable, controller, destructionStmts, allConfiguredBindableTypes);
 
     controller.addInitializationStatements(initStmts);
     controller.addDestructionStatements(destructionStmts);
   }
 
-  private static DataBindingUtil.DataBinderRef lookupDataBinderRef(final Decorable decorable, final FactoryController controller) {
-    return DataBindingUtil.lookupDataBinderRef(decorable, controller, DataBindingUtil.getConfiguredBindableTypes());
+  private static DataBindingUtil.DataBinderRef lookupDataBinderRef(final Decorable decorable,
+          final FactoryController controller,
+          final Set<MetaClass> allConfiguredBindableTypes) {
+
+    return DataBindingUtil.lookupDataBinderRef(decorable, controller, allConfiguredBindableTypes);
   }
 }

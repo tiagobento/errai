@@ -350,33 +350,4 @@ public class DataBindingUtil {
       throw new GenerationException(type.getName() + " must be a @Bindable type when used as @Model");
     }
   }
-
-
-  private static Set<MetaClass> configuredBindableTypes = null;
-
-  /**
-   * Reads bindable types from all ErraiApp.properties files on the classpath.
-   *
-   * @return a set of meta classes representing the configured bindable types.
-   */
-  public static Set<MetaClass> getConfiguredBindableTypes() {
-    if (configuredBindableTypes != null) {
-      configuredBindableTypes = refreshConfiguredBindableTypes();
-    } else {
-      configuredBindableTypes = new ErraiAppPropertiesConfiguration().modules().getBindableTypes();
-    }
-
-    return configuredBindableTypes;
-  }
-
-  private static Set<MetaClass> refreshConfiguredBindableTypes() {
-    final Set<MetaClass> refreshedTypes = new HashSet<>(configuredBindableTypes.size());
-
-    for (final MetaClass clazz : configuredBindableTypes) {
-      refreshedTypes.add(MetaClassFactory.get(clazz.getFullyQualifiedName()));
-    }
-
-    return refreshedTypes;
-  }
-
 }
