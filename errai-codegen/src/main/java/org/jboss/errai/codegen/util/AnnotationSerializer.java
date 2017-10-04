@@ -1,5 +1,8 @@
 package org.jboss.errai.codegen.util;
 
+import org.jboss.errai.codegen.meta.MetaAnnotation;
+import org.jboss.errai.common.client.util.SharedAnnotationSerializer;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,11 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.jboss.errai.codegen.meta.MetaAnnotation;
-import org.jboss.errai.common.client.util.SharedAnnotationSerializer;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
 public class AnnotationSerializer {
   
@@ -29,7 +31,7 @@ public class AnnotationSerializer {
   }
 
   public static String[] serialize(final Spliterator<MetaAnnotation> qualifiers) {
-    return serialize(StreamSupport.stream(qualifiers, false).collect(Collectors.toList())).toArray(new String[0]);
+    return serialize(StreamSupport.stream(qualifiers, false).collect(toList())).toArray(new String[0]);
   }
 
   public static Set<String> serialize(final Collection<MetaAnnotation> qualifiers) {
@@ -51,9 +53,14 @@ public class AnnotationSerializer {
 
     if (!values.isEmpty()) {
       builder.append('(');
-      for (final Map.Entry<String, Object> e : values.entrySet()) {
-        Object value = e.getValue();
-        String stringValue = value.getClass().isArray() ? Arrays.toString((Object[]) value) : value.toString();
+
+      for (final Map.Entry<String, Object> e : values.entrySet()
+              .stream()
+              .sorted(comparing(Map.Entry::getKey))
+              .collect(toList())) {
+
+        final Object value = e.getValue();
+        final String stringValue = value.getClass().isArray() ? Arrays.toString((Object[]) value) : value.toString();
         builder.append(e.getKey()).append('=').append(stringValue).append(',');
       }
       builder.replace(builder.length() - 1, builder.length(), ")");
