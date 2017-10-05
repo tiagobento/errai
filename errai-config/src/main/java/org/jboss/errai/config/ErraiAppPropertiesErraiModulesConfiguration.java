@@ -46,7 +46,7 @@ import static java.util.stream.Collectors.toSet;
 public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModulesConfiguration {
 
   public static final String SERIALIZABLE_TYPES = "errai.marshalling.serializableTypes";
-  public static final String NONSERIALIZABLE_TYPES = "errai.marshalling.nonserializableTypes";
+  public static final String NON_SERIALIZABLE_TYPES = "errai.marshalling.nonserializableTypes";
   private static final String QUALIFYING_METADATA_FACTORY = "errai.ioc.QualifyingMetaDataFactory";
   public static final String IOC_ENABLED_ALTERNATIVES = "errai.ioc.enabled.alternatives";
   private static final String IOC_WHITELIST_PROPERTY = "errai.ioc.whitelist";
@@ -62,7 +62,7 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
     if (props != null) {
       log.info("Checking ErraiApp.properties for configured types ...");
 
-      //FIXME: tiago: unused property?
+      //FIXME: Unused property?
       final Collection<String> qualifyingMetadataFactoryProperties = props.get(QUALIFYING_METADATA_FACTORY);
 
       if (qualifyingMetadataFactoryProperties.size() > 1) {
@@ -70,8 +70,6 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
       }
     }
   }
-
-  //FIXME: tiago: wildcards doesn't work on this implementation
 
   @Override
   public Set<MetaClass> getIocEnabledAlternatives() {

@@ -203,7 +203,7 @@ public abstract class EnvUtil {
       if (key.equals(ErraiAppPropertiesErraiModulesConfiguration.SERIALIZABLE_TYPES)) {
         addSerializableTypes(exposedClasses, value);
       }
-      else if (key.equals(ErraiAppPropertiesErraiModulesConfiguration.NONSERIALIZABLE_TYPES)) {
+      else if (key.equals(ErraiAppPropertiesErraiModulesConfiguration.NON_SERIALIZABLE_TYPES)) {
         addNonSerializableTypes(exposedClasses, nonportableClasses, value);
       }
       else if (key.equals(CONFIG_ERRAI_MAPPING_ALIASES)) {
@@ -319,7 +319,7 @@ public abstract class EnvUtil {
     return key.equals(ErraiAppPropertiesErraiModulesConfiguration.IOC_ENABLED_ALTERNATIVES)
             || key.equals(ErraiAppPropertiesErraiModulesConfiguration.BINDABLE_TYPES)
             || key.equals(ErraiAppPropertiesErraiModulesConfiguration.SERIALIZABLE_TYPES)
-            || key.equals(ErraiAppPropertiesErraiModulesConfiguration.NONSERIALIZABLE_TYPES)
+            || key.equals(ErraiAppPropertiesErraiModulesConfiguration.NON_SERIALIZABLE_TYPES)
             || key.equals(CONFIG_ERRAI_MAPPING_ALIASES);
   }
 

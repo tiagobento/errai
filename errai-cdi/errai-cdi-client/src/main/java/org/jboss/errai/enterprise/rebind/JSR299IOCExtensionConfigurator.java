@@ -96,7 +96,7 @@ public class JSR299IOCExtensionConfigurator implements IOCExtensionConfigurator 
     final Set<MetaClass> knownTypesWithSuperTypes = new HashSet<>(knownObserverTypes);
 
     if (!context.erraiConfiguration().app().isAptEnvironment()) {
-      //FIXME: tiago: how to get subTypesOf?
+      //FIXME: Query a generated map of subtypes of all @Observes annotated types using GWT.create()
       for (final MetaClass cls : knownObserverTypes) {
         knownTypesWithSuperTypes.addAll(ClassScanner.getSubTypesOf(cls, context.getGeneratorContext()));
       }
