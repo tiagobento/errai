@@ -131,7 +131,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
           final List<Statement> destructionStmts,
           final Set<MetaClass> allConfiguredBindableTypes) {
 
-    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller,
+    final DataBindingUtil.DataBinderRef dataBinder = DataBindingUtil.lookupDataBinderRef(decorable, controller,
             allConfiguredBindableTypes);
 
     if (!controller.hasAttribute(STYLE_BINDING_HOUSEKEEPING_ATTR)) {
@@ -184,8 +184,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
       throw new RuntimeException("problem with style binding. element target type is invalid: " + decorable.decorableType());
     }
 
-
-    final DataBindingUtil.DataBinderRef dataBinder = lookupDataBinderRef(decorable, controller,
+    final DataBindingUtil.DataBinderRef dataBinder = DataBindingUtil.lookupDataBinderRef(decorable, controller,
             allConfiguredBindableTypes);
 
     final List<Statement> initStmts = new ArrayList<Statement>();
@@ -230,12 +229,5 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
 
     controller.addInitializationStatements(initStmts);
     controller.addDestructionStatements(destructionStmts);
-  }
-
-  private static DataBindingUtil.DataBinderRef lookupDataBinderRef(final Decorable decorable,
-          final FactoryController controller,
-          final Set<MetaClass> allConfiguredBindableTypes) {
-
-    return DataBindingUtil.lookupDataBinderRef(decorable, controller, allConfiguredBindableTypes);
   }
 }

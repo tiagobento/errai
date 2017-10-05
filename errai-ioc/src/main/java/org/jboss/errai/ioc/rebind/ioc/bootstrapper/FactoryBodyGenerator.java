@@ -45,5 +45,5 @@ public interface FactoryBodyGenerator {
 *          The single {@link InjectionContext} shared by all
 *          {@link FactoryBodyGenerator FactoryBodyGenerators}.
    */
-  void generate(ClassStructureBuilder<?> bodyBlockBuilder, Injectable injectable, InjectionContext injectionContext);
+  void generate(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable, final InjectionContext injectionContext);
 }

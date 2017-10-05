@@ -97,11 +97,7 @@ public class InjectionContext {
 
   private InjectionContext(final Builder builder) {
     this.processingContext = Assert.notNull(builder.processingContext);
-    if (builder.qualifierFactory == null) {
-      this.qualifierFactory = new DefaultQualifierFactory();
-    } else {
-      this.qualifierFactory = builder.qualifierFactory;
-    }
+    this.qualifierFactory = new DefaultQualifierFactory();
     this.whitelist = Assert.notNull(builder.whitelist);
     this.blacklist = Assert.notNull(builder.blacklist);
     this.async = builder.async;
@@ -110,18 +106,12 @@ public class InjectionContext {
   public static class Builder {
     private IOCProcessingContext processingContext;
     private boolean async;
-    private QualifierFactory qualifierFactory;
     private final HashSet<String> enabledAlternatives = new HashSet<String>();
     private final HashSet<String> whitelist = new HashSet<String>();
     private final HashSet<String> blacklist = new HashSet<String>();
 
     public static Builder create() {
       return new Builder();
-    }
-
-    public Builder qualifierFactory(final QualifierFactory qualifierFactory) {
-      this.qualifierFactory = qualifierFactory;
-      return this;
     }
 
     public Builder processingContext(final IOCProcessingContext processingContext) {
@@ -221,10 +211,6 @@ public class InjectionContext {
     return qualifierFactory;
   }
 
-  public boolean isIncluded(final MetaClass type) {
-    return isWhitelisted(type) && !isBlacklisted(type);
-  }
-
   public boolean isWhitelisted(final MetaClass type) {
     if (whitelist.isEmpty()) {
       return true;
@@ -300,10 +286,6 @@ public class InjectionContext {
     }
   }
 
-  public boolean isMetaAnnotationFor(final Class<? extends Annotation> alias, final Class<? extends Annotation> forAnno) {
-    return metaAnnotationAliases.containsEntry(alias, forAnno);
-  }
-
   private void sortDecorators() {
     for (final Class<? extends Annotation> a : getDecoratorAnnotations()) {
       if (a.isAnnotationPresent(Target.class)) {
@@ -340,76 +322,6 @@ public class InjectionContext {
     return getAnnotationsForElementType(type).contains(annotation);
   }
 
-  /**
-   * Overloaded version to check GWT's JClassType classes.
-   *
-   * @param type
-   * @param hasAnnotations
-   *
-   * @return
-   */
-  public boolean isElementType(final WiringElementType type,
-                               final com.google.gwt.core.ext.typeinfo.HasAnnotations hasAnnotations) {
-    final Collection<Class<? extends Annotation>> annotationsForElementType = getAnnotationsForElementType(type);
-    for (final Annotation a : hasAnnotations.getAnnotations()) {
-      if (annotationsForElementType.contains(a.annotationType())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public MetaAnnotation getMatchingAnnotationForElementType(final WiringElementType type,
-                                                        final HasAnnotations hasAnnotations) {
-
-    final Collection<Class<? extends Annotation>> annotationsForElementType = getAnnotationsForElementType(type);
-
-    for (final MetaAnnotation a : hasAnnotations.getAnnotations()) {
-      if (annotationsForElementType.stream().anyMatch(a::instanceOf)) {
-        return a;
-      }
-    }
-
-    final Set<MetaAnnotation> annotationSet = new HashSet<>();
-
-    fillInStereotypes(annotationSet, hasAnnotations.getAnnotations(), false);
-
-    for (final MetaAnnotation a : annotationSet) {
-      if (annotationsForElementType.stream().anyMatch(a::instanceOf)) {
-        return a;
-      }
-    }
-    return null;
-  }
-
-  private static void fillInStereotypes(final Set<MetaAnnotation> annotationSet,
-                                        final Collection<MetaAnnotation> from,
-                                        boolean filterScopes) {
-
-    final List<MetaClass> stereotypes = new ArrayList<>();
-
-    for (final MetaAnnotation a : from) {
-      final MetaClass aClass = a.annotationType();
-      if (aClass.isAnnotationPresent(Stereotype.class)) {
-        stereotypes.add(aClass);
-      }
-      else if (!filterScopes &&
-          aClass.isAnnotationPresent(NormalScope.class) ||
-          aClass.isAnnotationPresent(Scope.class)) {
-        filterScopes = true;
-
-        annotationSet.add(a);
-      }
-      else if (aClass.isAnnotationPresent(Qualifier.class)) {
-        annotationSet.add(a);
-      }
-    }
-
-    for (final MetaClass stereotype : stereotypes) {
-      fillInStereotypes(annotationSet, stereotype.getAnnotations(), filterScopes);
-    }
-  }
-
   public Collection<Class<? extends Annotation>> getAllElementBindingRegisteredAnnotations() {
     return elementBindings.values();
   }
@@ -420,10 +332,6 @@ public class InjectionContext {
 
   public Object getAttribute(final String name) {
     return attributeMap.get(name);
-  }
-
-  public boolean hasAttribute(final String name) {
-    return attributeMap.containsKey(name);
   }
 
   public boolean isAsync() {

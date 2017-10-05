@@ -567,8 +567,8 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
    * @return A list of statements that will generated in the
    *         {@link Factory#createInstance(ContextManager)} method.
    */
-  protected abstract List<Statement> generateCreateInstanceStatements(ClassStructureBuilder<?> bodyBlockBuilder,
-          Injectable injectable, InjectionContext injectionContext);
+  protected abstract List<Statement> generateCreateInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
+          final Injectable injectable, final InjectionContext injectionContext);
 
   @Override
   public void generate(final ClassStructureBuilder<?> bodyBlockBuilder, final Injectable injectable, final InjectionContext injectionContext) {
@@ -715,12 +715,9 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
             .map(s -> s.valueAsArray(MetaClass[].class))
             // Ensure that Object is an assignable type
             .map(beanTypes -> {
-              if (Arrays.stream(beanTypes).anyMatch(type -> {
-                return objectMetaclass.equals(type);
-              })) {
+              if (Arrays.stream(beanTypes).anyMatch(objectMetaclass::equals)) {
                 return (Object[]) beanTypes;
-              }
-              else {
+              } else {
                 final MetaClass[] copyWithObject = Arrays.copyOf(beanTypes, beanTypes.length+1);
                 copyWithObject[beanTypes.length] = objectMetaclass;
                 return (Object[]) copyWithObject;

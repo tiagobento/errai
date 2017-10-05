@@ -110,19 +110,19 @@ public class FactoryGenerator extends IncrementalGenerator {
 
     final RebindResult retVal;
     if (pw != null) {
-      final String generatedSource;
+      final String factorySource;
       if (isCacheUsable(typeName, injectable)) {
         log.debug("Reusing cached factory for " + typeName);
-        generatedSource = generatedSourceByFactoryTypeName.get(typeName);
+        factorySource = generatedSourceByFactoryTypeName.get(typeName);
       } else {
         final InjectionContext injectionContext = assertInjectionContextSetAndGet();
-        generatedSource = generate(typeName, injectable, injectionContext);
-        generatedSourceByFactoryTypeName.put(typeName, generatedSource);
+        factorySource = generate(typeName, injectable, injectionContext);
+        generatedSourceByFactoryTypeName.put(typeName, factorySource);
         injectablesByFactoryTypeName.put(typeName, injectable);
-        writeToDotErraiFolder(getFactorySubTypeSimpleName(typeName), generatedSource);
+        writeToDotErraiFolder(getFactorySubTypeSimpleName(typeName), factorySource);
       }
 
-      pw.write(generatedSource);
+      pw.write(factorySource);
       generatorContext.commit(logger, pw);
       retVal = new RebindResult(RebindMode.USE_ALL_NEW, getFactorySubTypeName(typeName));
     } else {
@@ -141,6 +141,7 @@ public class FactoryGenerator extends IncrementalGenerator {
     final InjectableType factoryType = injectable.getInjectableType();
     final ClassStructureBuilder<?> factoryClassBuilder = define(getFactorySubTypeName(typeName),
             parameterizedAs(Factory.class, typeParametersOf(injectable.getInjectedType()))).publicScope().body();
+
     final FactoryBodyGenerator generator = selectBodyGenerator(factoryType, typeName, injectable);
 
     log.debug("Generating factory for " + typeName);

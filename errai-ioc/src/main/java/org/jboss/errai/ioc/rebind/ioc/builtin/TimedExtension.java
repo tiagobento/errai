@@ -21,7 +21,9 @@ import java.util.List;
 
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
+import org.jboss.errai.codegen.meta.MetaEnum;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.client.util.TimeUnit;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.api.Timed;
 import org.jboss.errai.ioc.client.api.TimerType;
@@ -51,7 +53,7 @@ public class TimedExtension extends IOCDecoratorExtension<Timed> {
       final Statement methodInvokation
           = decorable.getAccessStatement();
 
-      final org.jboss.errai.common.client.util.TimeUnit timeUnit = timed.value("timeUnit");
+      final TimeUnit timeUnit = TimeUnit.valueOf(timed.<MetaEnum>value("timeUnit").name());
       final int interval = timed.value("interval");
 
       final Statement timerDecl

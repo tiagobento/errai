@@ -111,9 +111,7 @@ public class ErraiAppAptGenerator extends AbstractProcessor {
 
   private ErraiAptGenerators.Any newGenerator(final Class<? extends ErraiAptGenerators.Any> generatorClass) {
     try {
-      final Constructor<? extends ErraiAptGenerators.Any> constructor = generatorClass.getConstructor(
-              ErraiAptExportedTypes.class);
-
+      final Constructor<? extends ErraiAptGenerators.Any> constructor = generatorClass.getConstructor(ErraiAptExportedTypes.class);
       constructor.setAccessible(true);
       return constructor.newInstance(erraiAptExportedTypes);
     } catch (final Exception e) {

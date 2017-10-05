@@ -100,8 +100,7 @@ public class ElementProviderExtension implements IOCExtensionConfigurator {
   }
 
   private static ExactTypeInjectableProvider exactTypeInjectableProvider(final InjectionContext injectionContext,
-          final MetaClass type,
-          final String tagName) {
+          final MetaClass type, final String tagName) {
 
     final Qualifier qualifier = injectionContext.getQualifierFactory().forSource(new HasNamedAnnotation(tagName));
     final InjectableHandle handle = new InjectableHandle(type, qualifier);

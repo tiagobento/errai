@@ -45,8 +45,8 @@ import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
-import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.common.client.api.Assert;
+import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.ioc.client.Bootstrapper;
 import org.jboss.errai.ioc.client.JsArray;
@@ -127,9 +127,9 @@ import static org.jboss.errai.codegen.util.Stmt.declareVariable;
 import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
 import static org.jboss.errai.codegen.util.Stmt.loadLiteral;
 import static org.jboss.errai.codegen.util.Stmt.loadVariable;
+import static org.jboss.errai.config.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
 import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator.getAnnotationArrayStmt;
 import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator.getAssignableTypesArrayStmt;
-import static org.jboss.errai.config.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
 
 /**
  * Creates {@link DependencyGraph} by adding all types and dependencies to the
@@ -430,9 +430,12 @@ public class IOCProcessor {
     return loadVariable(handleVarName);
   }
 
-  @SuppressWarnings("unchecked")
-  private void declareAndRegisterConcreteInjectable(final Injectable injectable, final Map<MetaClass, MetaClass> scopeContexts,
-          @SuppressWarnings("rawtypes") final BlockBuilder registerFactoriesBody, final MetaClass factoryClass) {
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private void declareAndRegisterConcreteInjectable(final Injectable injectable,
+          final Map<MetaClass, MetaClass> scopeContexts,
+          final BlockBuilder registerFactoriesBody,
+          final MetaClass factoryClass) {
+
     registerFactoryWithContext(injectable, factoryClass, scopeContexts, registerFactoriesBody);
     final boolean windowScoped = injectable.getWiringElementTypes().contains(WiringElementType.SharedSingleton);
     final boolean jsType = injectable.getWiringElementTypes().contains(WiringElementType.JsType);
@@ -676,7 +679,7 @@ public class IOCProcessor {
     final Optional<String> unassignableTypes =
             Arrays
             .stream(beanTypes)
-            .map(MetaClass::getName)
+            .map(MetaClass::getFullyQualifiedName)
             .filter(name -> !assignableTypeNames.contains(name))
             .reduce((s1, s2) -> s1 + "\n" + s2);
 

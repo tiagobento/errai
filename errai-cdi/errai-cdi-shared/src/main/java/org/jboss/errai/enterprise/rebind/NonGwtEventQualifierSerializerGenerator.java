@@ -74,8 +74,7 @@ public class NonGwtEventQualifierSerializerGenerator {
     for (final MetaClass qual : qualifiers) {
       final Collection<MetaMethod> bindingAttributes = CDIAnnotationUtils.getAnnotationAttributes(qual);
       if (!bindingAttributes.isEmpty()) {
-        ctor.append(loadVariable("serializers").invoke("put", qual.getFullyQualifiedName(), generateEntryStatement(
-                bindingAttributes)));
+        ctor.append(loadVariable("serializers").invoke("put", qual.getFullyQualifiedName(), generateEntryStatement(bindingAttributes)));
       }
     }
     ctor.finish();

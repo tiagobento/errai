@@ -42,7 +42,7 @@ public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.Sin
   private final QualifierEqualityFactoryGenerator qualifierEqualityFactoryGenerator;
 
   // IMPORTANT: Do not remove. ErraiAppAptGenerator depends on this constructor
-  public QualifierEqualityFactoryAptGenerator(ErraiAptExportedTypes exportedTypes) {
+  public QualifierEqualityFactoryAptGenerator(final ErraiAptExportedTypes exportedTypes) {
     super(exportedTypes);
     this.qualifierEqualityFactoryGenerator = new QualifierEqualityFactoryGenerator();
   }

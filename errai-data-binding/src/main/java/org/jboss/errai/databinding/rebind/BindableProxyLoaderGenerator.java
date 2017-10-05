@@ -169,8 +169,10 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
     return false;
   }
 
-  private Set<MetaClass> findAnnotatedElements(final Class<? extends Annotation> annotation, final GeneratorContext context,
-          final Set<String> translatablePackages, final Set<MetaClass> allConfiguredBindableTypes) {
+  private Set<MetaClass> findAnnotatedElements(final Class<? extends Annotation> annotation,
+          final GeneratorContext context,
+          final Set<String> translatablePackages,
+          final Set<MetaClass> allConfiguredBindableTypes) {
 
     if (annotation.equals(Bindable.class)) {
       final Set<MetaClass> annotatedBindableTypes = new HashSet<>(

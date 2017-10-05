@@ -56,7 +56,7 @@ import static java.util.stream.Collectors.toSet;
 public class IOCGenerator extends AbstractAsyncGenerator {
 
   private final String packageName = "org.jboss.errai.ioc.client";
-  private final String classSimpleName = "BootstrapperImpl";
+  private final String className = "BootstrapperImpl";
 
   public IOCGenerator() {
   }
@@ -66,7 +66,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           throws UnableToCompleteException {
 
     logger.log(TreeLogger.INFO, "generating ioc bootstrapping code...");
-    return startAsyncGeneratorsAndWaitFor(Bootstrapper.class, context, logger, packageName, classSimpleName);
+    return startAsyncGeneratorsAndWaitFor(Bootstrapper.class, context, logger, packageName, className);
   }
 
   @Override
@@ -87,7 +87,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           final ResourceFilesFinder resourceFilesFinder) {
 
     return new IOCBootstrapGenerator(metaClassFinder, resourceFilesFinder, context, erraiConfiguration, relevantClasses)
-            .generate(packageName, classSimpleName);
+            .generate(packageName, className);
   }
 
   private Set<MetaClass> findMetaClasses(final GeneratorContext context,
@@ -132,7 +132,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
   }
 
   public String getClassSimpleName() {
-    return classSimpleName;
+    return className;
   }
 
   @Override

@@ -76,7 +76,7 @@ public class JaxrsProxyLoaderGenerator extends AbstractAsyncGenerator {
     final Boolean iocEnabled = RebindUtils.isModuleInherited(context, IOC_MODULE_NAME);
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
     final AnnotationFilter annotationFilter = new RuntimeAnnotationFilter(translatablePackages);
-    final MetaClassFinder metaClassFinder = (annotation) -> getMetaClasses(context, annotation, translatablePackages);
+    final MetaClassFinder metaClassFinder = annotation -> getMetaClasses(context, annotation, translatablePackages);
 
     return generate(metaClassFinder, iocEnabled, annotationFilter);
   }

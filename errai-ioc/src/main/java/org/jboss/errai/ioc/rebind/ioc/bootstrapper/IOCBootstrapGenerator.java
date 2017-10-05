@@ -25,9 +25,9 @@ import org.jboss.errai.codegen.builder.impl.BlockBuilderImpl;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaEnum;
-import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.codegen.util.Implementations;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.common.server.api.ErraiBootstrapFailure;
@@ -80,7 +80,7 @@ public class IOCBootstrapGenerator {
   private final List<MetaClass> afterTasks = new ArrayList<>();
 
   private final ErraiConfiguration erraiConfiguration;
-  private final IocRelevantClassesFinder relevantClasses;
+  private final IocRelevantClassesFinder relevantClassesFinder;
   private final ResourceFilesFinder resourceFilesFinder;
 
 
@@ -90,13 +90,13 @@ public class IOCBootstrapGenerator {
           final ResourceFilesFinder resourceFilesFinder,
           final GeneratorContext context,
           final ErraiConfiguration erraiConfiguration,
-          final IocRelevantClassesFinder relevantClasses) {
+          final IocRelevantClassesFinder relevantClassesFinder) {
 
     this.resourceFilesFinder = resourceFilesFinder;
     this.metaClassFinder = metaClassFinder;
     this.context = context;
     this.erraiConfiguration = erraiConfiguration;
-    this.relevantClasses = relevantClasses;
+    this.relevantClassesFinder = relevantClassesFinder;
   }
 
   public String generate(final String packageName, final String className) {
@@ -108,7 +108,7 @@ public class IOCBootstrapGenerator {
 
       log.debug("setting up injection context...");
       final long injectionStart = System.currentTimeMillis();
-      final InjectionContext injectionContext = buildInjectContext(packageName, className);
+      final InjectionContext injectionContext = buildInjectionContext(packageName, className);
       log.debug("injection context setup in " + (System.currentTimeMillis() - injectionStart) + "ms");
 
       final String gen = generateBootstrappingClassSource(injectionContext);
@@ -118,7 +118,7 @@ public class IOCBootstrapGenerator {
     }
   }
 
-  private InjectionContext buildInjectContext(final String packageName, final String className) {
+  private InjectionContext buildInjectionContext(final String packageName, final String className) {
 
     final ClassStructureBuilder<?> classStructureBuilder = Implementations.implement(Bootstrapper.class, packageName,
             className);
@@ -178,7 +178,6 @@ public class IOCBootstrapGenerator {
 
     final IOCProcessor iocProcessor = new IOCProcessor(injectionContext, erraiConfiguration);
     final IOCProcessingContext iocProcessingContext = injectionContext.getProcessingContext();
-
     final ClassStructureBuilder<?> classBuilder = iocProcessingContext.getBootstrapBuilder();
     final BlockBuilder<?> blockBuilder = iocProcessingContext.getBlockBuilder();
     final BlockBuilder builder = new BlockBuilderImpl(classBuilder.getClassDefinition().getInstanceInitializer(), null);
@@ -188,7 +187,7 @@ public class IOCBootstrapGenerator {
     log.debug("Process dependency graph...");
     start = System.currentTimeMillis();
 
-    iocProcessor.process(iocProcessingContext, relevantClasses.find(getRelevantAnnotations(injectionContext)));
+    iocProcessor.process(iocProcessingContext, relevantClassesFinder.find(getRelevantAnnotations(injectionContext)));
     log.debug("Processed dependency graph in {}ms", System.currentTimeMillis() - start);
 
     doAfterRunnbales(blockBuilder);
@@ -203,7 +202,7 @@ public class IOCBootstrapGenerator {
     return bootstrapperImplString;
   }
 
-  private Collection<Class<? extends Annotation>> getRelevantAnnotations(InjectionContext injectionContext) {
+  private Collection<Class<? extends Annotation>> getRelevantAnnotations(final InjectionContext injectionContext) {
     final Collection<Class<? extends Annotation>> annotations = new ArrayList<>(injectionContext.getAllElementBindingRegisteredAnnotations());
     annotations.add(JsType.class);
     return annotations;
@@ -228,8 +227,8 @@ public class IOCBootstrapGenerator {
   private void doRunnableTasks(final Collection<MetaClass> classes, final BlockBuilder<?> blockBuilder) {
     for (final MetaClass clazz : classes) {
       if (!clazz.isAssignableTo(Runnable.class)) {
-        throw new RuntimeException(
-                "annotated @IOCBootstrap task: " + clazz.getName() + " is not of type: " + Runnable.class.getName());
+        throw new RuntimeException("annotated @IOCBootstrap task: " + clazz.getName() + " is not of type: "
+                + Runnable.class.getName());
       }
 
       blockBuilder.append(Stmt.nestedCall(Stmt.newObject(clazz)).invoke("run"));
@@ -243,7 +242,7 @@ public class IOCBootstrapGenerator {
     final List<IOCExtensionConfigurator> extensionConfigurators = metaClassFinder.findAnnotatedWith(IOCExtension.class)
             .stream()
             .map(this::newIocExtension)
-            .peek(extension -> configureIocExtension(extension, injectionContext))
+            .peek(extension -> extension.configure(injectionContext.getProcessingContext(), injectionContext))
             .collect(toList());
 
     //Configure IocBootstrapTasks
@@ -289,8 +288,8 @@ public class IOCBootstrapGenerator {
 
     final ParameterizedType pType = (ParameterizedType) t;
     if (IOCDecoratorExtension.class.equals(pType.getRawType())) {
-      if (pType.getActualTypeArguments().length == 0 || !Annotation.class.isAssignableFrom(
-              (Class<?>) pType.getActualTypeArguments()[0])) {
+      if (pType.getActualTypeArguments().length == 0
+              || !Annotation.class.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0])) {
         throw new ErraiBootstrapFailure("code decorator must extend IOCDecoratorExtension<@AnnotationType>");
       }
 
@@ -298,12 +297,6 @@ public class IOCBootstrapGenerator {
       annoType = ((Class<?>) pType.getActualTypeArguments()[0]).asSubclass(Annotation.class);
     }
     return annoType;
-  }
-
-  private void configureIocExtension(final IOCExtensionConfigurator extensionConfigurator,
-          final InjectionContext injectionContext) {
-
-    extensionConfigurator.configure(injectionContext.getProcessingContext(), injectionContext);
   }
 
   private IOCExtensionConfigurator newIocExtension(final MetaClass metaClass) {
