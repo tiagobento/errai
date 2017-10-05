@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.app;
+package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.common.apt.TestMetaClassFinder;
@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAppConfigurationTest extends ErraiAptTest {
+public class AptErraiConfigurationTest extends ErraiAptTest {
 
   @Test
   public void testGetAllPropertiesWithDefaultValues() {

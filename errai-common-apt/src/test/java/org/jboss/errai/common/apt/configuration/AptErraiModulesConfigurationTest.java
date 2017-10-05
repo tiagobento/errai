@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
+package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.common.apt.TestMetaClassFinder;
-import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocWhitelisted1;
-import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocAlternative2;
-import org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.Serializable2;
+import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocWhitelisted1;
+import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocAlternative2;
+import org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.Serializable2;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Set;
 
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.Bindable1;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocAlternative1;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.IocBlacklisted1;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.NonSerializable1;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule1.Serializable1;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.Bindable2;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocBlacklisted2;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.IocWhitelisted2;
-import static org.jboss.errai.common.apt.configuration.module.ErraiTestCustomModule2.NonSerializable2;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.Bindable1;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocAlternative1;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.IocBlacklisted1;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.NonSerializable1;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule1.Serializable1;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.Bindable2;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocBlacklisted2;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.IocWhitelisted2;
+import static org.jboss.errai.common.apt.configuration.ErraiTestCustomModule2.NonSerializable2;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiModuleConfigurationTest extends ErraiAptTest {
+public class AptErraiModulesConfigurationTest extends ErraiAptTest {
 
   @Test
   public void testGetAllPropertiesWithDefaultValues() {

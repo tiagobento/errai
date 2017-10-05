@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.app;
+package org.jboss.errai.common.apt.module;
 
-import org.jboss.errai.common.configuration.ErraiApp;
+import org.jboss.errai.common.apt.configuration.TestAnnotation;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiApp
-class ErraiTestAppWithDefaultValues {
+@TestAnnotation
+class AnnotatedTypeWithAnnotatedInnerClasses {
+
+  @TestAnnotation
+  static class InnerAnnotatedType {
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
+package org.jboss.errai.common.apt.module;
 
 import com.sun.tools.javac.code.Symbol;
 import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;

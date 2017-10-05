@@ -17,8 +17,6 @@
 package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.common.apt.MetaClassFinder;
-import org.jboss.errai.common.apt.configuration.app.AptErraiAppConfiguration;
-import org.jboss.errai.common.apt.configuration.module.AptErraiModulesConfiguration;
 import org.jboss.errai.config.ErraiAppConfiguration;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.config.ErraiModulesConfiguration;
@@ -26,12 +24,12 @@ import org.jboss.errai.config.ErraiModulesConfiguration;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAptConfiguration implements ErraiConfiguration {
+public class AptErraiConfiguration implements ErraiConfiguration {
 
   private final ErraiModulesConfiguration modules;
   private final ErraiAppConfiguration app;
 
-  public ErraiAptConfiguration(final MetaClassFinder metaClassFinder) {
+  public AptErraiConfiguration(final MetaClassFinder metaClassFinder) {
     this.modules = new AptErraiModulesConfiguration(metaClassFinder);
     this.app = new AptErraiAppConfiguration(metaClassFinder);
   }

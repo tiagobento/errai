@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
+package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -43,7 +43,7 @@ public class AptErraiModulesConfiguration implements ErraiModulesConfiguration {
 
   private final Set<MetaAnnotation> erraiModules;
 
-  public AptErraiModulesConfiguration(final MetaClassFinder metaClassFinder) {
+  AptErraiModulesConfiguration(final MetaClassFinder metaClassFinder) {
     this.erraiModules = metaClassFinder.findAnnotatedWith(ErraiModule.class)
             .stream()
             .map(module -> module.getAnnotation(ErraiModule.class))

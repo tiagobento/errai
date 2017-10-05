@@ -21,10 +21,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.config.ErraiAppConfiguration;
-import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 import org.jboss.errai.databinding.client.TestModel;
-import org.jboss.errai.databinding.rebind.DataBindingUtil;
 import org.jboss.errai.databinding.rebind.DataBindingValidator;
 import org.junit.Test;
 
@@ -38,7 +36,7 @@ import java.util.Set;
  */
 public class DataBindingValidatorTest {
 
-  private static final Set<MetaClass> ALL_CONFIGURED_BINDABLE_TYPES = new ErraiAppPropertiesModulesConfiguration().getBindableTypes();
+  private static final Set<MetaClass> ALL_CONFIGURED_BINDABLE_TYPES = new ErraiAppPropertiesConfiguration().modules().getBindableTypes();
 
   private final MetaClass testClass = MetaClassFactory.get(TestModel.class);
 

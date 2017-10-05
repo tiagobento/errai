@@ -25,7 +25,7 @@ public class ErraiAppPropertiesConfiguration implements ErraiConfiguration {
   private final ErraiModulesConfiguration modules;
 
   public ErraiAppPropertiesConfiguration() {
-    this.modules = new ErraiAppPropertiesModulesConfiguration();
+    this.modules = new ErraiAppPropertiesErraiModulesConfiguration();
     this.app = new ErraiAppPropertiesErraiAppConfiguration();
   }
 

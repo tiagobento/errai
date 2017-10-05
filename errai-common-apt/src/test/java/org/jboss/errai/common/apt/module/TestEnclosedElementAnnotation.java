@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
-
-import org.jboss.errai.common.configuration.ErraiModule;
+package org.jboss.errai.common.apt.module;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiModule
-public class ErraiDefaultTestModule {
+@interface TestEnclosedElementAnnotation {
 }

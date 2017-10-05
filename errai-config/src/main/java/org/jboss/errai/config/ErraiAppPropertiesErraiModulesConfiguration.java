@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfiguration {
+public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModulesConfiguration {
 
   public static final String SERIALIZABLE_TYPES = "errai.marshalling.serializableTypes";
   public static final String NONSERIALIZABLE_TYPES = "errai.marshalling.nonserializableTypes";
@@ -53,9 +53,9 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
   private static final String IOC_BLACKLIST_PROPERTY = "errai.ioc.blacklist";
   public static final String BINDABLE_TYPES = "errai.ui.bindableTypes";
 
-  private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesModulesConfiguration.class);
+  private static final Logger log = LoggerFactory.getLogger(ErraiAppPropertiesErraiModulesConfiguration.class);
 
-  public ErraiAppPropertiesModulesConfiguration() {
+  ErraiAppPropertiesErraiModulesConfiguration() {
     final MetaDataScanner scanner = ScannerSingleton.getOrCreateInstance();
     final Multimap<String, String> props = scanner.getErraiProperties();
 
@@ -127,7 +127,7 @@ public class ErraiAppPropertiesModulesConfiguration implements ErraiModulesConfi
 
           final ResourceBundle props = new PropertyResourceBundle(inputStream);
           for (final String key : props.keySet()) {
-            if (key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)) {
+            if (key.equals(ErraiAppPropertiesErraiModulesConfiguration.BINDABLE_TYPES)) {
               final Set<String> patterns = new LinkedHashSet<>();
 
               for (final String s : props.getString(key).split(" ")) {

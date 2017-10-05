@@ -24,7 +24,8 @@ import org.jboss.errai.common.client.types.TypeHandlerFactory;
 import org.jboss.errai.common.metadata.ErraiAppPropertiesFiles;
 import org.jboss.errai.common.rebind.CacheStore;
 import org.jboss.errai.common.rebind.CacheUtil;
-import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesErraiModulesConfiguration;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.slf4j.Logger;
@@ -199,10 +200,10 @@ public abstract class EnvUtil {
       final String value = props.getString(key);
       updateFrameworkProperties(frameworkProps, key, value);
 
-      if (key.equals(ErraiAppPropertiesModulesConfiguration.SERIALIZABLE_TYPES)) {
+      if (key.equals(ErraiAppPropertiesErraiModulesConfiguration.SERIALIZABLE_TYPES)) {
         addSerializableTypes(exposedClasses, value);
       }
-      else if (key.equals(ErraiAppPropertiesModulesConfiguration.NONSERIALIZABLE_TYPES)) {
+      else if (key.equals(ErraiAppPropertiesErraiModulesConfiguration.NONSERIALIZABLE_TYPES)) {
         addNonSerializableTypes(exposedClasses, nonportableClasses, value);
       }
       else if (key.equals(CONFIG_ERRAI_MAPPING_ALIASES)) {
@@ -315,10 +316,10 @@ public abstract class EnvUtil {
   }
 
   private static boolean isListValuedProperty(final String key) {
-    return key.equals(ErraiAppPropertiesModulesConfiguration.IOC_ENABLED_ALTERNATIVES)
-            || key.equals(ErraiAppPropertiesModulesConfiguration.BINDABLE_TYPES)
-            || key.equals(ErraiAppPropertiesModulesConfiguration.SERIALIZABLE_TYPES)
-            || key.equals(ErraiAppPropertiesModulesConfiguration.NONSERIALIZABLE_TYPES)
+    return key.equals(ErraiAppPropertiesErraiModulesConfiguration.IOC_ENABLED_ALTERNATIVES)
+            || key.equals(ErraiAppPropertiesErraiModulesConfiguration.BINDABLE_TYPES)
+            || key.equals(ErraiAppPropertiesErraiModulesConfiguration.SERIALIZABLE_TYPES)
+            || key.equals(ErraiAppPropertiesErraiModulesConfiguration.NONSERIALIZABLE_TYPES)
             || key.equals(CONFIG_ERRAI_MAPPING_ALIASES);
   }
 
@@ -368,7 +369,7 @@ public abstract class EnvUtil {
   }
 
   public static boolean isPortableType(final MetaClass mc) {
-    final Set<MetaClass> allSerializableTypes = new ErraiAppPropertiesModulesConfiguration().getSerializableTypes();
+    final Set<MetaClass> allSerializableTypes = new ErraiAppPropertiesConfiguration().modules().getSerializableTypes();
     return mc.isAnnotationPresent(Portable.class)
             || allSerializableTypes .contains(mc)
             || String.class.getName().equals(mc.getFullyQualifiedName())

@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module;
+package org.jboss.errai.common.apt.configuration;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
 @TestAnnotation
-class AnnotatedTypeWithAnnotatedInnerClasses {
-
-  @TestAnnotation
-  static class InnerAnnotatedType {
-  }
+public class AnnotatedTypeInsideModule {
 }

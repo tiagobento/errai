@@ -35,7 +35,7 @@ import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.metadata.RebindUtils;
-import org.jboss.errai.config.ErraiAppPropertiesModulesConfiguration;
+import org.jboss.errai.config.ErraiAppPropertiesConfiguration;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;
 import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
@@ -77,9 +77,10 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
   @Override
   protected String generate(final TreeLogger logger, final GeneratorContext context) {
     final Set<String> translatablePackages = RebindUtils.findTranslatablePackages(context);
-    final Set<MetaClass> allConfiguredBindableTypes = new ErraiAppPropertiesModulesConfiguration().getBindableTypes();
+    final Set<MetaClass> allConfiguredBindableTypes = new ErraiAppPropertiesConfiguration().modules().getBindableTypes();
 
-    return generate((annotation) -> findAnnotatedElements(context, translatablePackages, annotation, allConfiguredBindableTypes));
+    return generate((annotation) -> findAnnotatedElements(annotation, context, translatablePackages,
+            allConfiguredBindableTypes));
   }
 
   public String generate(final MetaClassFinder metaClassFinder) {
@@ -168,10 +169,8 @@ public class BindableProxyLoaderGenerator extends AbstractAsyncGenerator {
     return false;
   }
 
-  private Set<MetaClass> findAnnotatedElements(final GeneratorContext context,
-          final Set<String> translatablePackages,
-          final Class<? extends Annotation> annotation,
-          final Set<MetaClass> allConfiguredBindableTypes) {
+  private Set<MetaClass> findAnnotatedElements(final Class<? extends Annotation> annotation, final GeneratorContext context,
+          final Set<String> translatablePackages, final Set<MetaClass> allConfiguredBindableTypes) {
 
     if (annotation.equals(Bindable.class)) {
       final Set<MetaClass> annotatedBindableTypes = new HashSet<>(

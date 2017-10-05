@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.apt.configuration.module2;
+package org.jboss.errai.common.apt.configuration;
 
-import org.jboss.errai.common.apt.configuration.module.TestAnnotation;
+import org.jboss.errai.common.configuration.ErraiApp;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@TestAnnotation
-public class AnnotatedTypeOutOfModule {
+@ErraiApp(userOnHostPageEnabled = true,
+          asyncBeanManager = true,
+          enableWebSocketServer = true,
+          autoDiscoverServices = true,
+          applicationContext = "/test")
+class ErraiTestApp {
 }

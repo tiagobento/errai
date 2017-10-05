@@ -18,7 +18,7 @@ package org.jboss.errai.apt.internal.generator;
 
 import org.jboss.errai.common.apt.ErraiAptExportedTypes;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.common.apt.configuration.ErraiAptConfiguration;
+import org.jboss.errai.common.apt.configuration.AptErraiConfiguration;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCEnvironmentGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class IocEnvironmentAptGenerator extends ErraiAptGenerators.SingleFile {
   @Override
   public String generate() {
     log.info("Generating {}...", getClassSimpleName());
-    final String generatedSource = iocEnvironmentGenerator.generate(new ErraiAptConfiguration(metaClassFinder()));
+    final String generatedSource = iocEnvironmentGenerator.generate(new AptErraiConfiguration(metaClassFinder()));
     log.info("Generated {}", getClassSimpleName());
     return generatedSource;
   }
