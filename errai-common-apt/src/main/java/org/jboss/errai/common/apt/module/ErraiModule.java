@@ -26,7 +26,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -62,7 +61,7 @@ public class ErraiModule {
 
   Optional<ExportFile> newExportFile(final TypeElement annotation) {
 
-    final Set<Element> exportedTypes = findAnnotatedClassesAndInterfaces(annotation);
+    final Set<Element> exportedTypes = findAnnotatedElements(annotation);
 
     if (exportedTypes.isEmpty()) {
       return Optional.empty();
@@ -71,7 +70,7 @@ public class ErraiModule {
     return Optional.of(new ExportFile(erraiModuleUniqueNamespace(), annotation, exportedTypes));
   }
 
-  Set<Element> findAnnotatedClassesAndInterfaces(final TypeElement annotationTypeElement) {
+  Set<Element> findAnnotatedElements(final TypeElement annotationTypeElement) {
     return annotatedSourceElementsFinder.findSourceElementsAnnotatedWith(annotationTypeElement)
             .stream()
             .filter(this::isPartOfModule)

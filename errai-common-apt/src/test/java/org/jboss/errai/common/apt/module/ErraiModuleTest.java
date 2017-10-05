@@ -3,11 +3,9 @@ package org.jboss.errai.common.apt.module;
 import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.common.apt.AnnotatedSourceElementsFinder;
 import org.jboss.errai.common.apt.TestAnnotatedSourceElementsFinder;
-import org.jboss.errai.common.apt.configuration.AnnotatedTypeInsideModule;
-import org.jboss.errai.common.apt.configuration.ErraiDefaultTestModule;
 import org.jboss.errai.common.apt.configuration.TestAnnotation;
-import org.jboss.errai.common.apt.configuration2.AnnotatedTypeOutOfModule;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
+import org.jboss.errai.common.apt.module2.AnnotatedTypeOutOfModule;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,15 +21,14 @@ public class ErraiModuleTest extends ErraiAptTest {
 
   @Test
   public void testFindAnnotatedClassesAndInterfacesForAnnotatedField() {
-    final Element[] testExportedType = getTypeElement(
+    final Element[] testExportedTypes = getTypeElement(
             TestExportableTypeWithFieldAnnotations.class).getEnclosedElements().toArray(new Element[0]);
 
     final TypeElement testEnclosedElementAnnotation = getTypeElement(TestEnclosedElementAnnotation.class);
-    final ErraiModule erraiModule = getErraiModule(getTestAnnotatedElementsFinder(testExportedType));
+    final ErraiModule erraiModule = getErraiModule(getTestAnnotatedElementsFinder(testExportedTypes));
 
-    final Set<? extends Element> elements = erraiModule.findAnnotatedClassesAndInterfaces(
-            testEnclosedElementAnnotation);
-    Assert.assertTrue(elements.isEmpty());
+    final Set<Element> elements = erraiModule.findAnnotatedElements(testEnclosedElementAnnotation);
+    Assert.assertEquals(singleton(getTypeElement(String.class)), elements);
   }
 
   @Test
@@ -41,7 +38,7 @@ public class ErraiModuleTest extends ErraiAptTest {
 
     final ErraiModule testGenerator = getErraiModule(getTestAnnotatedElementsFinder(testExportedType));
 
-    final Set<? extends Element> elements = testGenerator.findAnnotatedClassesAndInterfaces(testAnnotation);
+    final Set<Element> elements = testGenerator.findAnnotatedElements(testAnnotation);
     Assert.assertEquals(singleton(testExportedType), elements);
   }
 
@@ -53,7 +50,7 @@ public class ErraiModuleTest extends ErraiAptTest {
     final TypeElement innerType = getTypeElement(AnnotatedTypeWithAnnotatedInnerClasses.InnerAnnotatedType.class);
     final ErraiModule erraiModule = getErraiModule(getTestAnnotatedElementsFinder(type, innerType));
 
-    final Set<Element> exportedTypes = erraiModule.findAnnotatedClassesAndInterfaces(testAnnotation);
+    final Set<Element> exportedTypes = erraiModule.findAnnotatedElements(testAnnotation);
     assertContainsOnly(exportedTypes, type, innerType);
   }
 
@@ -65,7 +62,7 @@ public class ErraiModuleTest extends ErraiAptTest {
     final ErraiModule erraiModule = getErraiModule(
             getTestAnnotatedElementsFinder(annotatedTypeInsideModule, getTypeElement(AnnotatedTypeOutOfModule.class)));
 
-    final Set<Element> exportedTypes = erraiModule.findAnnotatedClassesAndInterfaces(testAnnotation);
+    final Set<Element> exportedTypes = erraiModule.findAnnotatedElements(testAnnotation);
     assertContainsOnly(exportedTypes, annotatedTypeInsideModule);
   }
 
@@ -96,7 +93,7 @@ public class ErraiModuleTest extends ErraiAptTest {
   @Test
   public void testErraiModuleUniqueNamespace() {
     final String moduleNamespace = getErraiModule(getTestAnnotatedElementsFinder()).erraiModuleUniqueNamespace();
-    Assert.assertEquals("org_jboss_errai_common_apt_configuration_ErraiDefaultTestModule__test", moduleNamespace);
+    Assert.assertEquals("org_jboss_errai_common_apt_module_ErraiDefaultTestModule__test", moduleNamespace);
   }
 
   private TestAnnotatedSourceElementsFinder getTestAnnotatedElementsFinder(final Element... typeElements) {

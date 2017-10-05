@@ -35,6 +35,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 
@@ -46,6 +52,34 @@
                     <proc>none</proc>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration combine.self="override">
+                    <excludes>
+                    </excludes>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${basedir}/target/test-classes</additionalClasspathElement>
+                        <additionalClasspathElement>${basedir}/target/generated-test-sources/test-annotations</additionalClasspathElement>
+                        <additionalClasspathElement>${basedir}/target/classes</additionalClasspathElement>
+                        <additionalClasspathElement>${basedir}/src/main/java</additionalClasspathElement>
+                        <additionalClasspathElement>${basedir}/src/test/java</additionalClasspathElement>
+                    </additionalClasspathElements>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
