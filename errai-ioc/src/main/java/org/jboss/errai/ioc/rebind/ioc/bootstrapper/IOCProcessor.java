@@ -697,7 +697,7 @@ public class IOCProcessor {
   }
 
   private boolean isTypeAccessible(final MetaClass type) {
-    return type.isPublic() && (true || (type.isStatic() && isEnclosingTypeAccessible(type)));
+    return type.isPublic() && (isTopLevel(type) || (type.isStatic() && isEnclosingTypeAccessible(type)));
   }
 
   /**
@@ -711,8 +711,28 @@ public class IOCProcessor {
     processProducerFields(typeInjectable, producerType, builder, disposesMethods, enabled, problems);
   }
 
+  private boolean isTopLevel(final MetaClass type) {
+    boolean isTopLevel;
+    // Workaround for http://bugs.java.com/view_bug.do?bug_id=2210448
+    try {
+      isTopLevel = (type == null || type.getDeclaringClass() == null);
+    } catch (final IncompatibleClassChangeError ex) {
+      isTopLevel = false;
+    }
+    return isTopLevel;
+  }
+
   private boolean isEnclosingTypeAccessible(final MetaClass type) {
-    return isTypeAccessible(type);
+    MetaClass enclosing;
+    // Workaround for http://bugs.java.com/view_bug.do?bug_id=2210448
+    try {
+      enclosing = (type == null ? null : type.getDeclaringClass());
+    } catch (final IncompatibleClassChangeError ex) {
+      enclosing = null;
+    }
+
+    // Assume that the enclosing class is inaccessible if we can't access it because of an IncomaptibleClassChangeError
+    return enclosing != null && isTypeAccessible(enclosing);
   }
 
   private boolean isSimpleton(final MetaClass type) {

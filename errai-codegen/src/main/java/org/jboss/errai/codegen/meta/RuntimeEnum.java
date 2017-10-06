@@ -34,7 +34,7 @@ public class RuntimeEnum extends MetaEnum {
 
   @Override
   public MetaClass getDeclaringClass() {
-    return MetaClassFactory.get(enumInstance.getDeclaringClass());
+    return MetaClassFactory.getUncached(enumInstance.getDeclaringClass());
   }
 
   @Override

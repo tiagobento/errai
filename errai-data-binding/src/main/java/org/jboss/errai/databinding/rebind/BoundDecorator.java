@@ -192,7 +192,7 @@ public class BoundDecorator extends IOCDecoratorExtension<Bound> {
 
   private Statement coverterStatement(final MetaAnnotation bound, final MetaClass boundType, final MetaClass propertyType) {
     final MetaClass converter = bound.value("converter");
-    if (converter.equals(MetaClassFactory.get(Bound.NO_CONVERTER.class))) {
+    if (converter.instanceOf(Bound.NO_CONVERTER.class)) {
       final Optional<MetaClass> valueType;
       if (boundType.isAssignableTo(TakesValue.class)) {
         valueType = Optional.ofNullable(boundType.getMethod("getValue", new Class[0]).getReturnType());

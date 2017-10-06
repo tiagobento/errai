@@ -820,6 +820,15 @@ public class APTClass extends AbstractMetaClass<TypeMirror> {
   }
 
   @Override
+  public MetaClass getDeclaringClass() {
+    final TypeMirror typeMirror = getEnclosedMetaObject();
+    return Optional.ofNullable(APTClassUtil.types.asElement(typeMirror).getEnclosingElement())
+            .filter(s -> s.getKind().isInterface() || s.getKind().isClass())
+            .map(s -> new APTClass(s.asType()))
+            .orElse(null);
+  }
+
+  @Override
   public boolean unsafeIsAnnotationPresent(Class<? extends Annotation> annotation) {
     return APTClassUtil.unsafeIsAnnotationPresent();
   }
