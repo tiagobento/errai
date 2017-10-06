@@ -1220,7 +1220,7 @@ public class IOCProcessor {
   private boolean scopeDoesNotRequireProxy(final MetaClass type) {
     final MetaClass scope = getScope(type);
     return scope.instanceOf(EntryPoint.class) || injectionContext.getAnnotationsForElementType(
-            WiringElementType.DependentBean).stream().anyMatch(type::instanceOf);
+            WiringElementType.DependentBean).stream().anyMatch(scope::instanceOf);
   }
 
   private List<MetaConstructor> getInjectableConstructors(final MetaClass type) {

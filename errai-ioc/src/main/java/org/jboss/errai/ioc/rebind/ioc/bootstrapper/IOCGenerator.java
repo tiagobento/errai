@@ -22,6 +22,7 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
 import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.apt.ResourceFilesFinder;
 import org.jboss.errai.common.metadata.RebindUtils;
@@ -33,6 +34,7 @@ import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
+import org.jboss.errai.ioc.client.api.IOCExtension;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 
 import java.lang.annotation.Annotation;
@@ -94,19 +96,15 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           final Set<String> translatablePackages,
           final Class<? extends Annotation> annotation) {
 
-    //FIXME: tiago: this is a terrible workaround
-    final Collection<MetaClass> typesAnnotatedWith = ClassScanner.getTypesAnnotatedWith(annotation,
-            translatablePackages, context);
-
-    if (!typesAnnotatedWith.isEmpty()) {
-      return new HashSet<>(typesAnnotatedWith);
+    if (annotation.equals(IOCExtension.class)) {
+      return ScannerSingleton.getOrCreateInstance()
+              .getTypesAnnotatedWith(annotation)
+              .stream()
+              .map(JavaReflectionClass::newUncachedInstance)
+              .collect(toSet());
     }
 
-    return ScannerSingleton.getOrCreateInstance()
-            .getTypesAnnotatedWith(annotation)
-            .stream()
-            .map(MetaClassFactory::get)
-            .collect(toSet());
+    return new HashSet<>(ClassScanner.getTypesAnnotatedWith(annotation, translatablePackages, context));
   }
 
   @Override
