@@ -19,6 +19,7 @@ package org.jboss.errai.config;
 import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
 import org.jboss.errai.common.metadata.MetaDataScanner;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 import org.jboss.errai.config.rebind.EnvUtil;
@@ -36,6 +37,7 @@ import java.util.LinkedHashSet;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
@@ -76,9 +78,18 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
     return PropertiesUtil.getPropertyValues(IOC_ENABLED_ALTERNATIVES, "\\s")
             .stream()
             .map(String::trim)
-            .filter(s -> !s.contains("*"))
-            .map(MetaClassFactory::get)
+            .flatMap(this::getMetaClassesFromConfiguredEntry)
             .collect(toSet());
+  }
+
+  private Stream<? extends MetaClass> getMetaClassesFromConfiguredEntry(final String entry) {
+    if (entry.endsWith("*")) {
+      final Set<MetaClass> list = new HashSet<>();
+      addPatternsToSet(list, Collections.singleton(entry));
+      return list.stream();
+    } else {
+      return Stream.of(JavaReflectionClass.newUncachedInstance(MetaClassFactory.loadClass(entry)));
+    }
   }
 
   @Override
@@ -86,8 +97,7 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
     return PropertiesUtil.getPropertyValues(IOC_BLACKLIST_PROPERTY, "\\s")
             .stream()
             .map(String::trim)
-            .filter(s -> !s.contains("*"))
-            .map(MetaClassFactory::get)
+            .flatMap(this::getMetaClassesFromConfiguredEntry)
             .collect(toSet());
   }
 
@@ -96,8 +106,7 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
     return PropertiesUtil.getPropertyValues(IOC_WHITELIST_PROPERTY, "\\s")
             .stream()
             .map(String::trim)
-            .filter(s -> !s.contains("*"))
-            .map(MetaClassFactory::get)
+            .flatMap(this::getMetaClassesFromConfiguredEntry)
             .collect(toSet());
   }
 
@@ -143,11 +152,7 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
               }
 
               if (!patterns.isEmpty()) {
-                final SimplePackageFilter filter = new SimplePackageFilter(patterns);
-                MetaClassFactory.getAllCachedClasses()
-                        .stream()
-                        .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
-                        .collect(toCollection(() -> bindableTypes));
+                addPatternsToSet(bindableTypes, patterns);
               }
               break;
             }
@@ -169,6 +174,14 @@ public class ErraiAppPropertiesErraiModulesConfiguration implements ErraiModules
     }
 
     return configuredBindableTypes;
+  }
+
+  private void addPatternsToSet(final Set<MetaClass> list, final Set<String> patterns) {
+    final SimplePackageFilter filter = new SimplePackageFilter(patterns);
+    MetaClassFactory.getAllCachedClasses()
+            .stream()
+            .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
+            .collect(toCollection(() -> list));
   }
 
   @Override
