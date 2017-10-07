@@ -71,7 +71,9 @@ public class TimedExtension extends IOCDecoratorExtension<Timed> {
       initStmts.add(controller.setReferenceStmt(timerVarName, timerDecl));
 
       final Statement timerExec;
-      switch (timed.<TimerType>value("type")) {
+      final MetaEnum type = timed.value("type");
+
+      switch (TimerType.valueOf(type.name())) {
         case REPEATING:
           timerExec = Stmt.nestedCall(timerVar).invoke("scheduleRepeating", timeUnit.toMillis(interval));
           break;
