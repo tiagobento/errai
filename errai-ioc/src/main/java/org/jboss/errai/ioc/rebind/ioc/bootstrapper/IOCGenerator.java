@@ -34,12 +34,15 @@ import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.config.rebind.GenerateAsync;
 import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.ioc.client.Bootstrapper;
+import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.api.IOCExtension;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -59,6 +62,8 @@ public class IOCGenerator extends AbstractAsyncGenerator {
 
   private final String packageName = "org.jboss.errai.ioc.client";
   private final String className = "BootstrapperImpl";
+  private static final List<Class<? extends Annotation>> ANNOTATIONS_THAT_NEED_REFLECTIONS_SCANNER = Arrays.asList(
+          IOCExtension.class, CodeDecorator.class);
 
   public IOCGenerator() {
   }
@@ -96,7 +101,7 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           final Set<String> translatablePackages,
           final Class<? extends Annotation> annotation) {
 
-    if (annotation.equals(IOCExtension.class)) {
+    if (ANNOTATIONS_THAT_NEED_REFLECTIONS_SCANNER.contains(annotation)) {
       return ScannerSingleton.getOrCreateInstance()
               .getTypesAnnotatedWith(annotation)
               .stream()
