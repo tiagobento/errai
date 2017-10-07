@@ -149,17 +149,16 @@ final class GraphUtil {
     final StringBuilder message = new StringBuilder()
             .append("Unsatisfied ")
             .append(dep.dependencyType.toString().toLowerCase())
-            .append(" dependency [")
+            .append(" dependency ")
             .append(dep.injectable)
-            .append("] for [")
+            .append(" for ")
             .append(concrete)
-            .append("].");
+            .append('.');
 
     if (!resolvedDisabledBeans.isEmpty()) {
-      message.append(" Some beans were found that satisfied this dependency, but must be enabled: ");
-      message.append(resolvedDisabledBeans.stream()
-              .map(s -> s.getInjectedType().getFullyQualifiedName())
-              .collect(joining(", ")));
+      message.append(" Some beans were found that satisfied this dependency, but must be enabled:\n");
+      resolvedDisabledBeans.stream().forEach(inj -> message
+              .append(inj.getInjectedType().getFullyQualifiedName()).append('\n'));
     }
 
     return message.toString();
@@ -173,14 +172,14 @@ final class GraphUtil {
                   .append(dep.injectable)
                   .append(" in ")
                   .append(concrete)
-                  .append(". Resolved types: ")
+                  .append(".\n")
+                  .append("Resolved types:\n")
                   .append(resolved.get(0));
     for (int i = 1; i < resolved.size(); i++) {
       messageBuilder.append(", ")
                     .append(resolved.get(i));
     }
 
-    messageBuilder.append("\n");
     return messageBuilder.toString();
   }
 

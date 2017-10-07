@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -133,6 +134,7 @@ public class IOCProcessorErrorTest {
     when(procContext.getBlockBuilder()).thenReturn(blockBuilder);
     when(procContext.getBootstrapBuilder()).thenReturn(classBuilder);
     when(procContext.getBootstrapClass()).thenReturn(classBuilder.getClassDefinition());
+    when(procContext.metaClassFinder()).thenReturn(ann -> new HashSet<>());
 
     processor = new IOCProcessor(injContext, new ErraiAppPropertiesConfiguration());
   }
