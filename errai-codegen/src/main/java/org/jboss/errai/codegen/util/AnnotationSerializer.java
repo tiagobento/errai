@@ -80,9 +80,9 @@ public class AnnotationSerializer {
     if (value instanceof MetaAnnotation) {
       return asString((MetaAnnotation) value);
     } else if (value instanceof MetaClass) {
-      return ((MetaClass) value).getFullyQualifiedName();
+      return "class " + ((MetaClass) value).getFullyQualifiedName();
     } else if (value instanceof MetaEnum) {
-      return ((MetaEnum) value).getDeclaringClass() + "." + ((MetaEnum) value).name();
+      return ((MetaEnum) value).name();
     } else {
       return String.valueOf(value);
     }

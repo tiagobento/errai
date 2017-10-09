@@ -22,6 +22,7 @@ import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
+import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
 import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.apt.ResourceFilesFinder;
@@ -38,13 +39,14 @@ import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.api.IOCExtension;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 
+import javax.enterprise.event.Observes;
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -62,8 +64,6 @@ public class IOCGenerator extends AbstractAsyncGenerator {
 
   private final String packageName = "org.jboss.errai.ioc.client";
   private final String className = "BootstrapperImpl";
-  private static final List<Class<? extends Annotation>> ANNOTATIONS_THAT_NEED_REFLECTIONS_SCANNER = Arrays.asList(
-          IOCExtension.class, CodeDecorator.class);
 
   public IOCGenerator() {
   }
@@ -101,11 +101,18 @@ public class IOCGenerator extends AbstractAsyncGenerator {
           final Set<String> translatablePackages,
           final Class<? extends Annotation> annotation) {
 
-    if (ANNOTATIONS_THAT_NEED_REFLECTIONS_SCANNER.contains(annotation)) {
+    if (asList(IOCExtension.class, CodeDecorator.class).contains(annotation)) {
       return ScannerSingleton.getOrCreateInstance()
               .getTypesAnnotatedWith(annotation)
               .stream()
               .map(JavaReflectionClass::newUncachedInstance)
+              .collect(toSet());
+    }
+
+    if (Observes.class.equals(annotation)) {
+      return ClassScanner.getParametersAnnotatedWith(Observes.class, context)
+              .stream()
+              .map(MetaParameter::getType)
               .collect(toSet());
     }
 
