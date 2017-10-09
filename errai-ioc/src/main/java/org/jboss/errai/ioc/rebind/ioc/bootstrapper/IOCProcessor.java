@@ -642,12 +642,14 @@ public class IOCProcessor {
   }
 
   private Predicate<List<InjectableHandle>> getPathPredicate(final HasAnnotations annotated, final List<String> problems) {
-    final Optional<MetaAnnotation> typedAnnotation = annotated.getAnnotation(Typed.class);
-    if (typedAnnotation.isPresent()) {
-      final MetaClass[] beanTypes = typedAnnotation.get().valueAsArray(MetaClass[].class);
+    if (annotated.isAnnotationPresent(Typed.class)) {
+      final MetaClass[] beanTypes = annotated.getAnnotation(Typed.class).get().valueAsArray(MetaClass[].class);
       validateAssignableTypes(annotated, beanTypes, problems);
       return path -> Object.class.getName().equals(path.get(0)) || Arrays.stream(beanTypes)
-              .anyMatch(beanType -> path.get(0).getType().getFullyQualifiedName().equals(beanType.getName()));
+              .anyMatch(beanType -> path.get(0)
+                      .getType()
+                      .getFullyQualifiedName()
+                      .equals(beanType.getFullyQualifiedName()));
     }
     else {
       return ANY;
