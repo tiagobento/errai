@@ -37,6 +37,8 @@ import java.util.Set;
  */
 public class MockIOCGenerator {
 
+  private static final ErraiAppPropertiesConfiguration ERRAI_CONFIGURATION = new ErraiAppPropertiesConfiguration();
+
   private final Set<String> packages;
 
   public MockIOCGenerator(final Set<String> packages) {
@@ -52,7 +54,7 @@ public class MockIOCGenerator {
 
     final IOCBootstrapGenerator bootstrapGenerator = new IOCBootstrapGenerator(
             ann -> new HashSet<>(ClassScanner.getTypesAnnotatedWith(ann, packages, context)),
-            Thread.currentThread().getContextClassLoader()::getResource, context, new ErraiAppPropertiesConfiguration(),
+            Thread.currentThread().getContextClassLoader()::getResource, context, ERRAI_CONFIGURATION,
             (a) -> IocRelevantClassesUtil.findRelevantClasses());
 
     final String classStr = bootstrapGenerator.generate(packageName, className);

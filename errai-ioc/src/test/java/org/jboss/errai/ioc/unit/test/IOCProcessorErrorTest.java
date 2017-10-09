@@ -91,6 +91,8 @@ import com.google.common.collect.HashMultimap;
 @RunWith(MockitoJUnitRunner.class)
 public class IOCProcessorErrorTest {
 
+  private static final ErraiAppPropertiesConfiguration ERRAI_CONFIGURATION = new ErraiAppPropertiesConfiguration();
+  
   private IOCProcessor processor;
 
   @Mock
@@ -136,7 +138,7 @@ public class IOCProcessorErrorTest {
     when(procContext.getBootstrapClass()).thenReturn(classBuilder.getClassDefinition());
     when(procContext.metaClassFinder()).thenReturn(ann -> new HashSet<>());
 
-    processor = new IOCProcessor(injContext, new ErraiAppPropertiesConfiguration());
+    processor = new IOCProcessor(injContext, ERRAI_CONFIGURATION);
   }
 
   @Test

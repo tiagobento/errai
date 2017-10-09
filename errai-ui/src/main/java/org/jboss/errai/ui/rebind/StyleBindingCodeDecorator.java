@@ -208,7 +208,7 @@ public class StyleBindingCodeDecorator extends IOCDecoratorExtension<StyleBindin
                       decorable.getAnnotation(),
                       nestedCall(valueAccessor).invoke("getElement")));
     }
-    else if (decorable.getType().unsafeIsAnnotationPresent(Templated.class)) {
+    else if (decorable.getType().isAnnotationPresent(Templated.class)) {
       initStmts.add(invokeStatic(StyleBindingsRegistry.class, "get")
               .invoke("addElementBinding", Refs.get("instance"),
                       decorable.getAnnotation(),

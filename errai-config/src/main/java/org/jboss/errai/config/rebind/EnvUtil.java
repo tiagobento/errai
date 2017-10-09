@@ -50,6 +50,9 @@ import static java.util.stream.Collectors.toCollection;
  * @author Mike Brock
  */
 public abstract class EnvUtil {
+
+  private static Set<MetaClass> allSerializableTypes;
+
   public static class EnvironmentConfigCache implements CacheStore {
     private volatile EnvironmentConfig environmentConfig;
     private final Map<String, String> permanentProperties = new ConcurrentHashMap<>();
@@ -369,9 +372,13 @@ public abstract class EnvUtil {
   }
 
   public static boolean isPortableType(final MetaClass mc) {
-    final Set<MetaClass> allSerializableTypes = new ErraiAppPropertiesConfiguration().modules().getSerializableTypes();
+
+    if (allSerializableTypes == null) {
+       allSerializableTypes = new ErraiAppPropertiesConfiguration().modules().getSerializableTypes();
+    }
+
     return mc.isAnnotationPresent(Portable.class)
-            || allSerializableTypes .contains(mc)
+            || allSerializableTypes.contains(mc)
             || String.class.getName().equals(mc.getFullyQualifiedName())
             || TypeHandlerFactory.getHandler(mc.unsafeAsClass()) != null;
   }
