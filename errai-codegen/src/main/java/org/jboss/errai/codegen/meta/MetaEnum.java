@@ -27,6 +27,10 @@ public abstract class MetaEnum {
 
   public abstract String name();
 
+  public <T extends Enum<T>> T as(final Class<T> enumType) {
+    return T.valueOf(enumType, name());
+  }
+
   @Override
   public boolean equals(Object obj) {
     return obj != null

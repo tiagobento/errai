@@ -74,6 +74,7 @@ import org.jboss.errai.ui.shared.Template;
 import org.jboss.errai.ui.shared.TemplateStyleSheet;
 import org.jboss.errai.ui.shared.TemplateUtil;
 import org.jboss.errai.ui.shared.TemplateWidgetMapper;
+import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.DataField.ConflictStrategy;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.ForEvent;
@@ -118,6 +119,7 @@ import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
 import static org.jboss.errai.codegen.util.Stmt.loadLiteral;
 import static org.jboss.errai.codegen.util.Stmt.loadVariable;
 import static org.jboss.errai.codegen.util.Stmt.nestedCall;
+import static org.jboss.errai.codegen.util.Stmt.newArray;
 import static org.jboss.errai.codegen.util.Stmt.newObject;
 import static org.jboss.errai.ioc.util.GeneratedNamesUtil.qualifiedClassNameToShortenedIdentifier;
 
@@ -376,7 +378,8 @@ public class TemplatedCodeDecorator extends IOCDecoratorExtension<Templated> {
         }
         else {
           dataFieldMetaInstance = newObject(DataFieldMeta.class,
-                  loadLiteral(attributeRules), loadLiteral(defaultStrategy));
+                  newArray(DataField.AttributeRule.class).initialize((Object[]) attributeRules),
+                  loadLiteral(defaultStrategy));
         }
 
         return loadVariable(dataFieldMetasVarName).invoke("put", fieldName, dataFieldMetaInstance);

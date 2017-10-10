@@ -53,7 +53,7 @@ public class TimedExtension extends IOCDecoratorExtension<Timed> {
       final Statement methodInvokation
           = decorable.getAccessStatement();
 
-      final TimeUnit timeUnit = TimeUnit.valueOf(timed.<MetaEnum>value("timeUnit").name());
+      final TimeUnit timeUnit = timed.<MetaEnum>value("timeUnit").as(TimeUnit.class);
       final int interval = timed.value("interval");
 
       final Statement timerDecl

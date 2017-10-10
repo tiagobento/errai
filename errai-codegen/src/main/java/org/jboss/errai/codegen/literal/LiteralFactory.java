@@ -141,7 +141,7 @@ public class LiteralFactory {
     return new LiteralValue<MetaEnum>(o) {
       @Override
       public String getCanonicalString(final Context context) {
-        return o.getDeclaringClass().getName() + "." + o.name();
+        return getClassReference(o.getDeclaringClass(), context) + "." + o.name();
       }
 
       @Override
