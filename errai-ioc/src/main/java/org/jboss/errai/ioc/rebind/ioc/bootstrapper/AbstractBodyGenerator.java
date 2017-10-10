@@ -753,7 +753,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
 
   protected static boolean hasStartupAnnotation(final MetaClass injectedType) {
     for (final MetaAnnotation anno : injectedType.getAnnotations()) {
-      if (anno.annotationType().getName().equals("javax.ejb.Startup")) {
+      if (anno.annotationType().getFullyQualifiedName().equals("javax.ejb.Startup")) {
         return true;
       }
     }
