@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.ioc.client.util.AnnotationPropertyAccessor;
-import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
+import org.jboss.errai.ioc.client.util.ClientAnnotationSerializer;
 
 /**
  *
@@ -60,6 +60,6 @@ public abstract class EventQualifierSerializer {
 
   public String serialize(final Annotation qualifier) {
     final AnnotationPropertyAccessor entry = serializers.get(qualifier.annotationType().getName());
-    return SharedAnnotationSerializer.serialize(qualifier, entry);
+    return ClientAnnotationSerializer.serialize(qualifier, entry);
   }
 }

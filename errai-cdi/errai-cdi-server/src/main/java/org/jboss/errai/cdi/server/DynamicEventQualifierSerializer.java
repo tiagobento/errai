@@ -20,7 +20,7 @@ import org.jboss.errai.codegen.util.CDIAnnotationUtils;
 import org.jboss.errai.enterprise.client.cdi.EventQualifierSerializer;
 import org.jboss.errai.ioc.client.util.AnnotationPropertyAccessor;
 import org.jboss.errai.ioc.client.util.AnnotationPropertyAccessorBuilder;
-import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
+import org.jboss.errai.ioc.client.util.ClientAnnotationSerializer;
 
 import javax.enterprise.util.Nonbinding;
 import java.lang.annotation.Annotation;
@@ -63,7 +63,7 @@ public class DynamicEventQualifierSerializer extends EventQualifierSerializer {
 
   private String serializeValue(final Method method, final Annotation annotation) {
     try {
-      return SharedAnnotationSerializer.serializeObject(method.invoke(annotation));
+      return ClientAnnotationSerializer.serializeObject(method.invoke(annotation));
     } catch (final Exception e) {
       throw new RuntimeException(format("Could not access '%s' property while serializing %s.", method.getName(),
               annotation.annotationType()), e);

@@ -24,11 +24,9 @@ import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit tests for the DynamicEventQualifierSerializer.
- *
- * @author Max Barkley <mbarkley@redhat.com>
+ * @author Tiago Bento <tfernand@redhat.com>
  */
-public abstract class AnnotationSerializerAbstractTests {
+public abstract class AbstractAnnotationSerializerTest {
 
   @Test
   public void annotationWithNoProperties() throws Exception {

@@ -24,7 +24,6 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.EventMetadata;
 
 import org.jboss.errai.enterprise.client.cdi.api.CDI;
-import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
 
 /**
  * Represents an active client-side event observer (an observer that at least

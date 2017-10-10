@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.ioc.client.util;
+package org.jboss.errai.ioc.util;
 
 import org.jboss.errai.codegen.meta.RuntimeAnnotation;
+import org.jboss.errai.ioc.client.util.AnnotationAttrAnnotation;
+import org.jboss.errai.ioc.client.util.AbstractAnnotationSerializerTest;
+import org.jboss.errai.ioc.client.util.OneAttrAnnotation;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
@@ -27,11 +30,11 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class SharedAnnotationSerializerTest extends AnnotationSerializerAbstractTests {
+public class AnnotationSerializerTest extends AbstractAnnotationSerializerTest {
 
   @Override
   public String serialize(final Annotation annotation) {
-    return SharedAnnotationSerializer.serializeMetaAnnotation(new RuntimeAnnotation(annotation));
+    return AnnotationSerializer.serializeMetaAnnotation(new RuntimeAnnotation(annotation));
   }
 
   @Test
