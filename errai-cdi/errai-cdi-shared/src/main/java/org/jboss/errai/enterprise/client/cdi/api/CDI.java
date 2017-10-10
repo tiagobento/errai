@@ -55,8 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * CDI client interface.
@@ -123,22 +122,8 @@ public class CDI {
    *
    * @return
    */
-  public static Set<String> getQualifiersPart(final Annotation[] qualifiers) {
-    Set<String> qualifiersPart = null;
-    if (qualifiers != null) {
-      for (final Annotation qualifier : qualifiers) {
-        if (qualifiersPart == null)
-          qualifiersPart = new HashSet<>(qualifiers.length);
-
-        qualifiersPart.add(asString(qualifier));
-      }
-    }
-    return qualifiersPart == null ? Collections.<String>emptySet() : qualifiersPart;
-
-  }
-
-  public static String asString(final Annotation qualifier) {
-    return EventQualifierSerializer.get().serialize(qualifier);
+  public static Set<String> getSerializedQualifiers(final Annotation[] qualifiers) {
+    return Arrays.stream(qualifiers).map(EventQualifierSerializer.get()::serialize).collect(toSet());
   }
 
   public static void fireEvent(final Object payload, final Annotation... qualifiers) {
@@ -168,7 +153,7 @@ public class CDI {
     messageMap.put(CDIProtocol.FromClient.name(), "1");
 
     if (qualifiers != null && qualifiers.length > 0) {
-      messageMap.put(CDIProtocol.Qualifiers.name(), getQualifiersPart(qualifiers));
+      messageMap.put(CDIProtocol.Qualifiers.name(), getSerializedQualifiers(qualifiers));
     }
 
     consumeEventFromMessage(CommandMessage.createWithParts(messageMap));

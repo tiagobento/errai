@@ -40,8 +40,8 @@ import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaClassMember;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.RuntimeAnnotation;
-import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.CDIAnnotationUtils;
+import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Qualifier;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.QualifierFactory;
 
@@ -401,7 +401,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
         return 0;
       } else {
         // Arbitrary stable ordering for annotations of same type with different values.
-        return AnnotationSerializer.serializeMetaAnnotation(anno).compareTo(AnnotationSerializer.serializeMetaAnnotation(o.anno));
+        return SharedAnnotationSerializer.serializeMetaAnnotation(anno).compareTo(SharedAnnotationSerializer.serializeMetaAnnotation(o.anno));
       }
     }
   }

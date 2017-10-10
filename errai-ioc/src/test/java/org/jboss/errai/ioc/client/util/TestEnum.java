@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.cdi.eqs;
+package org.jboss.errai.ioc.client.util;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public @interface ClassAttrAnnotation {
-  Class<?> clazz();
+public enum TestEnum {
+  A, B;
 }

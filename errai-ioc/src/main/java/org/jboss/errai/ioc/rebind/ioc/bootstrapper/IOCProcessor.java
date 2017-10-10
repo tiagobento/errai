@@ -41,7 +41,6 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
-import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
@@ -71,6 +70,7 @@ import org.jboss.errai.ioc.client.container.async.AsyncBeanManagerSetup;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanManagerSetup.FactoryLoader;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanManagerSetup.FactoryLoaderCallback;
 import org.jboss.errai.ioc.client.container.async.DefaultRunAsyncCallback;
+import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.Dependency;
@@ -480,7 +480,7 @@ public class IOCProcessor {
             .finish()
       .publicOverridesMethod("getQualifiers")
             .append(Stmt.nestedCall(Stmt.newObject(parameterizedAs(JsArray.class,  typeParametersOf(String.class)),
-                    Stmt.loadLiteral(AnnotationSerializer.getQualifiersPart(injectable.getQualifier().spliterator())))).returnValue())
+                    Stmt.loadLiteral(SharedAnnotationSerializer.getSerializedQualifiers(injectable.getQualifier().spliterator())))).returnValue())
             .finish();
 
     return jsTypeProvider.finish();

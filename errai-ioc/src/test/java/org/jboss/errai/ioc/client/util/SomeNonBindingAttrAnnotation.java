@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.cdi.eqs;
+package org.jboss.errai.ioc.client.util;
 
 import javax.enterprise.util.Nonbinding;
 

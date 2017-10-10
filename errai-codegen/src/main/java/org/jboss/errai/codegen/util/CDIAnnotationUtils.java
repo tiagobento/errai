@@ -27,8 +27,6 @@ import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.RuntimeAnnotation;
 import org.jboss.errai.codegen.meta.impl.apt.APTAnnotation;
-import org.jboss.errai.common.client.util.AnnotationPropertyAccessor;
-import org.jboss.errai.common.client.util.AnnotationPropertyAccessorBuilder;
 import org.jboss.errai.common.metadata.MetaDataScanner;
 import org.jboss.errai.common.metadata.ScannerSingleton;
 
@@ -42,12 +40,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.lang.reflect.Modifier.isPublic;
 
 /**
  * <p>

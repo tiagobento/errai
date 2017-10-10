@@ -32,7 +32,6 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
-import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.apt.MetaClassFinder;
@@ -46,6 +45,7 @@ import org.jboss.errai.enterprise.client.cdi.JsTypeEventObserver;
 import org.jboss.errai.enterprise.client.cdi.api.CDI;
 import org.jboss.errai.ioc.client.api.CodeDecorator;
 import org.jboss.errai.ioc.client.container.Factory;
+import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.InjectUtil;
 import org.jboss.errai.ioc.rebind.ioc.extension.IOCDecoratorExtension;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.Decorable;
@@ -98,7 +98,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
-    final Set<String> qualifierNames = AnnotationSerializer.getQualifiersPart(qualifiers);
+    final Set<String> qualifierNames = SharedAnnotationSerializer.getSerializedQualifiers(qualifiers);
     final boolean isEnclosingTypeDependent = decorable.isEnclosingTypeDependent();
 
     if (qualifierNames.contains(Any.class.getName())) {
@@ -192,7 +192,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
-    final Set<String> qualifierNames = AnnotationSerializer.getQualifiersPart(qualifiers);
+    final Set<String> qualifierNames = SharedAnnotationSerializer.getSerializedQualifiers(qualifiers);
 
     final MetaClass callBackType = parameterizedAs(AbstractCDIEventCallback.class, typeParametersOf(eventType));
     AnonymousClassStructureBuilder callBack = Stmt.newObject(callBackType).extend();

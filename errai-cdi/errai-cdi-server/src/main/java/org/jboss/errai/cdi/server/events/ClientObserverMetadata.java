@@ -24,6 +24,7 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.EventMetadata;
 
 import org.jboss.errai.enterprise.client.cdi.api.CDI;
+import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
 
 /**
  * Represents an active client-side event observer (an observer that at least
@@ -84,7 +85,7 @@ public class ClientObserverMetadata {
   public boolean matches(Object event, EventMetadata emd) {
     Class<?> actualEventType = event.getClass();
     Set<String> actualQualifiers = (emd != null) ? CDI
-            .getQualifiersPart(emd.getQualifiers().toArray(new Annotation[0])) : Collections.<String> emptySet();
+            .getSerializedQualifiers(emd.getQualifiers().toArray(new Annotation[0])) : Collections.<String> emptySet();
 
     // The clients subscribe to every supertype and interface type separately
     // which is why checking for equals is enough here. Otherwise, we would have

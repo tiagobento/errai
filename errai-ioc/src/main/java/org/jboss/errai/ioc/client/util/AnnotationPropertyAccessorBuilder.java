@@ -1,4 +1,4 @@
-package org.jboss.errai.common.client.util;
+package org.jboss.errai.ioc.client.util;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;

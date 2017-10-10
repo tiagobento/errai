@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.cdi.eqs;
+package org.jboss.errai.ioc.client.util;
 
-import org.jboss.errai.cdi.server.DynamicEventQualifierSerializer;
-import org.jboss.errai.codegen.meta.RuntimeAnnotation;
-import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Function;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
@@ -153,6 +145,59 @@ public abstract class AnnotationSerializerAbstractTests {
     };
 
     assertEquals(format("%s(enun=%s)", EnumAttrAnnotation.class.getName(), TestEnum.A.name()), serialize(annotation));
+  }
+
+  @Test
+  public void annotationWithEmptyArrayAttr() throws Exception {
+    final ArrayAttrAnnotation annotation = new ArrayAttrAnnotation() {
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return ArrayAttrAnnotation.class;
+      }
+
+      @Override
+      public Class<?>[] classes() {
+        return new Class[0];
+      }
+    };
+    assertEquals(format("%s(classes=[])", ArrayAttrAnnotation.class.getName()), serialize(annotation));
+  }
+
+  @Test
+  public void annotationWithOneElementsArrayAttr() throws Exception {
+    final ArrayAttrAnnotation annotation = new ArrayAttrAnnotation() {
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return ArrayAttrAnnotation.class;
+      }
+
+      @Override
+      public Class<?>[] classes() {
+        return new Class[] { String.class };
+      }
+    };
+    assertEquals(format("%s(classes=[%s])", ArrayAttrAnnotation.class.getName(), String.class.getName()),
+            serialize(annotation));
+  }
+
+  @Test
+  public void annotationWithTwoElementsArrayAttr() throws Exception {
+    final ArrayAttrAnnotation annotation = new ArrayAttrAnnotation() {
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return ArrayAttrAnnotation.class;
+      }
+
+      @Override
+      public Class<?>[] classes() {
+        return new Class[] { String.class, Long.class };
+      }
+    };
+    assertEquals(format("%s(classes=[%s, %s])", ArrayAttrAnnotation.class.getName(), String.class.getName(),
+            Long.class.getName()), serialize(annotation));
   }
 
   public abstract String serialize(final Annotation annotation);

@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.errai.common.client.api.Assert;
-import org.jboss.errai.common.client.util.AnnotationPropertyAccessor;
-import org.jboss.errai.common.client.util.SharedAnnotationSerializer;
+import org.jboss.errai.ioc.client.util.AnnotationPropertyAccessor;
+import org.jboss.errai.ioc.client.util.SharedAnnotationSerializer;
 
 /**
  *
