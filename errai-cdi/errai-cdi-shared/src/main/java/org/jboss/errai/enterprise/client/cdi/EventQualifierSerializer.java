@@ -62,14 +62,4 @@ public abstract class EventQualifierSerializer {
     final AnnotationPropertyAccessor entry = serializers.get(qualifier.annotationType().getName());
     return SharedAnnotationSerializer.serialize(qualifier, entry);
   }
-
-  public String qualifierName(final String serializedQualifier) {
-    if (serializedQualifier.contains("(")) {
-      return serializedQualifier.substring(0, serializedQualifier.indexOf('('));
-    }
-    else {
-      return serializedQualifier;
-    }
-  }
-
 }
