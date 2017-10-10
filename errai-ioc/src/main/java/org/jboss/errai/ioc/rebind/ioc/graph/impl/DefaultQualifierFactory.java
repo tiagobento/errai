@@ -401,7 +401,7 @@ public class DefaultQualifierFactory implements QualifierFactory {
         return 0;
       } else {
         // Arbitrary stable ordering for annotations of same type with different values.
-        return AnnotationSerializer.asString(anno).compareTo(AnnotationSerializer.asString(o.anno));
+        return AnnotationSerializer.serializeMetaAnnotation(anno).compareTo(AnnotationSerializer.serializeMetaAnnotation(o.anno));
       }
     }
   }

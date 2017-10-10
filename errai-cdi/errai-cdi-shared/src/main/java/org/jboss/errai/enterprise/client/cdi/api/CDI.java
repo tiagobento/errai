@@ -16,20 +16,6 @@
 
 package org.jboss.errai.enterprise.client.cdi.api;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.jboss.errai.bus.client.ErraiBus;
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.bus.client.api.Subscription;
@@ -53,6 +39,24 @@ import org.jboss.errai.enterprise.client.cdi.WindowEventObservers;
 import org.jboss.errai.marshalling.client.api.MarshallerFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
 /**
  * CDI client interface.
@@ -133,7 +137,7 @@ public class CDI {
 
   }
 
-  private static String asString(final Annotation qualifier) {
+  public static String asString(final Annotation qualifier) {
     return EventQualifierSerializer.get().serialize(qualifier);
   }
 

@@ -446,57 +446,12 @@ public class CDIAnnotationUtils {
                       && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
     }
 
-    public static Collection<Method> getAnnotationAttributes(final Class<?> annoClass) {
-      return filterAnnotationMethods(Arrays.stream(annoClass.getDeclaredMethods()),
-              method -> !method.isAnnotationPresent(Nonbinding.class) && isPublic(method.getModifiers())
-                      && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
-    }
 
-    private static <T, M> Collection<M> filterAnnotationMethods(final Stream<M> methods, final Predicate<M> methodPredicate) {
+
+    public static <T, M> Collection<M> filterAnnotationMethods(final Stream<M> methods, final Predicate<M> methodPredicate) {
       return methods.filter(methodPredicate).collect(Collectors.toList());
     }
 
-    public static AnnotationPropertyAccessor createDynamicSerializer(final Class<? extends Annotation> annotationType) {
-      final AnnotationPropertyAccessorBuilder builder = AnnotationPropertyAccessorBuilder.create();
-
-      final Collection<Method> annoAttrs = CDIAnnotationUtils.getAnnotationAttributes(annotationType);
-      for (final Method attr : annoAttrs) {
-        builder.with(attr.getName(), anno -> {
-          try {
-            final String retVal;
-            final Function<Object, String> toString = componentToString(
-                  attr.getReturnType().isArray() ? attr.getReturnType().getComponentType() : attr.getReturnType());
-            if (attr.getReturnType().isArray()) {
-              final StringBuilder sb = new StringBuilder();
-              final Object[] array = (Object[]) attr.invoke(anno);
-              sb.append("[");
-              for (final Object obj : array) {
-                sb.append(toString.apply(obj)).append(",");
-              }
-              sb.replace(sb.length()-1, sb.length(), "]");
-              retVal = sb.toString();
-            }
-            else {
-              retVal = toString.apply(attr.invoke(anno));
-            }
-            return retVal;
-          } catch (final Exception e) {
-            throw new RuntimeException(String.format("Could not access '%s' property while serializing %s.", attr.getName(), anno.annotationType()), e);
-          }
-        });
-      }
-
-      return builder.build();
-    }
-
-    private static Function<Object, String> componentToString(final Class<?> returnType) {
-      if (Class.class.equals(returnType)) {
-        return o -> ((Class<?>) o).getName();
-      }
-      else {
-        return o -> String.valueOf(o);
-      }
-    }
 
   public static boolean equals(final MetaAnnotation anno1, final MetaAnnotation anno2) {
 

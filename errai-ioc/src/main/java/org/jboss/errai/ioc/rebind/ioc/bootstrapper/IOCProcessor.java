@@ -480,7 +480,7 @@ public class IOCProcessor {
             .finish()
       .publicOverridesMethod("getQualifiers")
             .append(Stmt.nestedCall(Stmt.newObject(parameterizedAs(JsArray.class,  typeParametersOf(String.class)),
-                    Stmt.loadLiteral(AnnotationSerializer.serialize(injectable.getQualifier().spliterator())))).returnValue())
+                    Stmt.loadLiteral(AnnotationSerializer.getQualifiersPart(injectable.getQualifier().spliterator())))).returnValue())
             .finish();
 
     return jsTypeProvider.finish();

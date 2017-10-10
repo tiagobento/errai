@@ -53,7 +53,7 @@ public class SharedAnnotationSerializer {
   }
 
   public static String stringify(final Class<?>[] value) {
-    return Arrays.toString(value);
+    return Arrays.toString(Arrays.stream(value).map(Class::getName).toArray());
   }
 
   public static String stringify(final byte[] value) {

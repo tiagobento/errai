@@ -16,16 +16,8 @@
 
 package org.jboss.errai.cdi.eqs;
 
-import org.jboss.errai.cdi.server.DynamicEventQualifierSerializer;
-
-import java.lang.annotation.Annotation;
-
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class DynamicEventQualifierSerializerTest extends AnnotationSerializerAbstractTests {
-  @Override
-  public String serialize(final Annotation annotation) {
-    return new DynamicEventQualifierSerializer().serialize(annotation);
-  }
+public @interface NoAttrAnnotation {
 }

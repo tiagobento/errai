@@ -16,16 +16,15 @@
 
 package org.jboss.errai.cdi.eqs;
 
-import org.jboss.errai.cdi.server.DynamicEventQualifierSerializer;
-
-import java.lang.annotation.Annotation;
+import javax.enterprise.util.Nonbinding;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class DynamicEventQualifierSerializerTest extends AnnotationSerializerAbstractTests {
-  @Override
-  public String serialize(final Annotation annotation) {
-    return new DynamicEventQualifierSerializer().serialize(annotation);
-  }
+public @interface SomeNonBindingAttrAnnotation {
+  int num();
+
+  String str();
+
+  @Nonbinding int nonBindingNum();
 }

@@ -700,9 +700,7 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
 
     final org.jboss.errai.ioc.rebind.ioc.graph.api.Qualifier qualifier = injectable.getQualifier();
     if (!qualifier.isDefaultQualifier()) {
-      final AbstractStatementBuilder qualArray =
-              getAnnotationArrayStmt(qualifier);
-      con.append(loadVariable("handle").invoke("setQualifiers", qualArray));
+      con.append(loadVariable("handle").invoke("setQualifiers", getAnnotationArrayStmt(qualifier)));
     }
     con.finish();
   }

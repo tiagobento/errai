@@ -30,12 +30,12 @@ import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.util.AnnotationSerializer;
 import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
+import org.jboss.errai.common.apt.MetaClassFinder;
 import org.jboss.errai.common.client.api.annotations.LocalEvent;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.client.types.TypeHandler;
@@ -98,7 +98,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
-    final Set<String> qualifierNames = AnnotationSerializer.serialize(qualifiers);
+    final Set<String> qualifierNames = AnnotationSerializer.getQualifiersPart(qualifiers);
     final boolean isEnclosingTypeDependent = decorable.isEnclosingTypeDependent();
 
     if (qualifierNames.contains(Any.class.getName())) {
@@ -192,7 +192,7 @@ public class ObservesExtension extends IOCDecoratorExtension<Observes> {
     final MetaClass eventType = parm.getType().asBoxed();
     final String parmClassName = eventType.getFullyQualifiedName();
     final List<MetaAnnotation> qualifiers = InjectUtil.extractQualifiers(parm);
-    final Set<String> qualifierNames = AnnotationSerializer.serialize(qualifiers);
+    final Set<String> qualifierNames = AnnotationSerializer.getQualifiersPart(qualifiers);
 
     final MetaClass callBackType = parameterizedAs(AbstractCDIEventCallback.class, typeParametersOf(eventType));
     AnonymousClassStructureBuilder callBack = Stmt.newObject(callBackType).extend();
