@@ -27,22 +27,22 @@ public class ErraiAppPropertiesErraiAppConfiguration implements ErraiAppConfigur
 
   @Override
   public boolean isUserEnabledOnHostPage() {
-    return false; //FIXME: tiago: implement
+    return false; //FIXME: Implement when migrating owner module to APT generators
   }
 
   @Override
   public boolean isWebSocketServerEnabled() {
-    return false; //FIXME: tiago: implement
+    return false; //FIXME: Implement when migrating owner module to APT generators
   }
 
   @Override
   public String getApplicationContext() {
-    return null; //FIXME: tiago: implement
+    return null; //FIXME: Implement when migrating owner module to APT generators
   }
 
   @Override
   public boolean isAutoDiscoverServicesEnabled() {
-    return false; //FIXME: tiago: implement
+    return false; //FIXME: Implement when migrating owner module to APT generators
   }
 
   @Override
