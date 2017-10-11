@@ -1,12 +1,12 @@
-/**
+/*
  * Copyright (C) 2016 Red Hat, Inc. and/or its affiliates.
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,24 +16,25 @@
 
 package org.jboss.errai.cdi.server;
 
+import org.jboss.errai.codegen.meta.impl.java.JavaReflectionMethod;
 import org.jboss.errai.codegen.util.CDIAnnotationUtils;
 import org.jboss.errai.enterprise.client.cdi.EventQualifierSerializer;
 import org.jboss.errai.ioc.client.util.AnnotationPropertyAccessor;
 import org.jboss.errai.ioc.client.util.AnnotationPropertyAccessorBuilder;
 import org.jboss.errai.ioc.client.util.ClientAnnotationSerializer;
 
-import javax.enterprise.util.Nonbinding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPublic;
+import static java.util.stream.Collectors.toList;
 
 /**
  * A specialization of {@link EventQualifierSerializer} that uses the Java Reflection API to serialize qualifiers.
- * <p>
+ *
  * This implementation is used in scenarios where a statically generated {@link EventQualifierSerializer} has not been
  * packaged in a deployment and cannot be generated when the application bootstraps.
  *
@@ -71,11 +72,8 @@ public class DynamicEventQualifierSerializer extends EventQualifierSerializer {
   }
 
   private Collection<Method> getSerializableMethods(final Class<? extends Annotation> annotationClass) {
-    return CDIAnnotationUtils.filterAnnotationMethods(Arrays.stream(annotationClass.getDeclaredMethods()),
-            method -> !method.isAnnotationPresent(Nonbinding.class)
-                    && isPublic(method.getModifiers())
-                    && !method.getName().equals("equals")
-                    && !method.getName().equals("hashCode"));
+    return Arrays.stream(annotationClass.getDeclaredMethods())
+            .filter(m -> CDIAnnotationUtils.relevantForSerialization(new JavaReflectionMethod(m)))
+            .collect(toList());
   }
-
 }

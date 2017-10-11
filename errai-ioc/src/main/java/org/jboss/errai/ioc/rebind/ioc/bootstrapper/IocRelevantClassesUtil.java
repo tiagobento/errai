@@ -28,11 +28,9 @@ import java.util.HashSet;
 public class IocRelevantClassesUtil {
 
   public static Collection<MetaClass> findRelevantClasses() {
-
     final Collection<MetaClass> allMetaClasses = new HashSet<>();
     allMetaClasses.addAll(MetaClassFactory.getAllCachedClasses());
     allMetaClasses.remove(MetaClassFactory.get(Object.class));
-
     return allMetaClasses;
   }
 }

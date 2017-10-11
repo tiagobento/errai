@@ -48,7 +48,7 @@ public class ServiceCodeDecorator extends IOCDecoratorExtension<Service> {
 
     boolean local = false;
     for (final MetaAnnotation a : InjectUtil.extractQualifiers(decorable.get())) {
-      if (MetaClassFactory.get(Local.class).equals(a.annotationType())) {
+      if (a.instanceOf(Local.class)) {
         local = true;
       }
     }

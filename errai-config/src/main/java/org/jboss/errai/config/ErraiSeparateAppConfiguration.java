@@ -21,6 +21,7 @@ package org.jboss.errai.config;
  */
 interface ErraiSeparateAppConfiguration {
 
+  //FIXME: Find out which modules use these properties
   interface Others {
 
     boolean isUserEnabledOnHostPage();

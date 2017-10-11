@@ -35,7 +35,7 @@ import static javax.tools.StandardLocation.SOURCE_PATH;
  */
 public class AptResourceFilesFinder implements ResourceFilesFinder {
 
-  private static final List<JavaFileManager.Location> locationsToSearch = Arrays.asList(SOURCE_PATH, CLASS_PATH);
+  private static final List<JavaFileManager.Location> LOCATIONS_TO_SEARCH = Arrays.asList(SOURCE_PATH, CLASS_PATH);
 
   private final Filer filer;
 
@@ -50,7 +50,7 @@ public class AptResourceFilesFinder implements ResourceFilesFinder {
     final String packageName = path.substring(0, lastSlashIndex).replace("/", ".");
     final String fileName = path.substring(lastSlashIndex + 1);
 
-    return locationsToSearch.stream()
+    return LOCATIONS_TO_SEARCH.stream()
             .map(location -> getUri(location, packageName, fileName))
             .filter(Optional::isPresent)
             .map(Optional::get)

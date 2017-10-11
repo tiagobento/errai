@@ -85,8 +85,10 @@ public class RuntimeAnnotation extends MetaAnnotation {
   private Object methodValue(final Method m) {
     try {
       return m.invoke(annotation);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (final Exception e) {
+      throw new RuntimeException(
+              "Error trying to access property [" + m.getName() + "] from annotation " + annotation.annotationType()
+                      .getName(), e);
     }
   }
 }

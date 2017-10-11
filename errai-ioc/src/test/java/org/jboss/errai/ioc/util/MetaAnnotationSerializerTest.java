@@ -30,11 +30,11 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class AnnotationSerializerTest extends AbstractAnnotationSerializerTest {
+public class MetaAnnotationSerializerTest extends AbstractAnnotationSerializerTest {
 
   @Override
   public String serialize(final Annotation annotation) {
-    return AnnotationSerializer.serializeMetaAnnotation(new RuntimeAnnotation(annotation));
+    return MetaAnnotationSerializer.serialize(new RuntimeAnnotation(annotation));
   }
 
   @Test

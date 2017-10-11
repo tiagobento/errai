@@ -20,6 +20,5 @@ package org.jboss.errai.ioc.client.util;
  * @author Tiago Bento <tfernand@redhat.com>
  */
 public @interface ArrayAttrAnnotation {
-
   Class<?>[] classes();
 }

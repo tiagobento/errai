@@ -139,6 +139,7 @@ public class MetaDataScanner extends Reflections {
             final String clsName = props.getString(key);
 
             try {
+              //FIXME: tiago
               final Class<?> aClass = Class.forName(clsName);
               extensions.add(aClass.asSubclass(Vfs.UrlType.class));
             } catch (final Throwable t) {

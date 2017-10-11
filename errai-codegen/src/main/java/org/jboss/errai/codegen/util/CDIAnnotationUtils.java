@@ -40,9 +40,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <p>
@@ -435,18 +433,20 @@ public class CDIAnnotationUtils {
       return qualifiersAsMetaClasses;
     }
 
-    public static Collection<MetaMethod> getAnnotationAttributes(final MetaClass annoClass) {
-      return filterAnnotationMethods(Arrays.stream(annoClass.getDeclaredMethods()),
-              method -> !method.isAnnotationPresent(Nonbinding.class) && method.isPublic()
-                      && !method.getName().equals("equals") && !method.getName().equals("hashCode"));
-    }
 
 
+  public static Collection<MetaMethod> getAnnotationAttributes(final MetaClass annoClass) {
+    return Arrays.stream(annoClass.getDeclaredMethods())
+            .filter(CDIAnnotationUtils::relevantForSerialization)
+            .collect(Collectors.toList());
+  }
 
-    public static <T, M> Collection<M> filterAnnotationMethods(final Stream<M> methods, final Predicate<M> methodPredicate) {
-      return methods.filter(methodPredicate).collect(Collectors.toList());
-    }
-
+  public static boolean relevantForSerialization(final MetaMethod method) {
+    return !method.isAnnotationPresent(Nonbinding.class)
+            && method.isPublic()
+            && !method.getName().equals("equals")
+            && !method.getName().equals("hashCode");
+  }
 
   public static boolean equals(final MetaAnnotation anno1, final MetaAnnotation anno2) {
 

@@ -69,16 +69,17 @@ public class GenUtil {
   }
 
   public static Statement[] generateCallParameters(final Context context, final Object... parameters) {
-    return Arrays.stream(parameters).map(p -> generate(context, p)).toArray(Statement[]::new);
+    return Arrays.stream(parameters).map(p -> generate(context, p)).toArray(s -> new Statement[s]);
   }
 
   public static Statement[] generateCallParameters(final MetaMethod method,
                                                    final Context context,
                                                    final Object... parameters) {
-    final MetaParameter[] methodParameters = method.getParameters();
-    if (parameters.length != methodParameters.length && !method.isVarArgs()) {
+    if (parameters.length != method.getParameters().length && !method.isVarArgs()) {
       throw new UndefinedMethodException("Wrong number of parameters");
     }
+
+    final MetaParameter[] methParms = method.getParameters();
 
     final Statement[] statements = new Statement[parameters.length];
     int i = 0;
@@ -89,12 +90,12 @@ public class GenUtil {
         }
       }
       try {
-        statements[i] = convert(context, parameter, methodParameters[i++].getType());
+        statements[i] = convert(context, parameter, methParms[i++].getType());
       }
       catch (final GenerationException t) {
         t.appendFailureInfo("in method call: "
             + method.getDeclaringClass().getFullyQualifiedName()
-            + "." + method.getName() + "(" + Arrays.toString(methodParameters) + ")");
+            + "." + method.getName() + "(" + Arrays.toString(methParms) + ")");
         throw t;
       }
     }

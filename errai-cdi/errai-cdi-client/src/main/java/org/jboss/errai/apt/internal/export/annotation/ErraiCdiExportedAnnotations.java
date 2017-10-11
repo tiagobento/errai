@@ -21,8 +21,8 @@ import javax.enterprise.event.Observes;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public final class ErraiCdiExportedAnnoations {
-  private ErraiCdiExportedAnnoations() {
+public final class ErraiCdiExportedAnnotations {
+  private ErraiCdiExportedAnnotations() {
   }
 
   private Observes observes;

@@ -35,9 +35,9 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class AnnotationSerializer {
+public class MetaAnnotationSerializer {
 
-  public static String serializeMetaAnnotation(final MetaAnnotation qualifier) {
+  public static String serialize(final MetaAnnotation qualifier) {
     final StringBuilder builder = new StringBuilder(qualifier.annotationType().getFullyQualifiedName());
     final Set<String> keys = qualifier.values().keySet();
 
@@ -60,14 +60,14 @@ public class AnnotationSerializer {
   }
 
   public static Set<String> getSerializedQualifiers(final Collection<MetaAnnotation> qualifiers) {
-    return qualifiers.stream().map(AnnotationSerializer::serializeMetaAnnotation).collect(toSet());
+    return qualifiers.stream().map(MetaAnnotationSerializer::serialize).collect(toSet());
   }
 
-  public static String serializeObject(final Object value) {
+  private static String serializeObject(final Object value) {
     if (value.getClass().isArray()) {
-      return Arrays.toString(stream((Object[]) value).map(AnnotationSerializer::serializeObject).toArray());
+      return Arrays.toString(stream((Object[]) value).map(MetaAnnotationSerializer::serializeObject).toArray());
     } else if (value instanceof MetaAnnotation) {
-      return serializeMetaAnnotation((MetaAnnotation) value);
+      return serialize((MetaAnnotation) value);
     } else if (value instanceof MetaClass) {
       return ((MetaClass) value).getFullyQualifiedName();
     } else if (value instanceof MetaEnum) {
