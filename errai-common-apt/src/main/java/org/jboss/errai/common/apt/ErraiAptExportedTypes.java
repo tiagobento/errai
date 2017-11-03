@@ -114,9 +114,11 @@ public final class ErraiAptExportedTypes {
   }
 
   private void addLocalExportableTypesWhichHaveNotBeenExported() {
-    log.info("Exporting local exportable types..");
+    final long start = System.currentTimeMillis();
+    System.out.println("Exporting local exportable types..");
     exportedAnnotationsPackageElement(elements).map(this::getAllExportedAnnotations)
             .ifPresent(this::addAllExportableTypes);
+    System.out.println("Exported local exportable types in " + (System.currentTimeMillis() - start) + "ms");
   }
 
   private Set<TypeElement> getAllExportedAnnotations(final PackageElement exportedAnnotationsPackageElement) {

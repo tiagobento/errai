@@ -23,6 +23,7 @@ import com.google.common.collect.Multimap;
 import com.google.gwt.core.ext.GeneratorContext;
 import com.google.gwt.core.ext.TreeLogger;
 import com.google.gwt.core.ext.UnableToCompleteException;
+import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.errai.codegen.Modifier;
