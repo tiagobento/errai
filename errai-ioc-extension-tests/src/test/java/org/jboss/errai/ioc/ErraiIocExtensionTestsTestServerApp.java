@@ -23,6 +23,6 @@ import static org.jboss.errai.common.configuration.Target.JAVA;
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiApp(gwtModuleName = "", targets = JAVA)
+@ErraiApp(gwtModuleName = "", target = JAVA)
 public class ErraiIocExtensionTestsTestServerApp {
 }

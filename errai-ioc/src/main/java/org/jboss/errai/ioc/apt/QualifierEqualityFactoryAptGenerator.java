@@ -32,11 +32,14 @@ import java.util.Collection;
 
 import static java.util.Collections.singleton;
 import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
+import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
+import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.common.configuration.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiGenerator
+@ErraiGenerator(targets = { JAVA, GWT })
 public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private static final Logger log = LoggerFactory.getLogger(QualifierEqualityFactoryAptGenerator.class);
@@ -75,6 +78,6 @@ public class QualifierEqualityFactoryAptGenerator extends ErraiAptGenerators.Sin
 
   @Override
   public ErraiAptGeneratedSourceFile.Type getType() {
-    return CLIENT;
+    return erraiConfiguration().app().target().equals(GWT) ? CLIENT : SHARED;
   }
 }

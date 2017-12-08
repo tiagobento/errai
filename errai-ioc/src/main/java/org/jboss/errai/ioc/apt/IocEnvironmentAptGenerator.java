@@ -16,8 +16,8 @@
 
 package org.jboss.errai.ioc.apt;
 
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCEnvironmentGenerator;
@@ -25,11 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
+import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
+import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.common.configuration.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiGenerator
+@ErraiGenerator(targets = { JAVA, GWT })
 public class IocEnvironmentAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private static final Logger log = LoggerFactory.getLogger(IocEnvironmentAptGenerator.class);
@@ -45,7 +48,8 @@ public class IocEnvironmentAptGenerator extends ErraiAptGenerators.SingleFile {
   @Override
   public String generate() {
     log.info("Generating {}...", getClassSimpleName());
-    final String generatedSource = iocEnvironmentGenerator.generate(erraiConfiguration(), getResolvedFullyQualifiedClassName());
+    final String generatedSource = iocEnvironmentGenerator.generate(erraiConfiguration(),
+            getResolvedFullyQualifiedClassName());
     log.info("Generated {}", getClassSimpleName());
     return generatedSource;
   }
@@ -62,6 +66,6 @@ public class IocEnvironmentAptGenerator extends ErraiAptGenerators.SingleFile {
 
   @Override
   public ErraiAptGeneratedSourceFile.Type getType() {
-    return CLIENT;
+    return erraiConfiguration().app().target().equals(GWT) ? CLIENT : SHARED;
   }
 }

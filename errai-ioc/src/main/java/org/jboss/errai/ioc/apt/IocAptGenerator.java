@@ -16,21 +16,25 @@
 
 package org.jboss.errai.ioc.apt;
 
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.common.apt.generator.app.ResourceFilesFinder;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
+import org.jboss.errai.common.apt.generator.app.ResourceFilesFinder;
 import org.jboss.errai.common.configuration.ErraiGenerator;
+import org.jboss.errai.common.configuration.Target;
 import org.jboss.errai.ioc.apt.util.AptIocRelevantClassesFinder;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClassesFinder;
 
 import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
+import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
+import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.common.configuration.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiGenerator
+@ErraiGenerator(targets = { JAVA, GWT })
 public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
 
   private final IOCGenerator iocGenerator;
@@ -62,6 +66,6 @@ public class IocAptGenerator extends ErraiAptGenerators.SingleFile {
 
   @Override
   public ErraiAptGeneratedSourceFile.Type getType() {
-    return CLIENT;
+    return erraiConfiguration().app().target().equals(Target.GWT) ? CLIENT : SHARED;
   }
 }

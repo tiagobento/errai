@@ -26,9 +26,7 @@ import org.jboss.errai.config.ErraiAppConfiguration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
-import static java.util.stream.Collectors.toSet;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.APPLICATION_CONTEXT;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.ASYNC_BEAN_MANAGER;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.AUTO_DISCOVER_SERVICES;
@@ -41,7 +39,7 @@ import static org.jboss.errai.common.configuration.ErraiApp.Property.JS_INTEROP_
 import static org.jboss.errai.common.configuration.ErraiApp.Property.LAZY_LOAD_BUILTIN_MARSHALLERS;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.MAKE_DEFAULT_ARRAY_MARSHALLERS;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.MODULES;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.TARGETS;
+import static org.jboss.errai.common.configuration.ErraiApp.Property.TARGET;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.USER_ON_HOST_PAGE_ENABLED;
 import static org.jboss.errai.common.configuration.ErraiApp.Property.USE_STATIC_MARSHALLERS;
 
@@ -115,6 +113,11 @@ public class AptErraiAppConfiguration implements ErraiAppConfiguration {
   }
 
   @Override
+  public Target target() {
+    return erraiAppMetaAnnotation.<MetaEnum>value(TARGET).as(Target.class);
+  }
+
+  @Override
   public boolean isAptEnvironment() {
     return true;
   }
@@ -125,12 +128,6 @@ public class AptErraiAppConfiguration implements ErraiAppConfiguration {
 
   public String gwtModuleName() {
     return erraiAppMetaAnnotation.value(GWT_MODULE_NAME);
-  }
-
-  public Set<Target> targets() {
-    return Arrays.stream(erraiAppMetaAnnotation.valueAsArray(TARGETS, MetaEnum[].class))
-            .map(s -> s.as(Target.class))
-            .collect(toSet());
   }
 
   public Collection<MetaClass> modules() {

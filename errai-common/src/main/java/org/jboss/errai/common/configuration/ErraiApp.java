@@ -29,7 +29,7 @@ public @interface ErraiApp {
 
   String gwtModuleName();
 
-  Target[] targets() default { GWT };
+  Target target() default GWT;
 
   Class<?>[] modules() default {};
 
@@ -72,6 +72,6 @@ public @interface ErraiApp {
     String CUSTOM_PROPERTIES = "customProperties";
     String MODULES = "modules";
     String GWT_MODULE_NAME = "gwtModuleName";
-    String TARGETS = "targets";
+    String TARGET = "target";
   }
 }

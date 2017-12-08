@@ -19,8 +19,8 @@ package org.jboss.errai.ioc.apt;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.util.GWTPrivateMemberAccessor;
 import org.jboss.errai.codegen.util.PrivateAccessUtil;
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryGenerator;
@@ -37,11 +37,14 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
+import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
+import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.common.configuration.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-@ErraiGenerator
+@ErraiGenerator(targets = { JAVA, GWT })
 public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
 
   private static final Logger log = LoggerFactory.getLogger(FactoriesAptGenerator.class);
@@ -79,7 +82,8 @@ public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
     final String generatedSource = generateSources(factoryMetaClass, injectable);
     final String classSimpleName = factoryMetaClass.getName();
 
-    return new ErraiAptGeneratedSourceFile(FactoryGenerator.GENERATED_PACKAGE, classSimpleName, generatedSource, CLIENT);
+    return new ErraiAptGeneratedSourceFile(FactoryGenerator.GENERATED_PACKAGE, classSimpleName, generatedSource,
+            erraiConfiguration().app().target().equals(GWT) ? CLIENT : SHARED);
   }
 
   private String generateSources(final MetaClass factoryMetaClass, final Injectable injectable) {
