@@ -16,6 +16,7 @@
 
 package org.jboss.errai.config;
 
+import org.jboss.errai.common.configuration.Target;
 import org.jboss.errai.config.ErraiSeparateAppConfiguration.Ioc;
 import org.jboss.errai.config.ErraiSeparateAppConfiguration.Jaxrs;
 import org.jboss.errai.config.ErraiSeparateAppConfiguration.Marshalling;
@@ -37,4 +38,6 @@ public interface ErraiAppConfiguration extends Ioc, Marshalling, Jaxrs, Validati
   default String namespace() {
     return "";
   }
+
+  Target target();
 }

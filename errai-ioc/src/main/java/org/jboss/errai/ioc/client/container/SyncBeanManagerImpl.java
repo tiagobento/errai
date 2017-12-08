@@ -16,17 +16,9 @@
 
 package org.jboss.errai.ioc.client.container;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Alternative;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.gwt.core.client.GWT;
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.ioc.client.JsArray;
 import org.jboss.errai.ioc.client.QualifierUtil;
@@ -35,8 +27,15 @@ import org.jboss.errai.ioc.client.WindowInjectionContextStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Alternative;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A simple bean manager provided by the Errai IOC framework. The manager provides access to all of the wired beans
@@ -157,7 +156,9 @@ public class SyncBeanManagerImpl implements SyncBeanManager, BeanManagerSetup {
 
     final Collection<FactoryHandle> handles = handlesByName.get(name);
     final Collection<SyncBeanDef<?>> runtimeBeanDefs = runtimeBeanDefsByName.get(name);
-    final JsArray<JsTypeProvider<?>> jsProviders = getJsProviders(name);
+    final JsArray<JsTypeProvider<?>> jsProviders = GWT.isClient() ?
+            getJsProviders(name) :
+            new JsArray<>(new JsTypeProvider[0]);
 
     final Set<String> beanDefFactoryNames = new HashSet<>();
     final Collection beanDefs = new ArrayList<SyncBeanDef<Object>>(handles.size()+runtimeBeanDefs.size()+jsProviders.length());

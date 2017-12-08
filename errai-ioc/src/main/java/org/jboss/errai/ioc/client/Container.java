@@ -70,24 +70,7 @@ public class Container implements EntryPoint {
       final Bootstrapper bootstrapper = GWT.create(Bootstrapper.class);
       logger.debug("Created {} instance in {}ms", Bootstrapper.class.getSimpleName(), System.currentTimeMillis() - start);
 
-      logger.debug("Creating new {} instance...", ContextManager.class.getSimpleName());
-      start = System.currentTimeMillis();
-      final ContextManager contextManager = bootstrapper.bootstrapContainer();
-      logger.debug("Created {} instance in {}ms", ContextManager.class.getSimpleName(), System.currentTimeMillis() - start);
-
-      logger.debug("Initializing bean manager...");
-      start = System.currentTimeMillis();
-      beanManager.setContextManager(contextManager);
-      logger.debug("Bean manager initialized in {}ms", System.currentTimeMillis() - start);
-
-      logger.debug("Running post initialization runnables...");
-      start = System.currentTimeMillis();
-      init = true;
-      for (final Runnable run : afterInit) {
-        run.run();
-      }
-      afterInit.clear();
-      logger.debug("All post initialization runnables finished in {}ms", System.currentTimeMillis() - start);
+      bootstrapContainer(beanManager, bootstrapper);
 
       logger.info("IOC bootstrapper successfully initialized in {}ms", System.currentTimeMillis() - bootstrapStart);
     }
@@ -96,6 +79,28 @@ public class Container implements EntryPoint {
 
       throw ex;
     }
+  }
+
+  public void bootstrapContainer(final BeanManagerSetup beanManager, final Bootstrapper bootstrapper) {
+    long start;
+    logger.debug("Creating new {} instance...", ContextManager.class.getSimpleName());
+    start = System.currentTimeMillis();
+    final ContextManager contextManager = bootstrapper.bootstrapContainer();
+    logger.debug("Created {} instance in {}ms", ContextManager.class.getSimpleName(), System.currentTimeMillis() - start);
+
+    logger.debug("Initializing bean manager...");
+    start = System.currentTimeMillis();
+    beanManager.setContextManager(contextManager);
+    logger.debug("Bean manager initialized in {}ms", System.currentTimeMillis() - start);
+
+    logger.debug("Running post initialization runnables...");
+    start = System.currentTimeMillis();
+    init = true;
+    for (final Runnable run : afterInit) {
+      run.run();
+    }
+    afterInit.clear();
+    logger.debug("All post initialization runnables finished in {}ms", System.currentTimeMillis() - start);
   }
 
   private static final List<Runnable> afterInit = new ArrayList<>();

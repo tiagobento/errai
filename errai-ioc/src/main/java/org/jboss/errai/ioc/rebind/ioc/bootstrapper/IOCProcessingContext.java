@@ -20,14 +20,15 @@ import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.codegen.InnerClass;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.BlockBuilder;
+import org.jboss.errai.codegen.builder.ClassDefinitionStaticOption;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.config.MetaClassFinder;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.common.apt.generator.app.ResourceFilesFinder;
-import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.common.client.api.Assert;
+import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.config.MetaClassFinder;
 import org.jboss.errai.ioc.client.container.Factory;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 
@@ -64,18 +65,15 @@ public class IOCProcessingContext {
   public MetaClass buildFactoryMetaClass(final Injectable injectable) {
     final String factoryName = erraiConfiguration.app().namespace() + injectable.getFactoryName();
     final MetaClass typeCreatedByFactory = injectable.getInjectedType();
-    final BuildMetaClass factoryMetaClass = ClassBuilder.define(factoryName,
-            parameterizedAs(Factory.class, typeParametersOf(typeCreatedByFactory)))
-            .publicScope()
-            .abstractClass()
-            .body()
-            .getClassDefinition();
+    final ClassDefinitionStaticOption<?> classBuilder = ClassBuilder.define(factoryName,
+            parameterizedAs(Factory.class, typeParametersOf(typeCreatedByFactory))).publicScope();
 
     if (!erraiConfiguration.app().isAptEnvironment()) {
-      getBootstrapBuilder().declaresInnerClass(new InnerClass(factoryMetaClass));
+      final BuildMetaClass clazz = classBuilder.abstractClass().body().getClassDefinition();
+      getBootstrapBuilder().declaresInnerClass(new InnerClass(clazz));
     }
 
-    return factoryMetaClass;
+    return classBuilder.body().getClassDefinition();
   }
 
   public static class Builder {
@@ -147,7 +145,7 @@ public class IOCProcessingContext {
   }
 
   public void insertBefore(final Statement statement) {
-     getBlockBuilder().insertBefore(statement);
+    getBlockBuilder().insertBefore(statement);
   }
 
   public BuildMetaClass getBootstrapClass() {

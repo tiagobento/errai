@@ -44,6 +44,7 @@ import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.Assert;
+import org.jboss.errai.common.configuration.Target;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.ioc.apt.FactoriesAptGenerator;
 import org.jboss.errai.ioc.client.Bootstrapper;
@@ -540,7 +541,7 @@ public class IOCProcessor {
     final String contextVarName = getContextVarName(scopeContextImpl);
     registerFactoriesBody.append(loadVariable(contextVarName).invoke("registerFactory",
             Stmt.castTo(parameterizedAs(Factory.class, typeParametersOf(injectedType)),
-                    invokeStatic(GWT.class, "create", factoryClass))));
+                    erraiConfiguration.app().target().equals(Target.GWT) ? invokeStatic(GWT.class, "create", factoryClass) : newInstanceOf(factoryClass))));
   }
 
   private String getContextVarName(final MetaClass scopeContextImpl) {

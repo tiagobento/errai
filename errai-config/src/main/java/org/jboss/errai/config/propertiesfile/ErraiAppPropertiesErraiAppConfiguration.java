@@ -16,6 +16,7 @@
 
 package org.jboss.errai.config.propertiesfile;
 
+import org.jboss.errai.common.configuration.Target;
 import org.jboss.errai.config.ErraiAppConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 
@@ -111,6 +112,11 @@ public class ErraiAppPropertiesErraiAppConfiguration implements ErraiAppConfigur
   @Override
   public boolean makeDefaultArrayMarshallers() {
     return CommonConfigAttributes.MAKE_DEFAULT_ARRAY_MARSHALLERS.getBoolean();
+  }
+
+  @Override
+  public Target target() {
+    return Target.GWT;
   }
 
   public enum CommonConfigAttributes {

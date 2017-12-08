@@ -80,7 +80,7 @@ public class ErraiAppAptGenerator {
 
   private boolean generatorsOfErraiAppTarget(final ErraiAptGenerators.Any generator) {
     final AptErraiAppConfiguration appConfiguration = (AptErraiAppConfiguration) generator.erraiConfiguration().app();
-    return Arrays.stream(generator.getClass().getAnnotation(ErraiGenerator.class).targets()).anyMatch(appConfiguration.targets()::contains);
+    return Arrays.stream(generator.getClass().getAnnotation(ErraiGenerator.class).targets()).anyMatch(appConfiguration.target()::equals);
   }
 
   private ExportedTypesFromExportFiles newExportedTypesFromExportFiles(final MetaClass erraiApp) {
@@ -89,7 +89,7 @@ public class ErraiAppAptGenerator {
 
   private void generateAptCompatibleGwtModuleFile(final ExportedTypesFromExportFiles exportedTypesFromExportFiles) {
     final AptErraiAppConfiguration appConfiguration = exportedTypesFromExportFiles.erraiAppConfiguration();
-    if (appConfiguration.targets().contains(Target.GWT)) {
+    if (appConfiguration.target().equals(Target.GWT)) {
       exportedTypesFromExportFiles.resourceFilesFinder()
               .getResource(appConfiguration.gwtModuleName().replace(".", "/") + GWT_XML)
               .map(resource -> ((AptCodeGenResource) resource).getFile())
