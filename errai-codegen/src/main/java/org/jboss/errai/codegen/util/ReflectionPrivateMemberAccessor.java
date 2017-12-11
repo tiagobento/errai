@@ -16,12 +16,6 @@
 
 package org.jboss.errai.codegen.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jboss.errai.codegen.Cast;
 import org.jboss.errai.codegen.DefParameters;
 import org.jboss.errai.codegen.Modifier;
@@ -37,6 +31,15 @@ import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaConstructor;
 import org.jboss.errai.codegen.meta.MetaField;
 import org.jboss.errai.codegen.meta.MetaMethod;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author Mike Brock
@@ -117,7 +120,7 @@ public class ReflectionPrivateMemberAccessor implements PrivateMemberAccessor {
             .finish();
   }
 
-  public static String initCachedField(final ClassStructureBuilder<?> classBuilder, final MetaField f) {
+  private static String initCachedField(final ClassStructureBuilder<?> classBuilder, final MetaField f) {
     createJavaReflectionFieldInitializerUtilMethod(classBuilder);
 
     final String fieldName = PrivateAccessUtil.getPrivateFieldAccessorName(f) + "_fld";
@@ -133,10 +136,10 @@ public class ReflectionPrivateMemberAccessor implements PrivateMemberAccessor {
     return fieldName;
   }
 
-  public static String initCachedMethod(final ClassStructureBuilder<?> classBuilder, final MetaMethod m) {
+  private static String initCachedMethod(final ClassStructureBuilder<?> classBuilder, final MetaMethod m) {
     createJavaReflectionMethodInitializerUtilMethod(classBuilder);
 
-    final String fieldName = PrivateAccessUtil.getPrivateMethodName(m) + "_meth";
+    final String fieldName = getUniqueMethodNameForCacheField(m);
 
     classBuilder.privateField(fieldName, Method.class).modifiers(Modifier.Static)
             .initializesWith(Stmt.invokeStatic(classBuilder.getClassDefinition(), JAVA_REFL_METH_UTIL_METH,
@@ -145,10 +148,10 @@ public class ReflectionPrivateMemberAccessor implements PrivateMemberAccessor {
     return fieldName;
   }
 
-  public static String initCachedMethod(final ClassStructureBuilder<?> classBuilder, final MetaConstructor c) {
+  private static String initCachedMethod(final ClassStructureBuilder<?> classBuilder, final MetaConstructor c) {
     createJavaReflectionConstructorInitializerUtilMethod(classBuilder);
 
-    final String fieldName = PrivateAccessUtil.getPrivateMethodName(c) + "_meth";
+    final String fieldName = getUniqueMethodNameForCacheField(c);
 
     classBuilder.privateField(fieldName, Constructor.class).modifiers(Modifier.Static)
             .initializesWith(Stmt.invokeStatic(classBuilder.getClassDefinition(), JAVA_REFL_CONSTRUCTOR_UTIL_METH,
@@ -157,6 +160,11 @@ public class ReflectionPrivateMemberAccessor implements PrivateMemberAccessor {
     return fieldName;
   }
 
+  private static String getUniqueMethodNameForCacheField(final MetaMethod metaMethod) {
+    return metaMethod.getName() + "__" + Arrays.stream(metaMethod.getParameters())
+            .map(s -> s.getType().getCanonicalName().replace(".", "_"))
+            .collect(joining("__")) + "_meth";
+  }
 
   @Override
   public void createWritableField(final MetaClass type,

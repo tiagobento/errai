@@ -44,7 +44,6 @@ import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.Assert;
-import org.jboss.errai.common.configuration.Target;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.ioc.apt.FactoriesAptGenerator;
 import org.jboss.errai.ioc.client.Bootstrapper;
@@ -127,6 +126,7 @@ import static org.jboss.errai.codegen.util.Stmt.declareVariable;
 import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
 import static org.jboss.errai.codegen.util.Stmt.loadLiteral;
 import static org.jboss.errai.codegen.util.Stmt.loadVariable;
+import static org.jboss.errai.common.configuration.Target.GWT;
 import static org.jboss.errai.config.propertiesfile.ErraiAppPropertiesErraiAppConfiguration.ERRAI_IOC_ASYNC_BEAN_MANAGER;
 import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator.getAnnotationArrayStmt;
 import static org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator.getAssignableTypesArrayStmt;
@@ -540,8 +540,15 @@ public class IOCProcessor {
     final MetaClass scopeContextImpl = Assert.notNull("No scope context for " + scope.getName(), scopeContexts.get(scope));
     final String contextVarName = getContextVarName(scopeContextImpl);
     registerFactoriesBody.append(loadVariable(contextVarName).invoke("registerFactory",
-            Stmt.castTo(parameterizedAs(Factory.class, typeParametersOf(injectedType)),
-                    erraiConfiguration.app().target().equals(Target.GWT) ? invokeStatic(GWT.class, "create", factoryClass) : newInstanceOf(factoryClass))));
+            Stmt.castTo(parameterizedAs(Factory.class, typeParametersOf(injectedType)), instantiate(factoryClass))));
+  }
+
+  private Statement instantiate(final MetaClass factoryClass) {
+    if (erraiConfiguration.app().target().equals(GWT)) {
+      return invokeStatic(GWT.class, "create", factoryClass);
+    } else {
+      return newInstanceOf(factoryClass);
+    }
   }
 
   private String getContextVarName(final MetaClass scopeContextImpl) {

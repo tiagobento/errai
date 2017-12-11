@@ -49,7 +49,6 @@ import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.ioc.client.QualifierUtil;
 import org.jboss.errai.ioc.client.api.ActivatedBy;
 import org.jboss.errai.ioc.client.api.EntryPoint;
-import org.jboss.errai.ioc.client.container.BeanActivator;
 import org.jboss.errai.ioc.client.container.Context;
 import org.jboss.errai.ioc.client.container.ContextManager;
 import org.jboss.errai.ioc.client.container.Factory;
@@ -97,6 +96,7 @@ import static org.jboss.errai.codegen.util.Stmt.newArray;
 import static org.jboss.errai.codegen.util.Stmt.newObject;
 import static org.jboss.errai.codegen.util.Stmt.throw_;
 import static org.jboss.errai.codegen.util.Stmt.try_;
+import static org.jboss.errai.common.configuration.Target.GWT;
 
 /**
  * Implements functionality common to most {@link FactoryBodyGenerator} such as
@@ -588,18 +588,25 @@ public abstract class AbstractBodyGenerator implements FactoryBodyGenerator {
     maybeImplementInvokePostConstructs(bodyBlockBuilder, injectable, invokePostConstructStatements);
     maybeImplementCreateProxy(bodyBlockBuilder, injectable);
 
-    addPrivateAccessors(bodyBlockBuilder);
+    addPrivateAccessors(bodyBlockBuilder, injectionContext);
   }
 
-  private void addPrivateAccessors(final ClassStructureBuilder<?> bodyBlockBuilder) {
+  private void addPrivateAccessors(final ClassStructureBuilder<?> bodyBlockBuilder, final InjectionContext injectionContext) {
+
+    final String accessorType = injectionContext.getProcessingContext()
+            .erraiConfiguration()
+            .app()
+            .target()
+            .equals(GWT) ? "jsni" : "reflection";
+
     for (final MetaField field : controller.getExposedFields()) {
-      addPrivateAccessStubs("jsni", bodyBlockBuilder, field);
+      addPrivateAccessStubs(accessorType, bodyBlockBuilder, field);
     }
     for (final MetaMethod method : controller.getExposedMethods()) {
-      addPrivateAccessStubs("jsni", bodyBlockBuilder, method);
+      addPrivateAccessStubs(accessorType, bodyBlockBuilder, method);
     }
     for (final MetaConstructor constructor : controller.getExposedConstructors()) {
-      addPrivateAccessStubs("jsni", bodyBlockBuilder, constructor);
+      addPrivateAccessStubs(accessorType, bodyBlockBuilder, constructor);
     }
   }
 
