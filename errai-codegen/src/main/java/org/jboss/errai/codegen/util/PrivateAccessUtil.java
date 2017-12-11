@@ -16,9 +16,6 @@
 
 package org.jboss.errai.codegen.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.jboss.errai.codegen.Modifier;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -26,6 +23,9 @@ import org.jboss.errai.codegen.meta.MetaConstructor;
 import org.jboss.errai.codegen.meta.MetaField;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility class with methods that generate code to access private, default
@@ -38,8 +38,7 @@ import org.jboss.errai.codegen.meta.MetaParameter;
  * @author Christian Sadilek <csadilek@redhat.com>
  */
 public class PrivateAccessUtil {
-  private static final Map<String, PrivateMemberAccessor> PRIVATE_MEMBER_ACCESSORS
-      = new HashMap<String, PrivateMemberAccessor>();
+  private static final Map<String, PrivateMemberAccessor> PRIVATE_MEMBER_ACCESSORS = new HashMap<>();
 
   static {
     PRIVATE_MEMBER_ACCESSORS.put("reflection", new ReflectionPrivateMemberAccessor());

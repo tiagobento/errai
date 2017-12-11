@@ -17,6 +17,7 @@
 package org.jboss.errai.common.apt.generator.app;
 
 import org.jboss.errai.codegen.meta.MetaClass;
+import org.jboss.errai.codegen.util.PrivateAccessUtil;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
