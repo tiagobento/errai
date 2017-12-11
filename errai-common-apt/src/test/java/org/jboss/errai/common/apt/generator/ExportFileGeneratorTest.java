@@ -49,7 +49,7 @@ public class ExportFileGeneratorTest extends ErraiAptTest {
 
     final TestExportFileGenerator testGenerator = getTestGenerator(
             annotatedElementsFinder(testExportedType, testModule));
-    final Set<ExportFile> exportFiles = testGenerator.createExportFile(singleton(testAnnotation));
+    final Set<ExportFile> exportFiles = testGenerator.createExportFiles(singleton(testAnnotation));
 
     Assert.assertEquals(1, exportFiles.size());
     final ExportFile exportFile = exportFiles.stream().findFirst().get();
@@ -59,7 +59,7 @@ public class ExportFileGeneratorTest extends ErraiAptTest {
   @Test
   public void testBuildExportFilesForUnusedAnnotation() {
     final Set<TypeElement> annotations = singleton(getTypeElement(TestUnusedAnnotation.class));
-    final Set<ExportFile> exportFiles = getTestGenerator(annotatedElementsFinder()).createExportFile(annotations);
+    final Set<ExportFile> exportFiles = getTestGenerator(annotatedElementsFinder()).createExportFiles(annotations);
 
     Assert.assertEquals(0, exportFiles.size());
   }
@@ -67,7 +67,7 @@ public class ExportFileGeneratorTest extends ErraiAptTest {
   @Test
   public void testBuildExportFilesForEmptySetOfAnnotations() {
     final TestExportFileGenerator testGenerator = getTestGenerator(annotatedElementsFinder());
-    final Set<ExportFile> exportFiles = testGenerator.createExportFile(emptySet());
+    final Set<ExportFile> exportFiles = testGenerator.createExportFiles(emptySet());
     Assert.assertEquals(0, exportFiles.size());
   }
 
