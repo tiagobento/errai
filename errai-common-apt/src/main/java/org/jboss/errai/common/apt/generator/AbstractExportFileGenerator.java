@@ -34,13 +34,11 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static javax.tools.Diagnostic.Kind.NOTE;
 import static org.jboss.errai.common.apt.generator.ExportFileGeneratorsControl.exportersAreAllFinished;
 import static org.jboss.errai.common.apt.generator.ExportFileGeneratorsControl.signalExistence;
 import static org.jboss.errai.common.apt.generator.ExportFileGeneratorsControl.signalReady;
@@ -126,7 +124,7 @@ public abstract class AbstractExportFileGenerator extends AbstractProcessor {
     final ExportingStrategies exportingStrategies = exportingStrategiesFactory.buildFrom(getExportingStrategiesClass());
 
     return new ExportFileGenerator(getCamelCaseErraiModuleName(), exportedTypes::findAnnotatedSourceElements,
-            exportingStrategies, erraiModules, filer, exportedTypes);
+            exportingStrategies, erraiModules, filer);
   }
 
   private Set<MetaClass> findAnnotatedMetaClasses(final RoundEnvironment roundEnv,
