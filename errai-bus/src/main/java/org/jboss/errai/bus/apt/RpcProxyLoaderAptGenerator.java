@@ -18,15 +18,13 @@ package org.jboss.errai.bus.apt;
 
 import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 
 import java.util.Collection;
 
 import static java.util.stream.Collectors.toList;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -70,8 +68,4 @@ public final class RpcProxyLoaderAptGenerator extends ErraiAptGenerators.SingleF
     return rpcProxyLoaderGenerator.getClassSimpleName();
   }
 
-  @Override
-  public ErraiAptGeneratedSourceFile.Type getType() {
-    return CLIENT;
-  }
 }

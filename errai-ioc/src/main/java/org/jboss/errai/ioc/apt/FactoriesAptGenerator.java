@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
 import static org.jboss.errai.common.configuration.Target.GWT;
 import static org.jboss.errai.common.configuration.Target.JAVA;
 
@@ -82,8 +80,7 @@ public class FactoriesAptGenerator extends ErraiAptGenerators.MultipleFiles {
     final String generatedSource = generateSources(factoryMetaClass, injectable);
     final String classSimpleName = factoryMetaClass.getName();
 
-    return new ErraiAptGeneratedSourceFile(FactoryGenerator.GENERATED_PACKAGE, classSimpleName, generatedSource,
-            erraiConfiguration().app().target().equals(GWT) ? CLIENT : SHARED);
+    return new ErraiAptGeneratedSourceFile(FactoryGenerator.GENERATED_PACKAGE, classSimpleName, generatedSource);
   }
 
   private String generateSources(final MetaClass factoryMetaClass, final Injectable injectable) {

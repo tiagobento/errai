@@ -67,8 +67,6 @@ public class ErraiAptGenerators {
 
     public abstract String getClassSimpleName();
 
-    public abstract ErraiAptGeneratedSourceFile.Type getType();
-
     protected String getResolvedClassSimpleName() {
       return erraiConfiguration().app().namespace() + getClassSimpleName();
     }
@@ -80,7 +78,7 @@ public class ErraiAptGenerators {
     @Override
     public final Collection<ErraiAptGeneratedSourceFile> files() {
       return Collections.singleton(
-              new ErraiAptGeneratedSourceFile(getPackageName(), getResolvedClassSimpleName(), generate(), getType()));
+              new ErraiAptGeneratedSourceFile(getPackageName(), getResolvedClassSimpleName(), generate()));
     }
 
   }

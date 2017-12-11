@@ -151,4 +151,9 @@ public class AptErraiAppConfiguration implements ErraiAppConfiguration {
             .map(a -> a.value("value"));
   }
 
+
+  public MetaClass erraiAppMetaClass() {
+    return erraiAppAnnotatedMetaClass;
+  }
+
 }
