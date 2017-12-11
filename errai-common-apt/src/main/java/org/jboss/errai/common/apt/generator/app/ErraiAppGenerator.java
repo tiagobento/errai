@@ -27,92 +27,55 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.Filer;
-import javax.lang.model.util.Elements;
 import javax.tools.FileObject;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.stream;
 import static java.util.Comparator.comparing;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
+import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.common.configuration.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public class ErraiAppAptGenerator {
+class ErraiAppGenerator {
 
-  private static final Logger log = LoggerFactory.getLogger(ErraiAppAptGenerator.class);
+  private static final Logger log = LoggerFactory.getLogger(ErraiAptGenerator.class);
 
   private static final String GWT_XML = ".gwt.xml";
 
+  private final ExportedTypesFromExportFiles exportedTypesFromExportFiles;
   private final Filer filer;
-  private final Elements elements;
-  private final ResourceFilesFinder resourceFilesFinder;
 
-  public ErraiAppAptGenerator(final Elements elements, final Filer filer) {
+  ErraiAppGenerator(final ExportedTypesFromExportFiles exportedTypesFromExportFiles, final Filer filer) {
+    this.exportedTypesFromExportFiles = exportedTypesFromExportFiles;
     this.filer = filer;
-    this.elements = elements;
-    this.resourceFilesFinder = new AptResourceFilesFinder(filer);
   }
 
-  public void generateAndSaveSourceFiles(final Set<MetaClass> erraiApps) {
+  void generateFiles() {
 
-    final long start = System.currentTimeMillis();
-    log.info("Generating files using Errai APT Generators..");
+    log.info("Processing {}", erraiAppConfiguration().erraiAppMetaClass());
 
-    erraiApps.stream()
-            .peek(erraiApp -> log.info("Processing {}", erraiApp.getFullyQualifiedName()))
-            .map(this::newExportedTypesFromExportFiles)
-            .peek(this::generateAptCompatibleGwtModuleFile)
-            .flatMap(this::createGenerators)
-            .filter(this::generatorsOfErraiAppTarget)
-            .flatMap(this::generateFiles)
+    if (erraiAppConfiguration().target().equals(GWT)) {
+      generateAptCompatibleGwtModuleFile();
+    }
+
+    createGenerators().filter(this::generatorsOfErraiAppTarget)
+            .flatMap(this::generateFilesOfGenerator)
             .forEach(this::saveFile);
-
-    log.info("Successfully generated files using Errai APT Generators in {}ms", System.currentTimeMillis() - start);
   }
 
-  private boolean generatorsOfErraiAppTarget(final ErraiAptGenerators.Any generator) {
-    final AptErraiAppConfiguration appConfiguration = (AptErraiAppConfiguration) generator.erraiConfiguration().app();
-    return Arrays.stream(generator.getClass().getAnnotation(ErraiGenerator.class).targets()).anyMatch(appConfiguration.target()::equals);
-  }
-
-  private ExportedTypesFromExportFiles newExportedTypesFromExportFiles(final MetaClass erraiApp) {
-    return new ExportedTypesFromExportFiles(erraiApp, resourceFilesFinder, elements);
-  }
-
-  private void generateAptCompatibleGwtModuleFile(final ExportedTypesFromExportFiles exportedTypesFromExportFiles) {
-    final AptErraiAppConfiguration appConfiguration = exportedTypesFromExportFiles.erraiAppConfiguration();
-    if (appConfiguration.target().equals(Target.GWT)) {
-      exportedTypesFromExportFiles.resourceFilesFinder()
-              .getResource(appConfiguration.gwtModuleName().replace(".", "/") + GWT_XML)
-              .map(resource -> ((AptCodeGenResource) resource).getFile())
-              .map(file -> new AptCompatibleGwtModuleFile(file, exportedTypesFromExportFiles))
-              .ifPresent(this::saveFile);
-    }
-  }
-
-  private Stream<ErraiAptGeneratedSourceFile> generateFiles(final ErraiAptGenerators.Any generator) {
-    try {
-      return generator.files().stream();
-    } catch (final Exception e) {
-      // Continues to next generator even when errors occur
-      e.printStackTrace();
-      return Stream.of();
-    }
-  }
-
-  private Stream<ErraiAptGenerators.Any> createGenerators(final ExportedTypesFromExportFiles exportedTypesFromExportFiles) {
+  private Stream<ErraiAptGenerators.Any> createGenerators() {
     return exportedTypesFromExportFiles.findAnnotatedMetaClasses(ErraiGenerator.class)
             .stream()
             .map(this::loadGeneratorClass)
-            .map(generatorClass -> newGenerator(generatorClass, exportedTypesFromExportFiles))
+            .map(this::newGenerator)
             .sorted(comparing(ErraiAptGenerators.Any::priority).thenComparing(g -> g.getClass().getSimpleName()));
   }
 
@@ -126,8 +89,7 @@ public class ErraiAppAptGenerator {
     }
   }
 
-  private ErraiAptGenerators.Any newGenerator(final Class<? extends ErraiAptGenerators.Any> generatorClass,
-          final ExportedTypesFromExportFiles exportedTypesFromExportFiles) {
+  private ErraiAptGenerators.Any newGenerator(final Class<? extends ErraiAptGenerators.Any> generatorClass) {
     try {
       final Constructor<? extends ErraiAptGenerators.Any> constructor = generatorClass.getConstructor(
               ExportedTypesFromExportFiles.class);
@@ -138,11 +100,43 @@ public class ErraiAppAptGenerator {
     }
   }
 
-  private void saveFile(final AptCompatibleGwtModuleFile file) {
+  private void generateAptCompatibleGwtModuleFile() {
 
-    final int lastDot = file.gwtModuleName().lastIndexOf(".");
-    final String fileName = file.gwtModuleName().substring(lastDot + 1) + GWT_XML;
-    final String packageName = file.gwtModuleName().substring(0, lastDot);
+    final String gwtModuleName = erraiAppConfiguration().gwtModuleName();
+    final String path = gwtModuleName.replace(".", "/") + GWT_XML;
+
+    exportedTypesFromExportFiles.resourceFilesFinder()
+            .getResource(path)
+            .map(resource -> ((AptCodeGenResource) resource))
+            .map(AptCodeGenResource::getFile)
+            .map(this::newAptCompatibleGwtModuleFile)
+            .ifPresent(file -> saveFile(file, gwtModuleName));
+  }
+
+  private boolean generatorsOfErraiAppTarget(final ErraiAptGenerators.Any generator) {
+    final Target[] targets = generator.getClass().getAnnotation(ErraiGenerator.class).targets();
+    return stream(targets).anyMatch(generator.erraiConfiguration().app().target()::equals);
+  }
+
+  private AptCompatibleGwtModuleFile newAptCompatibleGwtModuleFile(final File file) {
+    return new AptCompatibleGwtModuleFile(file, exportedTypesFromExportFiles);
+  }
+
+  private Stream<ErraiAptGeneratedSourceFile> generateFilesOfGenerator(final ErraiAptGenerators.Any generator) {
+    try {
+      return generator.files().stream();
+    } catch (final Exception e) {
+      // Continues to next generator even when errors occur
+      e.printStackTrace();
+      return Stream.of();
+    }
+  }
+
+  private void saveFile(final AptCompatibleGwtModuleFile file, final String gwtModuleName) {
+
+    final int lastDot = gwtModuleName.lastIndexOf(".");
+    final String fileName = gwtModuleName.substring(lastDot + 1) + GWT_XML;
+    final String packageName = gwtModuleName.substring(0, lastDot);
 
     try {
       // By writing to CLASS_OUTPUT we overwrite the original .gwt.xml file
@@ -153,7 +147,7 @@ public class ErraiAppAptGenerator {
         writer.write(newGwtModuleFileContent);
       }
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to write file " + file.gwtModuleName());
+      throw new RuntimeException("Unable to write file " + gwtModuleName);
     }
   }
 
@@ -168,19 +162,24 @@ public class ErraiAppAptGenerator {
   }
 
   private FileObject getFileObject(final ErraiAptGeneratedSourceFile file) throws IOException {
+
     final String pkg = file.getPackageName();
     final String classSimpleName = file.getClassSimpleName();
 
-    if (file.getType().equals(CLIENT)) {
+    if (erraiAppConfiguration().target().equals(GWT)) {
       // By saving .java source files as resources we skip javac compilation. This behavior is
       // desirable since generated client code will be compiled by the GWT/J2CL compiler.
       return filer.createResource(SOURCE_OUTPUT, pkg, classSimpleName + ".java");
     }
 
-    if (file.getType().equals(SHARED)) {
+    if (erraiAppConfiguration().target().equals(JAVA)) {
       return filer.createSourceFile(pkg + "." + classSimpleName);
     }
 
-    throw new RuntimeException("Unsupported generated source file type " + file.getType());
+    throw new RuntimeException("Unsupported target " + erraiAppConfiguration().target());
+  }
+
+  private AptErraiAppConfiguration erraiAppConfiguration() {
+    return exportedTypesFromExportFiles.erraiAppConfiguration();
   }
 }

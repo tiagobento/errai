@@ -17,16 +17,14 @@
 package org.jboss.errai.enterprise.apt;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 import org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderGenerator;
 
 import java.util.Collection;
 
 import static java.util.stream.Collectors.toList;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
@@ -73,8 +71,4 @@ public final class JaxrsProxyLoaderAptGenerator extends ErraiAptGenerators.Singl
     return jaxrsProxyLoaderGenerator.getClassSimpleName();
   }
 
-  @Override
-  public ErraiAptGeneratedSourceFile.Type getType() {
-    return CLIENT;
-  }
 }

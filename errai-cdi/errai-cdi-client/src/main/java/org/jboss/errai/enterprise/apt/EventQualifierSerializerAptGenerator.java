@@ -18,9 +18,8 @@ package org.jboss.errai.enterprise.apt;
 
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 import org.jboss.errai.enterprise.client.cdi.EventQualifierSerializer;
 import org.jboss.errai.enterprise.rebind.EventQualifierSerializerGenerator;
@@ -32,7 +31,6 @@ import javax.inject.Qualifier;
 import java.util.Set;
 
 import static java.util.Collections.singleton;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
 import static org.jboss.errai.common.configuration.Target.GWT;
 import static org.jboss.errai.common.configuration.Target.JAVA;
 
@@ -76,8 +74,4 @@ public class EventQualifierSerializerAptGenerator extends ErraiAptGenerators.Sin
     return EventQualifierSerializer.SERIALIZER_CLASS_NAME;
   }
 
-  @Override
-  public ErraiAptGeneratedSourceFile.Type getType() {
-    return SHARED;
-  }
 }

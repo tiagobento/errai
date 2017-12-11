@@ -16,14 +16,12 @@
 
 package org.jboss.errai.marshalling.apt;
 
-import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
-import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
+import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 import org.jboss.errai.marshalling.rebind.DefinitionsFactorySingleton;
 import org.jboss.errai.marshalling.rebind.MarshallerGeneratorFactory;
 
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
 import static org.jboss.errai.marshalling.rebind.MarshallerOutputTarget.GWT;
 import static org.jboss.errai.marshalling.rebind.MarshallersGenerator.CLIENT_CLASS_NAME;
 import static org.jboss.errai.marshalling.rebind.MarshallersGenerator.CLIENT_PACKAGE_NAME;
@@ -56,8 +54,4 @@ public class ClientMarshallersAptGenerator extends ErraiAptGenerators.SingleFile
     return CLIENT_CLASS_NAME;
   }
 
-  @Override
-  public ErraiAptGeneratedSourceFile.Type getType() {
-    return CLIENT;
-  }
 }

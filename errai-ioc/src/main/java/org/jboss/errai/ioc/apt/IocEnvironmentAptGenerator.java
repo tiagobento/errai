@@ -18,14 +18,11 @@ package org.jboss.errai.ioc.apt;
 
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
 import org.jboss.errai.common.configuration.ErraiGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCEnvironmentGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.CLIENT;
-import static org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile.Type.SHARED;
 import static org.jboss.errai.common.configuration.Target.GWT;
 import static org.jboss.errai.common.configuration.Target.JAVA;
 
@@ -64,8 +61,4 @@ public class IocEnvironmentAptGenerator extends ErraiAptGenerators.SingleFile {
     return IOCEnvironmentGenerator.CLASS_NAME;
   }
 
-  @Override
-  public ErraiAptGeneratedSourceFile.Type getType() {
-    return erraiConfiguration().app().target().equals(GWT) ? CLIENT : SHARED;
-  }
 }

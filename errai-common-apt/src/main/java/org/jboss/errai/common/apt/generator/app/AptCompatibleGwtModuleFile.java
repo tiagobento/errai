@@ -35,12 +35,10 @@ class AptCompatibleGwtModuleFile {
 
   private final File file;
   private final ExportedTypesFromExportFiles exportedTypesFromExportFiles;
-  private final String gwtModuleName;
 
   AptCompatibleGwtModuleFile(final File file, final ExportedTypesFromExportFiles exportedTypesFromExportFiles) {
     this.file = file;
     this.exportedTypesFromExportFiles = exportedTypesFromExportFiles;
-    this.gwtModuleName = exportedTypesFromExportFiles.erraiAppConfiguration().gwtModuleName();
   }
 
   public String generate() {
@@ -142,9 +140,5 @@ class AptCompatibleGwtModuleFile {
             + "\" />\n"
             + "<when-property-is name=\"errai.useAptGenerators\" value=\"true\" />\n"
             + "</replace-with>";
-  }
-
-  public String gwtModuleName() {
-    return gwtModuleName;
   }
 }

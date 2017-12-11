@@ -19,7 +19,7 @@ package org.jboss.errai.common.apt.generator;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.impl.apt.APTClass;
 import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
-import org.jboss.errai.common.apt.generator.app.ErraiAppAptGenerator;
+import org.jboss.errai.common.apt.generator.app.ErraiAptGenerator;
 import org.jboss.errai.common.apt.strategies.ErraiExportingStrategiesFactory;
 import org.jboss.errai.common.apt.strategies.ExportingStrategies;
 import org.jboss.errai.common.configuration.ErraiApp;
@@ -110,7 +110,7 @@ public abstract class AbstractExportFileGenerator extends AbstractProcessor {
     signalReady(this);
 
     if (exportersAreAllFinished() && aptCodeGenerationIsEnabled()) {
-      new ErraiAppAptGenerator(elements, filer).generateAndSaveSourceFiles(erraiApps);
+      new ErraiAptGenerator(elements, filer).generateAndSaveSourceFiles(erraiApps);
     }
   }
 
