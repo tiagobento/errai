@@ -16,17 +16,16 @@
 
 package org.jboss.errai.ioc.client;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.gwt.core.client.GWT;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 import org.jboss.errai.ioc.client.container.IOCResolutionException;
 import org.jboss.errai.ioc.client.container.SyncBeanDef;
 
-import com.google.gwt.core.client.GWT;
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -36,7 +35,11 @@ public abstract class IOCUtil {
 
   private IOCUtil() {};
 
-  private static final IOCEnvironment IOC_ENVIRONMENT = GWT.<IOCEnvironment> create(IOCEnvironment.class);
+  private static final boolean IS_ASYNC;
+
+  static {
+    IS_ASYNC = GWT.isClient() && GWT.<IOCEnvironment>create(IOCEnvironment.class).isAsync();
+  }
 
   public static <T> T getInstance(final Class<T> type, final Annotation... qualifiers) {
     return getSyncBean(type, qualifiers).getInstance();
@@ -46,7 +49,7 @@ public abstract class IOCUtil {
     try {
       return IOC.getBeanManager().lookupBean(type, qualifiers);
     } catch (final IOCResolutionException ex) {
-      if (IOC_ENVIRONMENT.isAsync() && isUnsatisfied(type, qualifiers)) {
+      if (IS_ASYNC && isUnsatisfied(type, qualifiers)) {
         throw new RuntimeException("No bean satisfied " + prettyQualifiersAndType(type, qualifiers)
                 + ". Hint: Types loaded via Instance should not be @LoadAsync.", ex);
       }

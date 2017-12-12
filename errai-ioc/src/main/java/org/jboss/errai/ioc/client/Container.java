@@ -16,20 +16,18 @@
 
 package org.jboss.errai.ioc.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import org.jboss.errai.ioc.client.container.BeanManagerSetup;
-import org.jboss.errai.ioc.client.container.ContextManager;
 import org.jboss.errai.ioc.client.container.ErraiUncaughtExceptionHandler;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Container implements EntryPoint {
 
@@ -54,7 +52,7 @@ public class Container implements EntryPoint {
 
       logger.debug("Initializing {}...", QualifierEqualityFactory.class.getSimpleName());
       long start = System.currentTimeMillis();
-      QualifierUtil.initFromFactoryProvider(() -> GWT.create(QualifierEqualityFactory.class));
+      final QualifierEqualityFactory qualifierEqualityFactory = GWT.create(QualifierEqualityFactory.class);
       logger.debug("{} initialized in {}ms", QualifierEqualityFactory.class.getSimpleName(), System.currentTimeMillis() - start);
 
       final BeanManagerSetup beanManager;
@@ -70,7 +68,17 @@ public class Container implements EntryPoint {
       final Bootstrapper bootstrapper = GWT.create(Bootstrapper.class);
       logger.debug("Created {} instance in {}ms", Bootstrapper.class.getSimpleName(), System.currentTimeMillis() - start);
 
-      bootstrapContainer(beanManager, bootstrapper);
+      final ErraiContainer container = new ErraiContainer(beanManager, bootstrapper, qualifierEqualityFactory);
+      container.bootstrap();
+
+      logger.debug("Running post initialization runnables...");
+      start = System.currentTimeMillis();
+      init = true;
+      for (final Runnable run : afterInit) {
+        run.run();
+      }
+      afterInit.clear();
+      logger.debug("All post initialization runnables finished in {}ms", System.currentTimeMillis() - start);
 
       logger.info("IOC bootstrapper successfully initialized in {}ms", System.currentTimeMillis() - bootstrapStart);
     }
@@ -79,28 +87,6 @@ public class Container implements EntryPoint {
 
       throw ex;
     }
-  }
-
-  public void bootstrapContainer(final BeanManagerSetup beanManager, final Bootstrapper bootstrapper) {
-    long start;
-    logger.debug("Creating new {} instance...", ContextManager.class.getSimpleName());
-    start = System.currentTimeMillis();
-    final ContextManager contextManager = bootstrapper.bootstrapContainer();
-    logger.debug("Created {} instance in {}ms", ContextManager.class.getSimpleName(), System.currentTimeMillis() - start);
-
-    logger.debug("Initializing bean manager...");
-    start = System.currentTimeMillis();
-    beanManager.setContextManager(contextManager);
-    logger.debug("Bean manager initialized in {}ms", System.currentTimeMillis() - start);
-
-    logger.debug("Running post initialization runnables...");
-    start = System.currentTimeMillis();
-    init = true;
-    for (final Runnable run : afterInit) {
-      run.run();
-    }
-    afterInit.clear();
-    logger.debug("All post initialization runnables finished in {}ms", System.currentTimeMillis() - start);
   }
 
   private static final List<Runnable> afterInit = new ArrayList<>();

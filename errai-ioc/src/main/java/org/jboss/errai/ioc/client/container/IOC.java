@@ -16,15 +16,14 @@
 
 package org.jboss.errai.ioc.client.container;
 
-import org.jboss.errai.common.client.util.CreationalCallback;
+import com.google.gwt.core.client.GWT;
+import org.jboss.errai.ioc.client.container.async.AsyncBeanDef;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanManager;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanManagerImpl;
 import org.jboss.errai.ioc.client.lifecycle.api.LifecycleEvent;
 import org.jboss.errai.ioc.client.lifecycle.api.LifecycleListener;
 import org.jboss.errai.ioc.client.lifecycle.api.LifecycleListenerGenerator;
 import org.jboss.errai.ioc.client.lifecycle.api.LifecycleListenerRegistrar;
-
-import com.google.gwt.core.client.GWT;
 
 /**
  * A simple utility class which provides a static reference in the client to the
@@ -33,42 +32,31 @@ import com.google.gwt.core.client.GWT;
  * @author Mike Brock
  */
 public final class IOC {
+
   private static final IOC inst = new IOC();
+
   private final ClientBeanManager beanManager;
 
   private IOC() {
-    IOCEnvironment iocEnvironment;
+    beanManager = getNewBeanManager();
+  }
 
+  private ClientBeanManager getNewBeanManager() {
     try {
-      iocEnvironment = GWT.create(IOCEnvironment.class);
+      return GWT.<IOCEnvironment>create(IOCEnvironment.class).getNewBeanManager();
+    } catch (final UnsupportedOperationException e) {
+      if (!GWT.isClient()) {
+        return new SyncBeanManagerImpl();
+      } else {
+        return null;
+      }
     }
-    catch (UnsupportedOperationException e) {
-      iocEnvironment = new IOCEnvironment() {
-        @Override
-        public boolean isAsync() {
-          return false;
-        }
-
-        @Override
-        public ClientBeanManager getNewBeanManager() {
-          if (!GWT.isClient()) {
-            return new SyncBeanManagerImpl();
-          }
-          else {
-            return null;
-          }
-        }
-      };
-    }
-
-    beanManager = iocEnvironment.getNewBeanManager();
   }
 
   /**
    * Returns a reference to the bean manager in the client.
    *
    * @return the singleton instance of the client bean manager.
-   *
    * @see SyncBeanManagerImpl
    */
   public static SyncBeanManager getBeanManager() {
@@ -90,24 +78,15 @@ public final class IOC {
    * Register a {@link LifecycleListenerGenerator} for
    * {@linkplain LifecycleEvent IOC Lifecycle Events}.
    *
-   * @param beanType
-   *          The type of bean for which {@link LifecycleListener
-   *          LifecycleListeners} created by this generator observe.
-   * @param listenerGenerator
-   *          A generator creating {@link LifecycleListener LifecycleListeners}
-   *          which observe events from the specified bean type.
+   * @param beanType          The type of bean for which {@link LifecycleListener
+   *                          LifecycleListeners} created by this generator observe.
+   * @param listenerGenerator A generator creating {@link LifecycleListener LifecycleListeners}
+   *                          which observe events from the specified bean type.
    */
   public static <T> void registerLifecycleListener(final Class<T> beanType,
           final LifecycleListenerGenerator<T> listenerGenerator) {
 
-    getAsyncBeanManager().lookupBean(LifecycleListenerRegistrar.class).getInstance(
-            new CreationalCallback<LifecycleListenerRegistrar>() {
-
-              @Override
-              public void callback(final LifecycleListenerRegistrar registrar) {
-                registrar.registerGenerator(beanType, listenerGenerator);
-              }
-            });
+    getLifecycleListenerRegistrar().getInstance(registrar -> registrar.registerGenerator(beanType, listenerGenerator));
   }
 
   /**
@@ -118,36 +97,20 @@ public final class IOC {
    * @param listener The listener to be registered.
    */
   public static <T> void registerLifecycleListener(final T instance, final LifecycleListener<T> listener) {
-    getAsyncBeanManager().lookupBean(LifecycleListenerRegistrar.class).getInstance(
-            new CreationalCallback<LifecycleListenerRegistrar>() {
-
-              @Override
-              public void callback(final LifecycleListenerRegistrar registrar) {
-                registrar.registerListener(instance, listener);
-              }
-            });
+    getLifecycleListenerRegistrar().getInstance(registrar -> registrar.registerListener(instance, listener));
   }
 
   /**
    * Unregister a {@link LifecycleListenerGenerator} and all the
    * {@link LifecycleListener LifecycleListeners} created by this generator.
    *
-   * @param beanType
-   *          The bean type for which this generator created listeners.
-   * @param generator
-   *          The generator to be unregistered (must be the same instance as was
-   *          registered).
+   * @param beanType  The bean type for which this generator created listeners.
+   * @param generator The generator to be unregistered (must be the same instance as was
+   *                  registered).
    */
   public static <T> void unregisterLifecycleListener(final Class<T> beanType,
           final LifecycleListenerGenerator<T> generator) {
-    getAsyncBeanManager().lookupBean(LifecycleListenerRegistrar.class).getInstance(
-            new CreationalCallback<LifecycleListenerRegistrar>() {
-
-              @Override
-              public void callback(final LifecycleListenerRegistrar registrar) {
-                registrar.unregisterGenerator(beanType, generator);
-              }
-            });
+    getLifecycleListenerRegistrar().getInstance(registrar -> registrar.unregisterGenerator(beanType, generator));
   }
 
   /**
@@ -158,14 +121,7 @@ public final class IOC {
    * @param listener The listener that was registered.
    */
   public static <T> void unregisterLifecycleListener(final T instance, final LifecycleListener<T> listener) {
-    getAsyncBeanManager().lookupBean(LifecycleListenerRegistrar.class).getInstance(
-            new CreationalCallback<LifecycleListenerRegistrar>() {
-
-              @Override
-              public void callback(final LifecycleListenerRegistrar registrar) {
-                registrar.unregisterListener(instance, listener);
-              }
-            });
+    getLifecycleListenerRegistrar().getInstance(registrar -> registrar.unregisterListener(instance, listener));
   }
 
   /**
@@ -179,5 +135,9 @@ public final class IOC {
     } else {
       throw new RuntimeException("Cannot reset bean manager of type " + inst.beanManager.getClass().getName());
     }
+  }
+
+  private static AsyncBeanDef<LifecycleListenerRegistrar> getLifecycleListenerRegistrar() {
+    return getAsyncBeanManager().lookupBean(LifecycleListenerRegistrar.class);
   }
 }

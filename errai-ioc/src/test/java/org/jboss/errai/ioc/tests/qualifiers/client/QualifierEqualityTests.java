@@ -19,7 +19,6 @@ package org.jboss.errai.ioc.tests.qualifiers.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.junit.client.GWTTestCase;
 import org.jboss.errai.ioc.client.QualifierEqualityFactory;
-import org.jboss.errai.ioc.client.QualifierEqualityFactoryProvider;
 import org.jboss.errai.ioc.client.QualifierUtil;
 import org.jboss.errai.ioc.tests.qualifiers.client.res.LesAnno;
 
@@ -33,12 +32,7 @@ public class QualifierEqualityTests extends GWTTestCase {
   @Override
   protected void gwtSetUp() throws Exception {
     super.gwtSetUp();
-    QualifierUtil.initFromFactoryProvider(new QualifierEqualityFactoryProvider() {
-      @Override
-      public QualifierEqualityFactory provide() {
-        return GWT.create(QualifierEqualityFactory.class);
-      }
-    });
+    QualifierUtil.init(GWT.create(QualifierEqualityFactory.class));
   }
 
   @Override
