@@ -16,6 +16,26 @@
 
 package org.jboss.errai.ioc.rebind.ioc.test.harness;
 
+import com.google.gwt.junit.JUnitShell;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import org.jboss.errai.codegen.exception.GenerationException;
+import org.jboss.errai.common.client.api.tasks.AsyncTask;
+import org.jboss.errai.common.client.api.tasks.TaskManager;
+import org.jboss.errai.common.client.api.tasks.TaskManagerFactory;
+import org.jboss.errai.common.client.api.tasks.TaskManagerProvider;
+import org.jboss.errai.common.client.util.TimeUnit;
+import org.jboss.errai.ioc.client.Bootstrapper;
+import org.jboss.errai.ioc.client.IOCClientTestCase;
+import org.jboss.errai.ioc.client.QualifierEqualityFactory;
+import org.jboss.errai.ioc.client.QualifierUtil;
+import org.junit.runner.Description;
+import org.junit.runner.Result;
+import org.junit.runner.Runner;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.ParentRunner;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,29 +46,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-
-import org.jboss.errai.codegen.exception.GenerationException;
-import org.jboss.errai.common.client.api.tasks.AsyncTask;
-import org.jboss.errai.common.client.api.tasks.TaskManager;
-import org.jboss.errai.common.client.api.tasks.TaskManagerFactory;
-import org.jboss.errai.common.client.api.tasks.TaskManagerProvider;
-import org.jboss.errai.common.client.util.TimeUnit;
-import org.jboss.errai.ioc.client.Bootstrapper;
-import org.jboss.errai.ioc.client.IOCClientTestCase;
-import org.jboss.errai.ioc.client.QualifierEqualityFactory;
-import org.jboss.errai.ioc.client.QualifierEqualityFactoryProvider;
-import org.jboss.errai.ioc.client.QualifierUtil;
-import org.junit.runner.Description;
-import org.junit.runner.Result;
-import org.junit.runner.Runner;
-import org.junit.runner.notification.Failure;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.ParentRunner;
-
-import com.google.gwt.junit.JUnitShell;
-
-import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 /**
  * @author Mike Brock <cbrock@redhat.com>
@@ -169,20 +166,15 @@ public class IOCSimulatedTestRunner extends ParentRunner<Runner> {
     final IOCClientTestCase iocClientTestCase = (IOCClientTestCase) getInstance();
 
     if (SIMULATED) {
-      QualifierUtil.initFromFactoryProvider(new QualifierEqualityFactoryProvider() {
+      QualifierUtil.init(new QualifierEqualityFactory() {
         @Override
-        public QualifierEqualityFactory provide() {
-          return new QualifierEqualityFactory() {
-            @Override
-            public boolean isEqual(final Annotation a1, final Annotation a2) {
-              return a1.equals(a2);
-            }
+        public boolean isEqual(final Annotation a1, final Annotation a2) {
+          return a1.equals(a2);
+        }
 
-            @Override
-            public int hashCodeOf(final Annotation a1) {
-              return a1.hashCode();
-            }
-          };
+        @Override
+        public int hashCodeOf(final Annotation a1) {
+          return a1.hashCode();
         }
       });
 

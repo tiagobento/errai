@@ -19,6 +19,7 @@ package org.jboss.errai.common.client.util;
 /**
  * @author Mike Brock
  */
+@FunctionalInterface
 public interface CreationalCallback<T> {
-  public void callback(T beanInstance);
+  void callback(T beanInstance);
 }

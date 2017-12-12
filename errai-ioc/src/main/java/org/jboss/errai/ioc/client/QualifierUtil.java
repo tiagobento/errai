@@ -16,15 +16,15 @@
 
 package org.jboss.errai.ioc.client;
 
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
+import javax.inject.Named;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
-import javax.inject.Named;
+import java.util.function.Supplier;
 
 /**
  * A utility class for testing the equality of qualifiers at runtime.
@@ -68,13 +68,7 @@ public class QualifierUtil {
     }
   };
 
-  private static QualifierEqualityFactoryProvider factoryProvider;
   private static QualifierEqualityFactory factory;
-
-  public static void init() {
-    if (factory == null)
-      factory = factoryProvider.provide();
-  }
 
   public static boolean isEqual(final Annotation a1, final Annotation a2) {
     return factory.isEqual(a1, a2);
@@ -147,10 +141,8 @@ public class QualifierUtil {
     return annotations == null || (annotations.size() == 2 && contains(DEFAULT_MATCHING_MAP.values(), annotations));
   }
 
-  public static void initFromFactoryProvider(final QualifierEqualityFactoryProvider provider) {
-    factoryProvider = provider;
-    factory = null;
-    init();
+  public static void init(final QualifierEqualityFactory qualifierEqualityFactory) {
+    factory = qualifierEqualityFactory;
   }
 
   public static int hashValueFor(final int i) {
