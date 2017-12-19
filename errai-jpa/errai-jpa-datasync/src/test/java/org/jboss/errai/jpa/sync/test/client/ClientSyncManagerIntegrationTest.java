@@ -449,7 +449,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
     Factory.maybeUnwrapProxy(csm).dataSyncService = new Caller<DataSyncService>() {
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback) {
+      public <S> DataSyncService call(final RemoteCallback<S> callback) {
         return new DataSyncService() {
 
           @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -473,7 +473,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
       }
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback, final ErrorCallback<?> errorCallback) {
+      public <S, E> DataSyncService call(final RemoteCallback<S> callback, final ErrorCallback<E> errorCallback) {
         return call(callback);
       }
 
@@ -519,7 +519,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
     csm.dataSyncService = new Caller<DataSyncService>() {
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback) {
+      public <S> DataSyncService call(final RemoteCallback<S> callback) {
         return new DataSyncService() {
 
           @SuppressWarnings({ "rawtypes" })
@@ -543,7 +543,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
       }
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback, final ErrorCallback<?> errorCallback) {
+      public <S, E> DataSyncService call(final RemoteCallback<S> callback, final ErrorCallback<E> errorCallback) {
         return call(callback);
       }
 
@@ -592,7 +592,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
     csm.dataSyncService = new Caller<DataSyncService>() {
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback) {
+      public <S> DataSyncService call(final RemoteCallback<S> callback) {
         return new DataSyncService() {
 
           @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -612,7 +612,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
       }
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback, final ErrorCallback<?> errorCallback) {
+      public <S, E> DataSyncService call(final RemoteCallback<S> callback, final ErrorCallback<E> errorCallback) {
         return call(callback);
       }
 
@@ -683,7 +683,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
     csm.dataSyncService = new Caller<DataSyncService>() {
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback) {
+      public <S> DataSyncService call(final RemoteCallback<S> callback) {
         return new DataSyncService() {
 
           @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -705,7 +705,7 @@ public class ClientSyncManagerIntegrationTest extends GWTTestCase {
       }
 
       @Override
-      public DataSyncService call(final RemoteCallback<?> callback, final ErrorCallback<?> errorCallback) {
+      public <S, E> DataSyncService call(final RemoteCallback<S> callback, final ErrorCallback<E> errorCallback) {
         return call(callback);
       }
 

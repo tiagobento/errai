@@ -26,6 +26,7 @@ package org.jboss.errai.common.client.api;
  * @param <R>
  *          type of response the callback expects. Use {@link Void} for methods returning {@code void}.
  */
+@FunctionalInterface
 public interface RemoteCallback<R> {
 
   /**
@@ -36,5 +37,5 @@ public interface RemoteCallback<R> {
    *          the response returned from the remote call. Will be null if the
    *          remote method returns null or has a void return type.
    */
-  public void callback(R response);
+  void callback(R response);
 }
