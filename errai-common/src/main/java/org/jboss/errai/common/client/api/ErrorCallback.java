@@ -25,6 +25,7 @@ package org.jboss.errai.common.client.api;
  * 
  * @author Mike Brock
  */
+@FunctionalInterface
 public interface ErrorCallback<T> {
 
   /**
