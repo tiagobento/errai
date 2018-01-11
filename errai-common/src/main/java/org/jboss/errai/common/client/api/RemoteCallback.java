@@ -37,5 +37,5 @@ public interface RemoteCallback<R> {
    *          the response returned from the remote call. Will be null if the
    *          remote method returns null or has a void return type.
    */
-  void callback(R response);
+  public void callback(R response);
 }
