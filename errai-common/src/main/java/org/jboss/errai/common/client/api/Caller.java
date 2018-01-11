@@ -49,7 +49,7 @@ public interface Caller<T> {
    * @return an instance of the proxy that can invoke service methods on the
    *         service described by {@code T}.
    */
-  public <S> T call(RemoteCallback<S> callback);
+  public T call(RemoteCallback<?> callback);
 
   /**
    * Returns an instance of the proxy that can invoke service methods on the
@@ -69,5 +69,5 @@ public interface Caller<T> {
    * @return an instance of the proxy that can invoke service methods on the
    *         service described by {@code T}.
    */
-  public <S, E> T call(RemoteCallback<S> callback, ErrorCallback<E> errorCallback);
+  public T call(RemoteCallback<?> callback, ErrorCallback<?> errorCallback);
 }
