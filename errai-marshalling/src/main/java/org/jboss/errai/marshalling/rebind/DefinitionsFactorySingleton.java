@@ -16,8 +16,8 @@
 
 package org.jboss.errai.marshalling.rebind;
 
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.MetaClassFinder;
 
 /**
  * @author Mike Brock

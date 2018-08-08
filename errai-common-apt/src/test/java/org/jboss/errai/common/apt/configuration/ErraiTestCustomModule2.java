@@ -16,8 +16,8 @@
 
 package org.jboss.errai.common.apt.configuration;
 
-import org.jboss.errai.common.configuration.ErraiModule;
-import org.jboss.errai.common.configuration.MappingAlias;
+import org.jboss.errai.config.apt.api.ErraiModule;
+import org.jboss.errai.config.apt.api.MappingAlias;
 
 import java.util.Collection;
 import java.util.HashSet;

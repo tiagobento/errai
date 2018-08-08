@@ -19,13 +19,13 @@ package org.jboss.errai.ioc.apt;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.app.ResourceFilesFinder;
-import org.jboss.errai.common.configuration.ErraiGenerator;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
 import org.jboss.errai.ioc.apt.util.AptIocRelevantClassesFinder;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClassesFinder;
 
-import static org.jboss.errai.common.configuration.Target.GWT;
-import static org.jboss.errai.common.configuration.Target.JAVA;
+import static org.jboss.errai.config.apt.api.Target.GWT;
+import static org.jboss.errai.config.apt.api.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

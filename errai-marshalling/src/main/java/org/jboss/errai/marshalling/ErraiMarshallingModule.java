@@ -17,7 +17,7 @@
 package org.jboss.errai.marshalling;
 
 import org.jboss.errai.common.client.PageRequest;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiModule;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

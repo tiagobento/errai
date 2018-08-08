@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.configuration;
+package org.jboss.errai.config.apt;
+
+import static org.jboss.errai.config.apt.ErraiSeparateModuleConfiguration.DataBinding;
+import static org.jboss.errai.config.apt.ErraiSeparateModuleConfiguration.Ioc;
+import static org.jboss.errai.config.apt.ErraiSeparateModuleConfiguration.Marshalling;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public @interface CustomProperty {
-  String name();
-
-  String value();
+public interface ErraiModulesConfiguration extends Ioc, DataBinding, Marshalling {
 }

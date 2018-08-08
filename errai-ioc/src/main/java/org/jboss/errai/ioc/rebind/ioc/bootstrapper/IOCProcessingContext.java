@@ -27,8 +27,8 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
 import org.jboss.errai.common.apt.generator.app.ResourceFilesFinder;
 import org.jboss.errai.common.client.api.Assert;
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.ioc.client.container.Factory;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 

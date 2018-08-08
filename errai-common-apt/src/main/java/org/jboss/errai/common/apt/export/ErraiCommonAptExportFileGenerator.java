@@ -40,9 +40,9 @@ public class ErraiCommonAptExportFileGenerator extends AbstractExportFileGenerat
 
   interface SupportedAnnotationTypes {
 
-    String ERRAI_GENERATOR = "org.jboss.errai.common.configuration.ErraiGenerator";
-    String ERRAI_MODULE = "org.jboss.errai.common.configuration.ErraiModule";
-    String ERRAI_APP = "org.jboss.errai.common.configuration.ErraiApp";
+    String ERRAI_GENERATOR = "org.jboss.errai.config.apt.api.ErraiGenerator";
+    String ERRAI_MODULE = "org.jboss.errai.config.apt.api.ErraiModule";
+    String ERRAI_APP = "org.jboss.errai.config.apt.api.ErraiApp";
   }
 
 }

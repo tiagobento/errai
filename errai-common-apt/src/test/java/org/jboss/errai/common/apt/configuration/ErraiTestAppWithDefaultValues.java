@@ -16,7 +16,7 @@
 
 package org.jboss.errai.common.apt.configuration;
 
-import org.jboss.errai.common.configuration.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiApp;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

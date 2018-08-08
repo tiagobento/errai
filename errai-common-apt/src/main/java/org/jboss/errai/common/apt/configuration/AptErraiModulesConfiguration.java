@@ -18,8 +18,8 @@ package org.jboss.errai.common.apt.configuration;
 
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.common.configuration.ErraiModule;
-import org.jboss.errai.config.ErraiModulesConfiguration;
+import org.jboss.errai.config.apt.api.ErraiModule;
+import org.jboss.errai.config.apt.ErraiModulesConfiguration;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,16 +30,16 @@ import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.BINDABLE_TYPES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.EXCLUDES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.INCLUDES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.IOC_ALTERNATIVES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.IOC_BLACKLIST;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.IOC_WHITELIST;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.MAPPING_ALIASES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.NON_BINDABLE_TYPES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.NON_SERIALIZABLE_TYPES;
-import static org.jboss.errai.common.configuration.ErraiModule.Property.SERIALIZABLE_TYPES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.BINDABLE_TYPES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.EXCLUDES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.INCLUDES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.IOC_ALTERNATIVES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.IOC_BLACKLIST;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.IOC_WHITELIST;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.MAPPING_ALIASES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.NON_BINDABLE_TYPES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.NON_SERIALIZABLE_TYPES;
+import static org.jboss.errai.config.apt.api.ErraiModule.Property.SERIALIZABLE_TYPES;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

@@ -28,7 +28,7 @@ import org.jboss.errai.codegen.exception.GenerationException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionAnnotation;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.common.client.dom.Anchor;
 import org.jboss.errai.common.client.dom.Event;
 import org.jboss.errai.common.client.dom.EventListener;

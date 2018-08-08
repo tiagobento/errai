@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.configuration;
+package org.jboss.errai.config.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public enum Target {
+public interface ErraiConfiguration {
+  ErraiModulesConfiguration modules();
 
-  GWT, JAVA;
+  ErraiAppConfiguration app();
 }

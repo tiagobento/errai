@@ -16,9 +16,9 @@
 
 package org.jboss.errai.config.propertiesfile;
 
-import org.jboss.errai.config.ErraiAppConfiguration;
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.ErraiModulesConfiguration;
+import org.jboss.errai.config.apt.ErraiAppConfiguration;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.ErraiModulesConfiguration;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

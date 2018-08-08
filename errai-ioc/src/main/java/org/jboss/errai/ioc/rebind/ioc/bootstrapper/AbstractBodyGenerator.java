@@ -96,7 +96,7 @@ import static org.jboss.errai.codegen.util.Stmt.newArray;
 import static org.jboss.errai.codegen.util.Stmt.newObject;
 import static org.jboss.errai.codegen.util.Stmt.throw_;
 import static org.jboss.errai.codegen.util.Stmt.try_;
-import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.config.apt.api.Target.GWT;
 
 /**
  * Implements functionality common to most {@link FactoryBodyGenerator} such as

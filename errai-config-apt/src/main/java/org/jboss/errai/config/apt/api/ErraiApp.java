@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.configuration;
+package org.jboss.errai.config.apt.api;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static org.jboss.errai.common.configuration.Target.GWT;
+import static org.jboss.errai.config.apt.api.Target.GWT;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

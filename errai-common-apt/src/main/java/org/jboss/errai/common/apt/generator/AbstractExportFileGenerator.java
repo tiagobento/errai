@@ -22,8 +22,8 @@ import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 import org.jboss.errai.common.apt.generator.app.ErraiAptGenerator;
 import org.jboss.errai.common.apt.strategies.ErraiExportingStrategiesFactory;
 import org.jboss.errai.common.apt.strategies.ExportingStrategies;
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

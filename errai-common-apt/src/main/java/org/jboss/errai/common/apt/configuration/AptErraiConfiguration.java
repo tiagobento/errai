@@ -16,15 +16,11 @@
 
 package org.jboss.errai.common.apt.configuration;
 
-import org.jboss.errai.common.configuration.ErraiModule;
-import org.jboss.errai.config.ErraiAppConfiguration;
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.ErraiModulesConfiguration;
-import org.jboss.errai.config.MetaClassFinder;
-
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toSet;
+import org.jboss.errai.config.apt.api.ErraiModule;
+import org.jboss.errai.config.apt.ErraiAppConfiguration;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.ErraiModulesConfiguration;
+import org.jboss.errai.config.apt.MetaClassFinder;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

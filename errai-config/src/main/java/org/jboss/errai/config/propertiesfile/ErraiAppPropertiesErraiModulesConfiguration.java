@@ -19,7 +19,7 @@ package org.jboss.errai.config.propertiesfile;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
-import org.jboss.errai.config.ErraiModulesConfiguration;
+import org.jboss.errai.config.apt.ErraiModulesConfiguration;
 import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

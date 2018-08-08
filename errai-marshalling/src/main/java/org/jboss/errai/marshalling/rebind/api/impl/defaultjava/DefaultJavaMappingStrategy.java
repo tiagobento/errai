@@ -47,7 +47,7 @@ import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.codegen.util.Str;
 import org.jboss.errai.common.client.protocols.SerializationParts;
-import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.config.apt.ErraiConfiguration;
 import org.jboss.errai.marshalling.client.api.GeneratedMarshaller;
 import org.jboss.errai.marshalling.client.api.MarshallingSession;
 import org.jboss.errai.marshalling.client.api.exceptions.InvalidMappingException;

@@ -22,7 +22,7 @@ import org.jboss.errai.codegen.util.PrivateAccessUtil;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
-import org.jboss.errai.common.configuration.ErraiGenerator;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.FactoryGenerator;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IOCProcessingContext;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static org.jboss.errai.common.configuration.Target.GWT;
-import static org.jboss.errai.common.configuration.Target.JAVA;
+import static org.jboss.errai.config.apt.api.Target.GWT;
+import static org.jboss.errai.config.apt.api.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

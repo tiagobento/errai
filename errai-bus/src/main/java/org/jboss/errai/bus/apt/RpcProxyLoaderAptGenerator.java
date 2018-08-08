@@ -20,7 +20,7 @@ import org.jboss.errai.bus.rebind.RpcProxyLoaderGenerator;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.configuration.ErraiGenerator;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
 
 import java.util.Collection;
 

@@ -19,8 +19,8 @@ package org.jboss.errai.common.apt;
 import org.jboss.errai.common.apt.configuration.AptErraiConfiguration;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.MetaClassFinder;
 
 import java.util.Collection;
 import java.util.Collections;

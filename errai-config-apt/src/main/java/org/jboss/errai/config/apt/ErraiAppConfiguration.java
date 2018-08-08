@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.config;
+package org.jboss.errai.config.apt;
 
-import org.jboss.errai.common.configuration.Target;
-import org.jboss.errai.config.ErraiSeparateAppConfiguration.Ioc;
-import org.jboss.errai.config.ErraiSeparateAppConfiguration.Jaxrs;
-import org.jboss.errai.config.ErraiSeparateAppConfiguration.Marshalling;
-import org.jboss.errai.config.ErraiSeparateAppConfiguration.Validation;
+import org.jboss.errai.config.apt.api.Target;
+import org.jboss.errai.config.apt.ErraiSeparateAppConfiguration.Ioc;
+import org.jboss.errai.config.apt.ErraiSeparateAppConfiguration.Jaxrs;
+import org.jboss.errai.config.apt.ErraiSeparateAppConfiguration.Marshalling;
+import org.jboss.errai.config.apt.ErraiSeparateAppConfiguration.Validation;
 
 import java.util.Optional;
 
-import static org.jboss.errai.config.ErraiSeparateAppConfiguration.Others;
+import static org.jboss.errai.config.apt.ErraiSeparateAppConfiguration.Others;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

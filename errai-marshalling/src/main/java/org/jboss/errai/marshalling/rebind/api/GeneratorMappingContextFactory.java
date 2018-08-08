@@ -18,8 +18,8 @@ package org.jboss.errai.marshalling.rebind.api;
 
 import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.codegen.exception.GenerationException;
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.marshalling.rebind.MarshallerGeneratorFactory;
 import org.jboss.errai.marshalling.rebind.MarshallerOutputTarget;
 

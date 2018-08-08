@@ -19,29 +19,29 @@ package org.jboss.errai.common.apt.configuration;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaEnum;
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.Target;
-import org.jboss.errai.config.ErraiAppConfiguration;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.Target;
+import org.jboss.errai.config.apt.ErraiAppConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.jboss.errai.common.configuration.ErraiApp.Property.APPLICATION_CONTEXT;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.ASYNC_BEAN_MANAGER;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.AUTO_DISCOVER_SERVICES;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.CUSTOM_PROPERTIES;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.DYNAMIC_VALIDATION_ENABLED;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.ENABLE_WEB_SOCKET_SERVER;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.FORCE_STATIC_MARSHALLERS;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.GWT_MODULE_NAME;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.JS_INTEROP_SUPPORT_ENABLED;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.LAZY_LOAD_BUILTIN_MARSHALLERS;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.MAKE_DEFAULT_ARRAY_MARSHALLERS;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.MODULES;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.TARGET;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.USER_ON_HOST_PAGE_ENABLED;
-import static org.jboss.errai.common.configuration.ErraiApp.Property.USE_STATIC_MARSHALLERS;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.APPLICATION_CONTEXT;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.ASYNC_BEAN_MANAGER;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.AUTO_DISCOVER_SERVICES;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.CUSTOM_PROPERTIES;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.DYNAMIC_VALIDATION_ENABLED;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.ENABLE_WEB_SOCKET_SERVER;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.FORCE_STATIC_MARSHALLERS;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.GWT_MODULE_NAME;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.JS_INTEROP_SUPPORT_ENABLED;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.LAZY_LOAD_BUILTIN_MARSHALLERS;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.MAKE_DEFAULT_ARRAY_MARSHALLERS;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.MODULES;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.TARGET;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.USER_ON_HOST_PAGE_ENABLED;
+import static org.jboss.errai.config.apt.api.ErraiApp.Property.USE_STATIC_MARSHALLERS;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

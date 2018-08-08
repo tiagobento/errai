@@ -18,7 +18,7 @@ package org.jboss.errai.ui.nav.apt;
 
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.configuration.ErraiGenerator;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
 import org.jboss.errai.ui.nav.rebind.NavigationGraphGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
