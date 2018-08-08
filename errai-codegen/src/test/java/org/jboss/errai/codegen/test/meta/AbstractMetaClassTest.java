@@ -17,7 +17,6 @@
 package org.jboss.errai.codegen.test.meta;
 
 import com.google.common.collect.Lists;
-import com.google.gwt.core.ext.typeinfo.NotFoundException;
 import org.jboss.errai.codegen.meta.HasAnnotations;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -69,8 +68,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Collections.singleton;
 import static java.util.Collections.sort;
@@ -462,7 +459,7 @@ public abstract class AbstractMetaClassTest {
   }
 
   @Test
-  public void testNoDuplicateMethodsInClassHierarchy() throws NotFoundException {
+  public void testNoDuplicateMethodsInClassHierarchy() {
     final MetaClass child = getMetaClass(Child.class);
 
     final List<MetaMethod> foundMethods = new ArrayList<>();
