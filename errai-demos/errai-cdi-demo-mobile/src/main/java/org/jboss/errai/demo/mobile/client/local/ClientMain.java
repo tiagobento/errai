@@ -24,7 +24,6 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.jboss.errai.common.configuration.ErraiApp;
 import org.jboss.errai.demo.mobile.client.shared.AllClientOrientations;
 import org.jboss.errai.demo.mobile.client.shared.ClientOrientationEvent;
 import org.jboss.errai.demo.mobile.client.shared.Disconnected;

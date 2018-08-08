@@ -14,40 +14,14 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.config;
-
-import org.jboss.errai.codegen.meta.MetaClass;
-
-import java.util.Map;
-import java.util.Set;
+package org.jboss.errai.config.apt.api;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-interface ErraiSeparateModuleConfiguration {
+public @interface MappingAlias {
 
-  interface DataBinding {
+  Class<?> from();
 
-    Set<MetaClass> getBindableTypes();
-
-    Set<MetaClass> getNonBindableTypes();
-  }
-
-  interface Marshalling {
-
-    Set<MetaClass> portableTypes();
-
-    Set<MetaClass> nonPortableTypes();
-
-    Map<String, String> getMappingAliases();
-  }
-
-  interface Ioc {
-
-    Set<MetaClass> getIocEnabledAlternatives();
-
-    Set<MetaClass> getIocBlacklist();
-
-    Set<MetaClass> getIocWhitelist();
-  }
+  Class<?> to();
 }

@@ -64,6 +64,13 @@
         <artifactId>errai-cdi-client</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+
+      <dependency>
+        <groupId>org.jboss.errai</groupId>
+        <artifactId>errai-config-apt</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       
       <dependency>
         <groupId>org.jboss.errai</groupId>

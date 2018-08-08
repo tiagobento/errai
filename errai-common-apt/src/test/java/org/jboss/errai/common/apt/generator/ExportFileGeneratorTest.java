@@ -20,7 +20,7 @@ import org.jboss.errai.codegen.apt.test.ErraiAptTest;
 import org.jboss.errai.codegen.meta.impl.apt.APTClass;
 import org.jboss.errai.common.apt.TestAnnotatedSourceElementsFinder;
 import org.jboss.errai.common.apt.exportfile.ExportFile;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.junit.Assert;
 import org.junit.Test;
 

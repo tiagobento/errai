@@ -16,9 +16,9 @@
 
 package org.jboss.errai.security;
 
-import org.jboss.errai.common.configuration.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiApp;
 
-import static org.jboss.errai.common.configuration.Target.JAVA;
+import static org.jboss.errai.config.apt.api.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

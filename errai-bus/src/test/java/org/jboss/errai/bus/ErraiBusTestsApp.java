@@ -19,8 +19,8 @@ package org.jboss.errai.bus;
 import org.jboss.errai.bus.client.tests.support.BuilderEntity;
 import org.jboss.errai.bus.client.tests.support.pkg.PortableType1;
 import org.jboss.errai.bus.client.tests.support.pkg.subpkg.NonSerializable;
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.jboss.errai.marshalling.ErraiMarshallingModule;
 
 /**

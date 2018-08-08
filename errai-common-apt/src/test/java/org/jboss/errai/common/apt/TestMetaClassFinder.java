@@ -17,7 +17,7 @@
 package org.jboss.errai.common.apt;
 
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.MetaClassFinder;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;

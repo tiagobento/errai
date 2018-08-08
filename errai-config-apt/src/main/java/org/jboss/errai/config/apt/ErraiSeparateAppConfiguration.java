@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.config;
+package org.jboss.errai.config.apt;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

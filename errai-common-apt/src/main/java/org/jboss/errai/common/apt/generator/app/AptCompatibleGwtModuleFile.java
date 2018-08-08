@@ -19,7 +19,7 @@ package org.jboss.errai.common.apt.generator.app;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiModule;
 
 import java.io.File;
 import java.io.IOException;

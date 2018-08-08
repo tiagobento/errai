@@ -16,8 +16,8 @@
 
 package org.jboss.errai.config.propertiesfile;
 
-import org.jboss.errai.common.configuration.Target;
-import org.jboss.errai.config.ErraiAppConfiguration;
+import org.jboss.errai.config.apt.api.Target;
+import org.jboss.errai.config.apt.ErraiAppConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 
 import java.util.Map;

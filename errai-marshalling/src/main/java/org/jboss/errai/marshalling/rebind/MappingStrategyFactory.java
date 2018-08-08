@@ -17,7 +17,7 @@
 package org.jboss.errai.marshalling.rebind;
 
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.config.apt.ErraiConfiguration;
 import org.jboss.errai.marshalling.rebind.api.GeneratorMappingContext;
 import org.jboss.errai.marshalling.rebind.api.MappingStrategy;
 import org.jboss.errai.marshalling.rebind.api.impl.defaultjava.DefaultJavaMappingStrategy;

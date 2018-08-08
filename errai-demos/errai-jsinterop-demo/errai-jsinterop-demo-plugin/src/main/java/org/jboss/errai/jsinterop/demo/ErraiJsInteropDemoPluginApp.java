@@ -16,8 +16,8 @@
 
 package org.jboss.errai.jsinterop.demo;
 
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

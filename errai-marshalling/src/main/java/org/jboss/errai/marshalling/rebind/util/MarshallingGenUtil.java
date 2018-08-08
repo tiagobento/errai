@@ -38,7 +38,7 @@ import org.jboss.errai.codegen.util.GenUtil;
 import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.config.propertiesfile.ErraiAppPropertiesErraiAppConfiguration;
-import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.config.apt.ErraiConfiguration;
 import org.jboss.errai.config.rebind.EnvUtil;
 import org.jboss.errai.marshalling.client.Marshalling;
 import org.jboss.errai.marshalling.client.api.Marshaller;

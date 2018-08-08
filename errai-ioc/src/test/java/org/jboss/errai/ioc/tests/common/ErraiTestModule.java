@@ -16,7 +16,7 @@
 
 package org.jboss.errai.ioc.tests.common;
 
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.jboss.errai.ioc.tests.wiring.client.res.AlternativeBeanA;
 import org.jboss.errai.ioc.tests.wiring.client.res.BlacklistedBean;
 import org.jboss.errai.ioc.tests.wiring.client.res.OverridingAltCommonInterfaceBImpl;

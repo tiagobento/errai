@@ -18,8 +18,8 @@ package org.jboss.errai.databinding.apt;
 
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.configuration.ErraiGenerator;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.rebind.BindableProxyLoaderGenerator;
 import org.slf4j.Logger;

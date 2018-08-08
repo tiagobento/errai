@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.config;
+package org.jboss.errai.config.apt.api;
 
-import static org.jboss.errai.config.ErraiSeparateModuleConfiguration.DataBinding;
-import static org.jboss.errai.config.ErraiSeparateModuleConfiguration.Ioc;
-import static org.jboss.errai.config.ErraiSeparateModuleConfiguration.Marshalling;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import static org.jboss.errai.config.apt.api.Target.GWT;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface ErraiModulesConfiguration extends Ioc, DataBinding, Marshalling {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ErraiGenerator {
+
+  Target[] targets() default { GWT };
+
 }

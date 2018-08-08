@@ -17,7 +17,7 @@
 package org.jboss.errai.config.rebind;
 
 import org.jboss.errai.codegen.meta.MetaClass;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.MetaClassFinder;
 
 import java.util.Collection;
 

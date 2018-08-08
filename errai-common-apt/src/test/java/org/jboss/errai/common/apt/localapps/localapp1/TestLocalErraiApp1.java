@@ -17,8 +17,7 @@
 package org.jboss.errai.common.apt.localapps.localapp1;
 
 import org.jboss.errai.common.apt.localapps.localapp1.module1.TestModule1;
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

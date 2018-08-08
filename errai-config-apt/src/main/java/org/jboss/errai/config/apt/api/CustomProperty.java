@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.config;
+package org.jboss.errai.config.apt.api;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>
  */
-public interface ErraiConfiguration {
-  ErraiModulesConfiguration modules();
+public @interface CustomProperty {
+  String name();
 
-  ErraiAppConfiguration app();
+  String value();
 }

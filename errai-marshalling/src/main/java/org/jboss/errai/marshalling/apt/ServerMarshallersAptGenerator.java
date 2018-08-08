@@ -19,15 +19,15 @@ package org.jboss.errai.marshalling.apt;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.configuration.ErraiGenerator;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.marshalling.client.api.annotations.ServerMarshaller;
 import org.jboss.errai.marshalling.rebind.DefinitionsFactorySingleton;
 import org.jboss.errai.marshalling.rebind.MarshallerGeneratorFactory;
 import org.jboss.errai.marshalling.server.marshallers.ServerClassMarshaller;
 
 import static java.util.Collections.singleton;
-import static org.jboss.errai.common.configuration.Target.JAVA;
+import static org.jboss.errai.config.apt.api.Target.JAVA;
 import static org.jboss.errai.marshalling.rebind.MarshallerOutputTarget.Java;
 import static org.jboss.errai.marshalling.rebind.MarshallersGenerator.SERVER_CLASS_NAME;
 import static org.jboss.errai.marshalling.rebind.MarshallersGenerator.SERVER_PACKAGE_NAME;

@@ -16,9 +16,9 @@
 
 package org.jboss.errai.enterprise.jaxrs;
 
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
-import org.jboss.errai.common.configuration.MappingAlias;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
+import org.jboss.errai.config.apt.api.MappingAlias;
 
 import java.util.ArrayList;
 import java.util.Collection;

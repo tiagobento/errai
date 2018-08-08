@@ -25,7 +25,7 @@ import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.config.propertiesfile.ErraiAppPropertiesConfiguration;
-import org.jboss.errai.config.ErraiConfiguration;
+import org.jboss.errai.config.apt.ErraiConfiguration;
 import org.jboss.errai.ioc.client.container.ClientBeanManager;
 import org.jboss.errai.ioc.client.container.IOCEnvironment;
 import org.jboss.errai.ioc.client.container.SyncBeanManagerImpl;

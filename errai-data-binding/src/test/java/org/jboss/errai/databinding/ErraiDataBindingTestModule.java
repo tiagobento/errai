@@ -16,8 +16,8 @@
 
 package org.jboss.errai.databinding;
 
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.jboss.errai.databinding.client.TestModelWithoutBindableAnnotation;
 import org.jboss.errai.databinding.client.nonbindablepkg.TestModelInNonBindablePkg;
 import org.jboss.errai.databinding.client.scan.TestModelBindable;

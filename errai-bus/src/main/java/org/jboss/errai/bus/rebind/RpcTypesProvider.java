@@ -26,10 +26,9 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.config.rebind.EnvironmentConfigExtension;
 import org.jboss.errai.config.rebind.ExposedTypesProvider;
-import org.jboss.errai.config.util.ClassScanner;
 
 /**
  * @author Mike Brock

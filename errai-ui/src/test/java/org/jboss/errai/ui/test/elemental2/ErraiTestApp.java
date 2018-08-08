@@ -17,8 +17,8 @@
 package org.jboss.errai.ui.test.elemental2;
 
 import org.jboss.errai.bus.ErraiBusModule;
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.jboss.errai.databinding.ErraiDataBindingModule;
 import org.jboss.errai.enterprise.ErraiCdiClientModule;
 import org.jboss.errai.enterprise.ErraiCdiSharedModule;

@@ -16,7 +16,7 @@
 
 package org.jboss.errai.cdi.rebind;
 
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiModule;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

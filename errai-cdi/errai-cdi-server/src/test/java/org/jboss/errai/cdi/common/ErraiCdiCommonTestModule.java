@@ -17,7 +17,7 @@
 package org.jboss.errai.cdi.common;
 
 import org.jboss.errai.cdi.common.client.event.FinishEvent;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiModule;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

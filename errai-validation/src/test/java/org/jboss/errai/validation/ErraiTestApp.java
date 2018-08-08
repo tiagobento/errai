@@ -16,8 +16,8 @@
 
 package org.jboss.errai.validation;
 
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.jboss.errai.databinding.ErraiDataBindingModule;
 import org.jboss.errai.ioc.ErraiIocModule;
 

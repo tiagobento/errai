@@ -19,7 +19,7 @@ package org.jboss.errai.enterprise.apt;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
-import org.jboss.errai.common.configuration.ErraiGenerator;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
 import org.jboss.errai.enterprise.rebind.JaxrsProxyLoaderGenerator;
 
 import java.util.Collection;

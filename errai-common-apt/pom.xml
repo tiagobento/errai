@@ -19,14 +19,14 @@
 
         <dependency>
             <groupId>org.jboss.errai</groupId>
-            <artifactId>errai-config</artifactId>
+            <artifactId>errai-codegen</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.errai</groupId>
-            <artifactId>errai-codegen</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <artifactId>errai-config-apt</artifactId>
         </dependency>
 
         <dependency>

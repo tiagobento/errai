@@ -22,12 +22,11 @@ import org.jboss.errai.common.client.api.annotations.NonPortable;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.common.client.types.TypeHandler;
 import org.jboss.errai.common.client.types.TypeHandlerFactory;
-import org.jboss.errai.config.ErraiConfiguration;
-import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.apt.ErraiConfiguration;
+import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.config.propertiesfile.ErraiAppPropertiesConfiguration;
 import org.jboss.errai.config.rebind.EnvironmentConfigExtension;
 import org.jboss.errai.config.rebind.ExposedTypesProvider;
-import org.jboss.errai.config.util.ClassScanner;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;

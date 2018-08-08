@@ -21,8 +21,8 @@ import org.jboss.errai.common.apt.ErraiAptGenerators;
 import org.jboss.errai.common.apt.configuration.AptErraiAppConfiguration;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.common.apt.generator.ErraiAptGeneratedSourceFile;
-import org.jboss.errai.common.configuration.ErraiGenerator;
-import org.jboss.errai.common.configuration.Target;
+import org.jboss.errai.config.apt.api.ErraiGenerator;
+import org.jboss.errai.config.apt.api.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +38,8 @@ import static java.util.Arrays.stream;
 import static java.util.Comparator.comparing;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
-import static org.jboss.errai.common.configuration.Target.GWT;
-import static org.jboss.errai.common.configuration.Target.JAVA;
+import static org.jboss.errai.config.apt.api.Target.GWT;
+import static org.jboss.errai.config.apt.api.Target.JAVA;
 
 /**
  * @author Tiago Bento <tfernand@redhat.com>

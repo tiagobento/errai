@@ -17,8 +17,8 @@
 package org.jboss.errai.ioc.support.tests.factory;
 
 import org.jboss.errai.bus.ErraiBusModule;
-import org.jboss.errai.common.configuration.ErraiApp;
-import org.jboss.errai.common.configuration.ErraiModule;
+import org.jboss.errai.config.apt.api.ErraiApp;
+import org.jboss.errai.config.apt.api.ErraiModule;
 import org.jboss.errai.ioc.ErraiIocModule;
 import org.jboss.errai.marshalling.ErraiMarshallingModule;
 
