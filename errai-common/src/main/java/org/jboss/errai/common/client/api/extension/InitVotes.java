@@ -49,6 +49,9 @@ import com.google.gwt.core.client.GWT;
  * @author Mike Brock
  */
 public final class InitVotes {
+
+  public static final int INIT_DELAY = 0;
+
   private InitVotes() {}
 
   private static final List<Runnable> preInitCallbacks = new ArrayList<>();
@@ -216,7 +219,7 @@ public final class InitVotes {
   }
 
   private static void _scheduleFinish(final Runnable runnable) {
-    initDelay = TaskManagerFactory.get().schedule(TimeUnit.MILLISECONDS, 250, runnable);
+    initDelay = TaskManagerFactory.get().schedule(TimeUnit.MILLISECONDS, INIT_DELAY, runnable);
   }
 
   public static void registerPersistentDependencyCallback(final Class clazz, final Runnable runnable) {

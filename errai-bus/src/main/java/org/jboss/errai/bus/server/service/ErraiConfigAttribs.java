@@ -69,6 +69,7 @@ public enum ErraiConfigAttribs {
   HOSTED_MODE_TESTING("errai.hosted_mode_testing", "false"),
   DO_LONG_POLL("org.jboss.errai.bus.do_long_poll", "true"),
   LONG_POLL_TIMEOUT("errai.bus.long_poll_timeout", "45000"),
+  POLLING_THROTTLE_INTERVAL("errai.bus.throttle", "175"),
 
   ENABLE_SSE_SUPPORT("errai.bus.enable_sse_support", "true"),
   SSE_TIMEOUT("errai.bus.servlet_sse_timeout", "45000"),

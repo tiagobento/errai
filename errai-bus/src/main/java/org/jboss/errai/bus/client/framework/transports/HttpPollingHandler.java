@@ -16,19 +16,14 @@
 
 package org.jboss.errai.bus.client.framework.transports;
 
-import static org.jboss.errai.common.client.framework.Constants.ERRAI_CSRF_TOKEN_HEADER;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.gwt.http.client.Header;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.RequestTimeoutException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Timer;
 import org.jboss.errai.bus.client.api.InvalidBusContentException;
 import org.jboss.errai.bus.client.api.RetryInfo;
 import org.jboss.errai.bus.client.api.base.DefaultErrorCallback;
@@ -42,22 +37,25 @@ import org.jboss.errai.common.client.protocols.MessageParts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.RequestTimeoutException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.Timer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.jboss.errai.common.client.framework.Constants.ERRAI_CSRF_TOKEN_HEADER;
 
 /**
  * @author Mike Brock
  */
 public class HttpPollingHandler implements TransportHandler, TransportStatistics {
-  public static int THROTTLE_TIME_MS = 175;
+  public static int THROTTLE_TIME_MS = 10;
   public static int POLL_FREQUENCY_MS = 500;
-  
+
   private static final Logger logger = LoggerFactory.getLogger(HttpPollingHandler.class);
 
   private boolean configured;
@@ -186,7 +184,7 @@ public class HttpPollingHandler implements TransportHandler, TransportStatistics
       transmit(txMessages, false);
     }
   }
-  
+
   private void transmit(final List<Message> txMessages, boolean isRetry) {
     if (txMessages.isEmpty()) {
       return;
@@ -280,7 +278,7 @@ public class HttpPollingHandler implements TransportHandler, TransportStatistics
   public Collection<Message> stop(final boolean stopAllCurrentRequests) {
     receiveCommCallback.cancel();
     throttleTimer.cancel();
-    
+
     try {
       if (stopAllCurrentRequests) {
         // Now stop all the in-flight XHRs
@@ -303,7 +301,7 @@ public class HttpPollingHandler implements TransportHandler, TransportStatistics
   public boolean isCancelled() {
     return receiveCommCallback.canceled;
   }
-  
+
   private class NoPollRequestCallback extends LongPollRequestCallback {
 
     @Override
