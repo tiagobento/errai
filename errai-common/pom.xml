@@ -4,6 +4,7 @@
   <name>Errai::Common</name>
   <artifactId>errai-common</artifactId>
   <packaging>jar</packaging>
+  <version>4.6.0.Final</version>
 
   <!-- Parent -->
   <parent>
