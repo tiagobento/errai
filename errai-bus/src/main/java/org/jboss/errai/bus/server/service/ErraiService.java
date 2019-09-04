@@ -19,6 +19,7 @@ package org.jboss.errai.bus.server.service;
 import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.bus.server.api.ServerMessageBus;
 
+import javax.enterprise.concurrent.ManagedExecutorService;
 import java.util.Collection;
 
 /**
@@ -45,8 +46,9 @@ public interface ErraiService<S> extends ServiceComposite<S> {
   /**
    * Stores a collection of messages/
    * @param messages
+   * @param executorService
    */
-  public void store(Collection<Message> messages);
+  public void store(Collection<Message> messages, ManagedExecutorService executorService);
 
   /**
    * Retrieves the server message bus employed by this service

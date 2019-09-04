@@ -16,11 +16,13 @@
 
 package org.jboss.errai.bus.server.servlet;
 
-import static org.jboss.errai.bus.server.io.MessageFactory.createCommandMessage;
+import org.jboss.errai.bus.client.api.QueueSession;
+import org.jboss.errai.bus.server.QueueUnavailableException;
+import org.jboss.errai.bus.server.api.MessageQueue;
+import org.jboss.errai.bus.server.io.OutputStreamWriteAdapter;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
+import javax.annotation.Resource;
+import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -29,13 +31,14 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import org.jboss.errai.bus.client.api.QueueSession;
-import org.jboss.errai.bus.server.QueueUnavailableException;
-import org.jboss.errai.bus.server.api.MessageQueue;
-import org.jboss.errai.bus.server.io.OutputStreamWriteAdapter;
+import static org.jboss.errai.bus.server.io.MessageFactory.createCommandMessage;
 
 /**
  * The default DefaultBlockingServlet which provides the HTTP-protocol gateway
@@ -81,16 +84,20 @@ import org.jboss.errai.bus.server.io.OutputStreamWriteAdapter;
  * </pre>
  */
 
-public class DefaultBlockingServlet extends AbstractErraiServlet implements Filter {
+@WebServlet(value = "*.erraiBus",
+            loadOnStartup = 1,
+            initParams = { @WebInitParam(name = "service-locator",
+                                         value = "org.jboss.errai.cdi.server.CDIServiceLocator") }) public class DefaultBlockingServlet
+        extends AbstractErraiServlet implements Filter {
   private static final long serialVersionUID = 1L;
 
-  @Override
-  public void init(ServletConfig config) throws ServletException {
+  @Resource private ManagedExecutorService executorService;
+
+  @Override public void init(ServletConfig config) throws ServletException {
     super.init(config);
   }
 
-  @Override
-  public void initAsFilter(FilterConfig config) throws ServletException {
+  @Override public void initAsFilter(FilterConfig config) throws ServletException {
     super.initAsFilter(config);
   }
 
@@ -98,21 +105,15 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
    * Called by the server (via the <tt>service</tt> method) to allow a servlet to handle a GET request by supplying
    * a response
    *
-   * @param httpServletRequest
-   *     - object that contains the request the client has made of the servlet
-   * @param httpServletResponse
-   *     - object that contains the response the servlet sends to the client
-   *
-   * @throws IOException
-   *     - if an input or output error is detected when the servlet handles the GET request
-   * @throws ServletException
-   *     - if the request for the GET could not be handled
+   * @param httpServletRequest  - object that contains the request the client has made of the servlet
+   * @param httpServletResponse - object that contains the response the servlet sends to the client
+   * @throws IOException      - if an input or output error is detected when the servlet handles the GET request
+   * @throws ServletException - if the request for the GET could not be handled
    */
-  @Override
-  protected void doGet(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
-      throws ServletException {
-    pollForMessages(sessionProvider.createOrGetSession(httpServletRequest.getSession(true),
-            getClientId(httpServletRequest)),
+  @Override protected void doGet(final HttpServletRequest httpServletRequest,
+          final HttpServletResponse httpServletResponse) throws ServletException {
+    pollForMessages(
+            sessionProvider.createOrGetSession(httpServletRequest.getSession(true), getClientId(httpServletRequest)),
             httpServletRequest, httpServletResponse, isLongPollingEnabled(), isSSERequest(httpServletRequest));
   }
 
@@ -120,20 +121,15 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
    * Called by the server (via the <code>service</code> method) to allow a servlet to handle a POST request, by
    * sending the request
    *
-   * @param httpServletRequest
-   *     - object that contains the request the client has made of the servlet
-   * @param httpServletResponse
-   *     - object that contains the response the servlet sends to the client
-   *
-   * @throws IOException
-   *     - if an input or output error is detected when the servlet handles the request
-   * @throws ServletException
-   *     - if the request for the POST could not be handled
+   * @param httpServletRequest  - object that contains the request the client has made of the servlet
+   * @param httpServletResponse - object that contains the response the servlet sends to the client
+   * @throws IOException      - if an input or output error is detected when the servlet handles the request
+   * @throws ServletException - if the request for the POST could not be handled
    */
-  @Override
-  protected void doPost(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) throws ServletException {
-    final QueueSession session = sessionProvider.createOrGetSession(httpServletRequest.getSession(true),
-        getClientId(httpServletRequest));
+  @Override protected void doPost(final HttpServletRequest httpServletRequest,
+          final HttpServletResponse httpServletResponse) throws ServletException {
+    final QueueSession session = sessionProvider
+            .createOrGetSession(httpServletRequest.getSession(true), getClientId(httpServletRequest));
 
     if (failFromMissingCSRFToken(httpServletRequest)) {
       prepareTokenChallenge(httpServletRequest, httpServletResponse);
@@ -141,16 +137,14 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
     }
 
     try {
-      service.store(createCommandMessage(session, httpServletRequest));
-    }
-    catch (IOException ioe) {
+      System.out.println(executorService != null);
+      service.store(createCommandMessage(session, httpServletRequest), this.executorService);
+    } catch (IOException ioe) {
       log.debug("Problem when storing message", ioe);
-    }
-    catch (QueueUnavailableException e) {
+    } catch (QueueUnavailableException e) {
       try {
         sendDisconnectDueToSessionExpiry(httpServletResponse);
-      } 
-      catch (IOException ioe) {
+      } catch (IOException ioe) {
         log.debug("Failed to inform client that session expired", ioe);
       }
       return;
@@ -160,8 +154,8 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
   }
 
   private void pollForMessages(final QueueSession session, final HttpServletRequest httpServletRequest,
-                               final HttpServletResponse httpServletResponse, boolean wait, final boolean sse) {
-    
+          final HttpServletResponse httpServletResponse, boolean wait, final boolean sse) {
+
     try {
       if (sse) {
         prepareSSE(httpServletResponse);
@@ -174,12 +168,12 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
 
       if (queue == null) {
         switch (getConnectionPhase(httpServletRequest)) {
-          case CONNECTING:
-          case DISCONNECTING:
-            return;
-          case NORMAL:
-          case UNKNOWN:
-            break;
+        case CONNECTING:
+        case DISCONNECTING:
+          return;
+        case NORMAL:
+        case UNKNOWN:
+          break;
         }
 
         sendDisconnectDueToSessionExpiry(httpServletResponse);
@@ -196,8 +190,7 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
             outputStream.write(SSE_TERMINATION_BYTES);
             outputStream.flush();
             queue.heartBeat();
-          } 
-          catch (IOException e) {
+          } catch (IOException e) {
             log.debug("SSE problem when polling for new messages", e);
             outputStream.close();
             return;
@@ -208,24 +201,20 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
         queue.poll(TimeUnit.MILLISECONDS, getLongPollTimeout(), new OutputStreamWriteAdapter(outputStream));
       }
       else {
-        queue.poll(new OutputStreamWriteAdapter(outputStream));
+//        queue.poll(new OutputStreamWriteAdapter(outputStream));
       }
-    }
-    catch (final IOException io) {
+    } catch (final IOException io) {
       log.debug("Problem when polling for new messages", io);
-    }
-    catch (final Throwable t) {
+    } catch (final Throwable t) {
       try {
         writeExceptionToOutputStream(httpServletResponse, t);
-      } 
-      catch (IOException e) {
+      } catch (IOException e) {
         log.debug("Couldn't write exception to output stream", e);
       }
     }
   }
 
-  @Override
-  public void init(final FilterConfig filterConfig) throws ServletException {
+  @Override public void init(final FilterConfig filterConfig) throws ServletException {
     super.initAsFilter(filterConfig);
   }
 
@@ -235,9 +224,8 @@ public class DefaultBlockingServlet extends AbstractErraiServlet implements Filt
    * class-level comment for the reason why this servlet might be configured as a
    * filter.
    */
-  @Override
-  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-      throws IOException, ServletException {
+  @Override public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+          throws IOException, ServletException {
     service(request, response);
   }
 }

@@ -20,6 +20,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.jboss.errai.bus.server.annotations.Remote;
 import org.jboss.errai.security.shared.api.Role;
 import org.jboss.errai.security.shared.api.annotation.RestrictedAccess;
 
@@ -31,12 +32,9 @@ import org.jboss.errai.security.shared.api.annotation.RestrictedAccess;
  * annotate both the type and methods (in which case the roles will be combined an all roles must be
  * present for access to be granted).
  */
-@Path("/admin")
+//@Path("/admin")
+@Remote
 @RestrictedAccess(providers = { AdminRoleProvider.class })
 public interface AdminService {
-
-  @Path("/ping")
-  @GET
-  @Produces("application/json")
   String ping();
 }

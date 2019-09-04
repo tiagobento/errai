@@ -148,7 +148,7 @@ public class StandardAsyncServlet extends AbstractErraiServlet {
 
     try {
       try {
-        service.store(createCommandMessage(session, request));
+        service.store(createCommandMessage(session, request), null);
       }
       catch (QueueUnavailableException e) {
         sendDisconnectDueToSessionExpiry(response);

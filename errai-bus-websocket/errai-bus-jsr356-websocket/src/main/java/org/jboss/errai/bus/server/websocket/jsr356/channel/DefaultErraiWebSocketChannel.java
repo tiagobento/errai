@@ -102,7 +102,7 @@ public class DefaultErraiWebSocketChannel implements ErraiWebSocketChannel {
           try {
             final List<Message> commandMessages = MessageFactory
                     .createCommandMessage(queueSession, val);
-            erraiService.store(commandMessages);
+            erraiService.store(commandMessages, null);
           } finally {
             FilterDelegate.invokeFilterAfter(session, httpSession,
                     sharedProperties, message);

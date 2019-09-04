@@ -30,8 +30,11 @@ import org.jboss.errai.bus.server.api.SessionProvider;
 import org.jboss.errai.bus.server.io.websockets.WebSocketServer;
 import org.jboss.errai.bus.server.service.bootstrap.BootstrapContext;
 import org.jboss.errai.bus.server.service.bootstrap.OrderedBootstrap;
+import org.jboss.errai.bus.server.servlet.WeldUtils;
 import org.slf4j.Logger;
 
+import javax.annotation.Resource;
+import javax.enterprise.concurrent.ManagedExecutorService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +44,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Default implementation of the ErraiBus server-side service.
  */
-@Singleton
-public class ErraiServiceImpl<S> implements ErraiService<S> {
+@Singleton public class ErraiServiceImpl<S> implements ErraiService<S> {
 
   private ServerMessageBus bus;
   private ErraiServiceConfigurator config;
@@ -52,15 +54,15 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
   private final Logger log = getLogger(getClass());
 
   // Silence WELD-001529
-  private ErraiServiceImpl() {}
-  
+  private ErraiServiceImpl() {
+  }
+
   /**
    * Initializes the errai service with a bus and configurator
    *
    * @param configurator - the configurator to take care of the configuration for the service
    */
-  @Inject
-  public ErraiServiceImpl(final ErraiServiceConfigurator configurator) {
+  @Inject public ErraiServiceImpl(final ErraiServiceConfigurator configurator) {
     this.bus = new ServerMessageBusImpl(this, configurator);
     this.config = configurator;
     boostrap();
@@ -81,8 +83,7 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
    *
    * @param message - the message to store/deliver
    */
-  @Override
-  public void store(Message message) {
+  @Override public void store(Message message) {
     if (message == null) {
       return;
     }
@@ -94,11 +95,9 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
      */
     try {
       getDispatcher().dispatchGlobal(message);
-    }
-    catch (QueueUnavailableException e) {
+    } catch (QueueUnavailableException e) {
       throw e;
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
       if (!message.hasResource("Exception")) {
         message.setResource("Exception", t.getCause());
@@ -107,27 +106,33 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
     }
   }
 
-  @Override
-  public void store(Collection<Message> messages) {
+  @Override public void store(Collection<Message> messages, ManagedExecutorService executorService) {
     for (Message m : messages) {
-      store(m);
+      System.out.println(m.getSubject());
+      if (m.getSubject().equals("ServerBus") || m.getSubject().equals("cdi.event:Dispatcher") || m.getSubject().equals("ServerEchoService")) {
+        store(m);
+      }
+      else {
+        WeldUtils.propagateContextsAndSubmitTask(executorService, () -> {
+          store(m);
+          return null;
+        });
+      }
     }
   }
 
-  @Override
-  public void stopService() {
+  @Override public void stopService() {
     bus.stop();
     DefaultTaskManager.get().requestStop();
 
     for (Runnable runnable : shutdownHooks) {
       try {
         runnable.run();
-      }
-      catch (Throwable e) {
+      } catch (Throwable e) {
         log.error("error executing shutdown hook", e);
       }
     }
-    
+
     bus = null;
     config = null;
     sessionProvider = null;
@@ -143,8 +148,7 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
    *
    * @return the bus associated with this service
    */
-  @Override
-  public ServerMessageBus getBus() {
+  @Override public ServerMessageBus getBus() {
     return bus;
   }
 
@@ -153,23 +157,19 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
    *
    * @return the errai service configurator
    */
-  @Override
-  public ErraiServiceConfigurator getConfiguration() {
+  @Override public ErraiServiceConfigurator getConfiguration() {
     return config;
   }
 
-  @Override
-  public void addShutdownHook(Runnable runnable) {
+  @Override public void addShutdownHook(Runnable runnable) {
     shutdownHooks.add(runnable);
   }
 
-  @Override
-  public SessionProvider<S> getSessionProvider() {
+  @Override public SessionProvider<S> getSessionProvider() {
     return sessionProvider;
   }
 
-  @Override
-  public void setSessionProvider(SessionProvider<S> sessionProvider) {
+  @Override public void setSessionProvider(SessionProvider<S> sessionProvider) {
     if (this.sessionProvider != null) {
       throw new IllegalStateException("cannot set session provider more than once.");
     }
@@ -177,13 +177,11 @@ public class ErraiServiceImpl<S> implements ErraiService<S> {
     this.sessionProvider = sessionProvider;
   }
 
-  @Override
-  public RequestDispatcher getDispatcher() {
+  @Override public RequestDispatcher getDispatcher() {
     return dispatcher;
   }
 
-  @Override
-  public void setDispatcher(RequestDispatcher dispatcher) {
+  @Override public void setDispatcher(RequestDispatcher dispatcher) {
     if (this.dispatcher != null) {
       throw new IllegalStateException("cannot set dispatcher more than once.");
     }

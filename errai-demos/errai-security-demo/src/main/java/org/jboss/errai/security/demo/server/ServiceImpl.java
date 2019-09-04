@@ -41,6 +41,11 @@ public class ServiceImpl implements MessageService, AdminService {
   public String hello() {
     final User user = authenticationService.getUser();
     String name = user.getProperty(FIRST_NAME) + " " + user.getProperty(LAST_NAME);
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     return "Hello " + name + " how are you";
   }
 

@@ -779,7 +779,7 @@ public class HttpPollingHandler implements TransportHandler, TransportStatistics
           txRetries = 0;
           notifyConnected();
           undeliveredMessages.removeAll(toSend);
-          schedulePolling();
+//          schedulePolling();
           break;
 
         // Happens for first bus request when CSRF token is enabled

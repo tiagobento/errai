@@ -92,7 +92,7 @@ public class JettyContinuationsServlet extends AbstractErraiServlet {
     }
 
     try {
-      service.store(createCommandMessage(session, httpServletRequest));
+      service.store(createCommandMessage(session, httpServletRequest), null);
     }
     catch (final IOException ioe) {
       log.debug("Problem when storing message", ioe);

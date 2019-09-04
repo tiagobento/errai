@@ -23,6 +23,7 @@ import org.jboss.errai.bus.server.api.SessionProvider;
 import org.jboss.errai.bus.server.service.ErraiService;
 import org.jboss.errai.bus.server.service.ErraiServiceConfigurator;
 
+import javax.enterprise.concurrent.ManagedExecutorService;
 import java.util.Collection;
 
 /**
@@ -34,7 +35,7 @@ public class MockErraiService<S> implements ErraiService<S> {
   }
 
   @Override
-  public void store(Collection<Message> messages) {
+  public void store(Collection<Message> messages, ManagedExecutorService executorService) {
   }
 
   @Override

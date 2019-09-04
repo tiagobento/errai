@@ -55,7 +55,7 @@
     <url>http://www.jboss.org</url>
   </organization>
   <properties>
-    <wildfly.version>14.0.1.Final</wildfly.version>
+    <wildfly.version>17.0.1.Final</wildfly.version>
     <errai.jboss.home>${project.build.directory}/wildfly-${wildfly.version}</errai.jboss.home>    
     <slf4j.version>1.5.11</slf4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -306,7 +306,6 @@
           <server>org.jboss.errai.cdi.server.gwt.EmbeddedWildFlyLauncher</server>
           <disableCastChecking>true</disableCastChecking>
           <runTarget>${errai.dev.context}/</runTarget>
-          <soyc>false</soyc>
           <hostedWebapp>src/main/webapp</hostedWebapp>
           <extraJvmArgs>-Xmx1G -XX:CompileThreshold=7000 -Derrai.jboss.home=${errai.jboss.home} -Derrai.dev.context=${errai.dev.context}</extraJvmArgs>
         </configuration>

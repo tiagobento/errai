@@ -21,6 +21,7 @@ import org.jboss.errai.bus.client.api.messaging.RequestDispatcher;
 import org.jboss.errai.bus.server.api.ServerMessageBus;
 import org.jboss.errai.bus.server.api.SessionProvider;
 
+import javax.enterprise.concurrent.ManagedExecutorService;
 import java.util.Collection;
 
 /**
@@ -39,8 +40,8 @@ class ErraiServiceProxy implements ErraiService<Object> {
   }
 
   @Override
-  public void store(Collection messages) {
-    service.store(messages);
+  public void store(Collection messages, ManagedExecutorService executorService) {
+    service.store(messages, executorService);
   }
 
   @Override
