@@ -137,6 +137,13 @@ public class TemplatedCodeDecoratorTest {
     when(decorable.getFactoryMetaClass()).thenReturn(factoryBuildMetaClass);
 
     this.elemental2EventClass = MetaClassFactory.getUncached(Event.class);
+
+    //FIXME: tiago2020
+//    when(elemental2EventClass.getAnnotation(any()))
+//            .then(inv -> Event.class.getAnnotation(inv.getArgument(0)));
+//    when(elemental2EventClass.isAssignableTo(any(Class.class)))
+//            .then(inv -> ofNullable((Class)inv.getArgument(0)).filter(c -> c.isAssignableFrom(Event.class))
+//                    .isPresent());
   }
 
   @Test

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>errai-parent</artifactId>
     <groupId>org.jboss.errai</groupId>
-    <version>4.1.2-SNAPSHOT</version>
+    <version>4.9.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -139,10 +139,10 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <!-- Override exclusions in parent -->
-            <configuration combine.self="override">
-              <excludes>
+            <configuration >
+              <excludes combine.self="override">
               </excludes>
-              <includes>
+              <includes combine.self="override">
                 <include>**/rebind/**/*Test.java</include>
                 <include>**/rebind/**/*Tests.java</include>
               </includes>
@@ -154,7 +154,7 @@
               <forkMode>always</forkMode>
               <argLine>-Xmx1500m ${argLine} -Dgwt.args='-prod'</argLine>
               <useManifestOnlyJar>true</useManifestOnlyJar>
-
+              <enableAssertions>false</enableAssertions>
               <systemProperties>
                 <property>
                   <name>java.io.tmpdir</name>

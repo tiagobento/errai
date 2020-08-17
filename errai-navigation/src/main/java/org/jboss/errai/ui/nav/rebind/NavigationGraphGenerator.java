@@ -75,6 +75,7 @@ import org.jboss.errai.ui.nav.client.local.TransitionToRole;
 import org.jboss.errai.ui.nav.client.local.URLPattern;
 import org.jboss.errai.ui.nav.client.local.URLPatternMatcher;
 import org.jboss.errai.ui.nav.client.local.UniquePageRole;
+import org.jboss.errai.ui.nav.client.local.*;
 import org.jboss.errai.ui.nav.client.local.api.NavigationControl;
 import org.jboss.errai.ui.nav.client.local.spi.NavigationGraph;
 import org.jboss.errai.ui.nav.client.local.spi.PageNode;
@@ -330,6 +331,7 @@ public class NavigationGraphGenerator extends AbstractAsyncGenerator {
 
     appendPageShowingMethod(pageImplBuilder, pageClass);
     appendPageShownMethod(pageImplBuilder, pageClass);
+    appendPageUpdateMethod(pageImplBuilder, pageClass);
 
     appendDestroyMethod(pageImplBuilder, pageClass);
 
@@ -536,6 +538,18 @@ public class NavigationGraphGenerator extends AbstractAsyncGenerator {
             .body();
 
     appendPageShowMethod(method, pageImplBuilder, pageClass, PageShown.class, false,
+        Parameter.of(HistoryToken.class, "state"));
+
+    method.finish();
+  }
+
+  private void appendPageUpdateMethod(AnonymousClassStructureBuilder pageImplBuilder, MetaClass pageClass) {
+    BlockBuilder<?> method = pageImplBuilder.publicMethod(void.class, createMethodNameFromAnnotation(PageUpdate.class),
+        Parameter.of(pageClass, "widget"),
+        Parameter.of(HistoryToken.class, "state"))
+        .body();
+
+    appendPageShowMethod(method, pageImplBuilder, pageClass, PageUpdate.class, false,
         Parameter.of(HistoryToken.class, "state"));
 
     method.finish();

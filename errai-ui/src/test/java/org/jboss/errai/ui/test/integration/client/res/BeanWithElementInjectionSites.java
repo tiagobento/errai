@@ -16,14 +16,14 @@
 
 package org.jboss.errai.ui.test.integration.client.res;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.TableCellElement;
+
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  *
@@ -57,4 +57,8 @@ public class BeanWithElementInjectionSites {
   @Inject
   public InputElementWithClassAndPropertyAnnotations inputWithClassAnnotationAndProperty;
 
+  @Inject
+  public Elemental2InputWithClassAndPropertiesAnnotations elemental2InputWithClassAndPropertiesAnnotations;
+
 }
+

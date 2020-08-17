@@ -17,6 +17,18 @@
 package org.jboss.errai.ui.nav.rebind;
 
 import com.google.gwt.core.ext.GeneratorContext;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.jboss.errai.codegen.exception.GenerationException;
 import org.jboss.errai.codegen.meta.HasAnnotations;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -146,6 +158,14 @@ public class ValidationRulesTest {
       assertTrue(message.contains(StartPage1.class.getName()));
       assertTrue(message.contains(StartPage2.class.getName()));
     }
+  }
+
+  private List<MetaClass> createMetaClassList(final Class<?>... classes) {
+    final List<MetaClass> result = new ArrayList<MetaClass>(classes.length);
+    for (final Class<?> aClass : classes) {
+      result.add(JavaReflectionClass.newInstance(aClass));
+    }
+    return result;
   }
 
   @Test
