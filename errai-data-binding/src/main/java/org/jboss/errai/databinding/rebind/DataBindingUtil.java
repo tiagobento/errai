@@ -16,6 +16,7 @@
 
 package org.jboss.errai.databinding.rebind;
 
+import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.Variable;
 import org.jboss.errai.codegen.exception.GenerationException;
@@ -29,8 +30,11 @@ import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.util.PrivateAccessUtil;
+import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.config.ErraiConfiguration;
 import org.jboss.errai.config.MetaClassFinder;
+import org.jboss.errai.config.rebind.EnvUtil;
+import org.jboss.errai.config.util.ClassScanner;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraphBuilder.Dependency;
@@ -40,19 +44,28 @@ import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.Decorable;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.Decorable.DecorableType;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.FactoryController;
+import org.jboss.errai.reflections.util.SimplePackageFilter;
 import org.jboss.errai.ui.shared.api.annotations.AutoBound;
 import org.jboss.errai.ui.shared.api.annotations.Model;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.jboss.errai.codegen.util.Stmt.invokeStatic;
 
 /**
@@ -360,4 +373,178 @@ public class DataBindingUtil {
   private static boolean isTypeBindable(final MetaClass type, final Set<MetaClass> allConfiguredBindableTypes) {
     return type.isAnnotationPresent(Bindable.class) || allConfiguredBindableTypes.contains(type);
   }
+
+  //TODO: tiago2020
+//  /**
+//   * Checks if the provided type is bindable.
+//   *
+//   * @param type
+//   *          the type to check
+//   *
+//   * @return true if the provide type is bindable, otherwise false.
+//   */
+//  public static boolean isBindableType(final MetaClass type) {
+//    return (type.isAnnotationPresent(Bindable.class) || getConfiguredBindableTypes().contains(type))
+//        && !getConfiguredNonBindableTypes().contains(type);
+//  }
+//
+//  /**
+//   * Returns all bindable types on the classpath.
+//   *
+//   * @param context
+//   *          the current generator context
+//   *
+//   * @return a set of meta classes representing the all bindable types (both
+//   *         annotated and configured in ErraiApp.properties).
+//   */
+//  public static Set<MetaClass> getAllBindableTypes(final GeneratorContext context) {
+//    final Collection<MetaClass> annotatedBindableTypes = ClassScanner.getTypesAnnotatedWith(Bindable.class,
+//        RebindUtils.findTranslatablePackages(context), context);
+//
+//    final Set<MetaClass> bindableTypes = new HashSet<>(annotatedBindableTypes);
+//    bindableTypes.addAll(DataBindingUtil.getConfiguredBindableTypes());
+//    bindableTypes.removeAll(DataBindingUtil.getConfiguredNonBindableTypes());
+//    return bindableTypes;
+//  }
+//
+//  private static Set<MetaClass> configuredBindableTypes = null;
+//  private static Set<MetaClass> configuredNonBindableTypes = null;
+//
+//  /**
+//   * Reads bindable types from all ErraiApp.properties files on the classpath.
+//   *
+//   * @return a set of meta classes representing the configured bindable types.
+//   */
+//  public static Set<MetaClass> getConfiguredBindableTypes() {
+//    if (configuredBindableTypes != null) {
+//      configuredBindableTypes = refreshConfiguredTypes(configuredBindableTypes);
+//    } else {
+//      initEnvironmentConfig();
+//    }
+//    return configuredBindableTypes;
+//  }
+//
+//  /**
+//   * Reads nonbindable types from all ErraiApp.properties files on the classpath.
+//   *
+//   * @return a set of meta classes representing the configured nonbindable types.
+//   */
+//  public static Set<MetaClass> getConfiguredNonBindableTypes() {
+//    if (configuredNonBindableTypes != null) {
+//      configuredNonBindableTypes = refreshConfiguredTypes(configuredNonBindableTypes);
+//    } else {
+//      initEnvironmentConfig();
+//    }
+//    return configuredNonBindableTypes;
+//  }
+//
+//  private static Set<MetaClass> refreshConfiguredTypes(Set<MetaClass> configuredTypes) {
+//    final Set<MetaClass> refreshedTypes = new HashSet<>(configuredTypes.size());
+//
+//    for (final MetaClass clazz : configuredTypes) {
+//      refreshedTypes.add(MetaClassFactory.get(clazz.getFullyQualifiedName()));
+//    }
+//    return refreshedTypes;
+//  }
+//
+//  private static void initEnvironmentConfig() {
+//    configuredBindableTypes = new HashSet<>();
+//    configuredNonBindableTypes = new HashSet<>();
+//
+//    final Collection<URL> erraiAppProperties = EnvUtil.getErraiAppPropertiesFilesUrls();
+//    for (final URL url : erraiAppProperties) {
+//      InputStream inputStream = null;
+//      try {
+//        log.debug("Checking " + url.getFile() + " for configured types...");
+//        inputStream = url.openStream();
+//
+//        final ResourceBundle props = new PropertyResourceBundle(inputStream);
+//        for (final String key : props.keySet()) {
+//          final String value = props.getString(key);
+//          if (key.equals(EnvUtil.CONFIG_ERRAI_BINDABLE_TYPES)) {
+//            addConfiguredBindableTypes(configuredBindableTypes, value);
+//          }
+//          else if (key.equals(EnvUtil.CONFIG_ERRAI_NONBINDABLE_TYPES)) {
+//            addConfiguredNonBindableTypes(configuredNonBindableTypes, value);
+//          }
+//        }
+//      } catch (final IOException e) {
+//        throw new RuntimeException("Error reading ErraiApp.properties", e);
+//      } finally {
+//        if (inputStream != null) {
+//          try {
+//            inputStream.close();
+//          } catch (final IOException e) {
+//            log.warn("Failed to close input stream", e);
+//          }
+//        }
+//      }
+//    }
+//  }
+//
+//  private static void addConfiguredBindableTypes(final Set<MetaClass> bindableClasses, String value) {
+//    final Set<String> patterns = new LinkedHashSet<>();
+//    for (final String s : value.split(" ")) {
+//      final String singleValue = s.trim();
+//      if (singleValue.endsWith("*")) {
+//        patterns.add(singleValue);
+//      }
+//      else {
+//        try {
+//          bindableClasses.add(MetaClassFactory.get(singleValue));
+//        } catch (final Exception e) {
+//          throw new RuntimeException("Could not find class defined in ErraiApp.properties as bindable type: " + s);
+//        }
+//      }
+//    }
+//    if (!patterns.isEmpty()) {
+//      final SimplePackageFilter filter = new SimplePackageFilter(patterns);
+//      MetaClassFactory
+//        .getAllCachedClasses()
+//        .stream()
+//        .filter(mc -> filter.apply(mc.getFullyQualifiedName()) && validateWildcard(mc))
+//        .collect(toCollection(() -> bindableClasses));
+//    }
+//  }
+//
+//  private static void addConfiguredNonBindableTypes(final Set<MetaClass> nonbindableClasses, String value) {
+//    final Set<String> patterns = new LinkedHashSet<>();
+//    for (final String s : value.split(" ")) {
+//      final String singleValue = s.trim();
+//      if (singleValue.endsWith("*")) {
+//        patterns.add(singleValue);
+//      }
+//      else {
+//        try {
+//          nonbindableClasses.add(MetaClassFactory.get(singleValue));
+//        } catch (final Exception e) {
+//          throw new RuntimeException("Could not find class defined in ErraiApp.properties as nonbindable type: " + s);
+//        }
+//      }
+//    }
+//    if (!patterns.isEmpty()) {
+//      final SimplePackageFilter filter = new SimplePackageFilter(patterns);
+//      MetaClassFactory
+//        .getAllCachedClasses()
+//        .stream()
+//        .filter(mc -> filter.apply(mc.getFullyQualifiedName()))
+//        .collect(toCollection(() -> nonbindableClasses));
+//    }
+//  }
+//
+//  private static boolean validateWildcard(MetaClass bindable) {
+//    if (bindable.isInterface()) {
+//      log.debug("@Bindable types cannot be an interface, ignoring: {}", bindable.getFullyQualifiedName());
+//      return false;
+//    }
+//    else if (bindable.isAbstract()) {
+//      log.debug("@Bindable types cannot be abstract, ignoring: {}", bindable.getFullyQualifiedName());
+//      return false;
+//    }
+//    else if (bindable.isFinal()) {
+//      log.debug("@Bindable types cannot be final, ignoring: {}", bindable.getFullyQualifiedName());
+//      return false;
+//    }
+//    return true;
+//  }
 }

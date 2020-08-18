@@ -38,6 +38,8 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
+import org.jboss.errai.codegen.util.Bool;
+import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.ProxyUtil;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.api.interceptor.RemoteCallContext;

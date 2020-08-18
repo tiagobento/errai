@@ -66,7 +66,7 @@
     <jetty.version>9.2.14.v20151106</jetty.version>
     <!-- Dev Mode config properties -->
     <errai.dev.context>${project.artifactId}</errai.dev.context>
-    <as.version>10.0.0.Final</as.version>
+    <as.version>19.1.0.Final</as.version>
     <!-- Add the absolute path for $JBOSS_HOME below to manage another instance -->
     <errai.jboss.home>${project.build.directory}/wildfly-${as.version}</errai.jboss.home>
   </properties>
@@ -115,6 +115,28 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+       <groupId>org.jboss.errai</groupId>
+       <artifactId>errai-codegen</artifactId>
+       <exclusions>
+         <exclusion>
+           <groupId>org.eclipse.jdt</groupId>
+           <artifactId>ecj</artifactId>
+         </exclusion>
+       </exclusions>
+     </dependency>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>apache-jsp</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
     <dependency>
       <groupId>org.jboss.errai</groupId>
@@ -157,6 +179,18 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.12.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.2</version>
     </dependency>
 
     <dependency>
@@ -284,6 +318,13 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jackson-provider</artifactId>
+          <version>3.0.16.Final</version>
           <scope>provided</scope>
         </dependency>
 

@@ -181,7 +181,6 @@ public class Navigation {
             navigate(new Request<>(toPage, token), false);
           }
         } catch (final Exception e) {
-          logger.warn("An error occurred while navigating.", e);
           if (token == null)
             navigationErrorHandler.handleInvalidURLError(e, event.getValue());
           else
@@ -652,6 +651,21 @@ public class Navigation {
    */
   public boolean isNavigating() {
     return locked;
+  }
+
+  /**
+   * Update the state of your existing page without performing a full navigation.
+   * <br/>
+   * This will perform a pseudo navigation updating the history token with the new states.
+   */
+  public void updateState(Multimap<String, String> state) {
+    if(currentPage != null) {
+      currentPageToken = historyTokenFactory.createHistoryToken(currentPage.name(), state);
+      HistoryWrapper.newItem(currentPageToken.toString(), false);
+      currentPage.pageUpdate(currentComponent, currentPageToken);
+    } else {
+      logger.error("Cannot update the state before a page has loaded.");
+    }
   }
 
   public void setContentDelegation(ContentDelegation contentDelegation) {

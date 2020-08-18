@@ -65,7 +65,7 @@
     <jetty.version>9.2.14.v20151106</jetty.version>
     <!-- Dev Mode config properties -->
     <errai.dev.context>${project.artifactId}</errai.dev.context>
-    <as.version>10.0.0.Final</as.version>
+    <as.version>19.1.0.Final</as.version>
     <!-- Add the absolute path for $JBOSS_HOME below to manage another instance -->
     <errai.jboss.home>${project.build.directory}/wildfly-${as.version}</errai.jboss.home>
   </properties>
@@ -115,6 +115,17 @@
 
   <dependencies>
     <dependency>
+       <groupId>org.jboss.errai</groupId>
+       <artifactId>errai-codegen</artifactId>
+       <exclusions>
+         <exclusion>
+           <groupId>org.eclipse.jdt</groupId>
+           <artifactId>ecj</artifactId>
+         </exclusion>
+       </exclusions>
+     </dependency>
+
+    <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-ioc</artifactId>
     </dependency>
@@ -129,6 +140,12 @@
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+       <groupId>com.google.gwt</groupId>
+       <artifactId>gwt-dev</artifactId>
+       <scope>provided</scope>
+     </dependency>
 
     <dependency>
       <groupId>org.jboss.errai</groupId>
@@ -162,20 +179,6 @@
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-cdi-jboss</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.logging</groupId>
-      <artifactId>jboss-logging</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
     </dependency>
 
     <dependency>
@@ -437,6 +440,30 @@
       </properties>
 
       <dependencies>
+
+        <dependency>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-dev</artifactId>
+          <scope>provided</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>apache-jsp</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.5</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>1.6.4</version>
+        </dependency>
+
         <dependency>
           <groupId>org.jboss.errai</groupId>
           <artifactId>errai-jboss-as-support</artifactId>

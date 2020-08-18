@@ -23,7 +23,6 @@ import elemental2.dom.Element;
 import jsinterop.base.Js;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
-import org.jboss.errai.codegen.builder.ContextualStatementBuilder;
 import org.jboss.errai.codegen.builder.impl.ObjectBuilder;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
@@ -34,6 +33,7 @@ import org.jboss.errai.common.client.api.annotations.Property;
 import org.jboss.errai.common.client.ui.HasValue;
 import org.jboss.errai.common.client.ui.NativeHasValueAccessors;
 import org.jboss.errai.ioc.rebind.ioc.bootstrapper.AbstractBodyGenerator;
+import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.Injectable;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.InjectionContext;
 
@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.joining;
 import static org.jboss.errai.codegen.Parameter.finalOf;
 import static org.jboss.errai.codegen.util.Stmt.castTo;
 import static org.jboss.errai.codegen.util.Stmt.declareFinalVariable;
@@ -61,14 +62,18 @@ class ElementInjectionBodyGenerator extends AbstractBodyGenerator {
 
   private final MetaClass type;
   private final String tagName;
-  private final String classNames;
   private final Set<Property> properties;
+  private final List<String> classNames;
 
   ElementInjectionBodyGenerator(final MetaClass type, String tagName) {
-    this(type, tagName, Collections.emptySet(), "");
+    this(type, tagName, Collections.emptySet(), Collections.emptyList());
   }
 
-  ElementInjectionBodyGenerator(final MetaClass type, String tagName, final Set<Property> properties, final String classNames) {
+  ElementInjectionBodyGenerator(final MetaClass type,
+          final String tagName,
+          final Set<Property> properties,
+          final List<String> classNames) {
+
     this.type = type;
     this.tagName = tagName;
     this.properties = properties;
@@ -77,21 +82,26 @@ class ElementInjectionBodyGenerator extends AbstractBodyGenerator {
 
   @Override
   protected List<Statement> generateCreateInstanceStatements(final ClassStructureBuilder<?> bodyBlockBuilder,
-          final Injectable injectable, final InjectionContext injectionContext) {
+          final Injectable injectable,
+          final InjectionContext injectionContext) {
 
     final List<Statement> stmts = new ArrayList<>();
+
     final String elementVar = "element";
 
-    stmts.add(declareFinalVariable(elementVar, elementClass(), elementInitialization()));
+    stmts.add(declareFinalVariable(elementVar, Element.class,
+            loadStatic(DomGlobal.class, "document").invoke("createElement", tagName)));
 
     for (final Property property : properties) {
-      stmts.add(loadVariable(elementVar).invoke("setPropertyString", loadLiteral(property.name()),
+      stmts.add(loadVariable(elementVar).invoke("setAttribute", loadLiteral(property.name()),
               loadLiteral(property.value())));
     }
 
-    if (!Strings.isNullOrEmpty(classNames)) {
-      stmts.add(loadVariable(elementVar).invoke("addClassName", loadLiteral(classNames)));
+    if (!classNames.isEmpty()) {
+      stmts.add(loadVariable(elementVar).loadField("className")
+              .assignValue(loadLiteral(classNames.stream().collect(joining(" ")))));
     }
+
     final String retValVar = "retVal";
 
     stmts.add(declareFinalVariable(retValVar, type, invokeStatic(Js.class, "cast", loadVariable(elementVar))));
@@ -103,14 +113,6 @@ class ElementInjectionBodyGenerator extends AbstractBodyGenerator {
 
     stmts.add(loadVariable(retValVar).returnValue());
     return stmts;
-  }
-
-  protected ContextualStatementBuilder elementInitialization() {
-    return loadStatic(DomGlobal.class, "document").invoke("createElement", tagName);
-  }
-
-  protected Class<?> elementClass() {
-    return Element.class;
   }
 
   /**

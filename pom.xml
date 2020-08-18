@@ -3,9 +3,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jboss.integration-platform</groupId>
-    <artifactId>jboss-integration-platform-parent</artifactId>
-    <version>8.0.0.CR2</version>
+    <groupId>org.jboss</groupId>
+    <artifactId>jboss-parent</artifactId>
+    <version>31</version>
+    <relativePath/>
   </parent>
 
   <name>Errai</name>
@@ -15,6 +16,7 @@
   <packaging>pom</packaging>
 
   <url>http://erraiframework.org</url>
+  <inceptionYear>2009</inceptionYear>
 
   <licenses>
     <license>
@@ -67,11 +69,9 @@
   </issueManagement>
 
   <properties>
-    <guice.version>3.0</guice.version>
-    <appengine.version>1.7.6</appengine.version>
-    <validation.api.version>1.0.0.GA</validation.api.version>
     <gwtArgs></gwtArgs>
     <argLine>-Dgwt.args="${gwtArgs}"</argLine>
+    <illegaltransitivereportonly>false</illegaltransitivereportonly>
   </properties>
 
   <modules>
@@ -83,6 +83,7 @@
     <module>errai-bus</module>
     <module>errai-tools</module>
     <module>errai-codegen</module>
+    <module>errai-cordova</module>
     <module>errai-marshalling</module>
     <module>errai-cdi</module>
     <module>errai-jaxrs</module>
@@ -96,7 +97,6 @@
     <module>errai-javaee-all</module>
     <module>errai-config</module>
     <module>errai-codegen-gwt</module>
-    <module>errai-cordova</module>
     <module>errai-ioc-bus-support</module>
     <module>errai-bus-websocket</module>    
     <module>errai-jboss-as-support</module>
@@ -104,7 +104,6 @@
     <module>errai-demos</module>
     <module>errai-client-local-class-hider</module>
     <module>errai-annotation-processors</module>
-    <module>errai-forge-addon</module>
     <module>errai-api</module>
     <module>errai-bus-export-apt</module>
     <module>errai-common-apt</module>
@@ -167,9 +166,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
     </dependencies>
-
   </dependencyManagement>
 
   <build>
@@ -278,6 +275,10 @@
 
     <pluginManagement>
       <plugins>
+        <plugin>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.2.1</version>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>gmaven-plugin</artifactId>
