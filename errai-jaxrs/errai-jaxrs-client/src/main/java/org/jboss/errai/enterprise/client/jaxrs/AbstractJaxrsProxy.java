@@ -19,8 +19,8 @@ package org.jboss.errai.enterprise.client.jaxrs;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.common.client.framework.ClientCSRFTokenCache;
 import org.jboss.errai.common.client.framework.Constants;
 import org.jboss.errai.common.client.framework.RpcBatch;

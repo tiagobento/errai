@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.client.api.interceptor;
+package org.jboss.errai.codegen.api;
 
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.common.client.api.Assert;
+import org.jboss.errai.codegen.api.RemoteCallback;
 
 import java.lang.annotation.Annotation;
 
 /**
  * Represents the context of an intercepted method call.
- * 
+ *
  * @author Christian Sadilek <csadilek@redhat.com>
  */
-abstract class CallContext {
+public abstract class CallContext {
   private Object[] parameters;
 
   /**
    * Provides access to the intercepted method's parameters.
-   * 
+   *
    * @return Array of method parameters in declaration order. An empty array if the intercepted method has no
    *         parameters.
    */
@@ -41,17 +40,20 @@ abstract class CallContext {
 
   /**
    * Overrides the parameters that are passed to the method for which the interceptor was invoked.
-   * 
+   *
    * @param parameters
    *          the parameters to use when invoking the intercepted method. Must not be null.
    */
   public void setParameters(Object[] parameters) {
-    this.parameters = Assert.notNull(parameters);
+    if (parameters == null) {
+      throw new NullPointerException();
+    }
+    this.parameters = parameters;
   }
 
   /**
    * Returns the name of the intercepted method.
-   * 
+   *
    * @return the name of the method for which the interceptor was invoked.
    */
   public abstract String getMethodName();
@@ -69,10 +71,10 @@ abstract class CallContext {
    * @return the annotations of the method of which the interceptor was invoked.
    */
   public abstract Annotation[] getAnnotations();
-  
+
   /**
    * Get the annotations of the intercepted type.
-   * 
+   *
    * @return the annotations of the type on which the interceptor was invoked.
    */
   public abstract Annotation[] getTypeAnnotations();
@@ -85,7 +87,7 @@ abstract class CallContext {
    * call), but only if the call's result is not required in the interceptor logic. If access to the result of an
    * asynchronous method call is needed in the interceptor, one of the overloaded versions of this method accepting a
    * {@link RemoteCallback} has to be used instead.
-   * 
+   *
    * @return the return value of the intercepted method. Always null for asynchronous methods.
    */
   public abstract Object proceed();

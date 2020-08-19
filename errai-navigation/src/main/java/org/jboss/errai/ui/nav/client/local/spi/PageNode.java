@@ -20,14 +20,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 
 import com.google.common.collect.Multimap;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.ui.nav.client.local.HistoryToken;
 import org.jboss.errai.ui.nav.client.local.Page;
 import org.jboss.errai.ui.nav.client.local.TransitionTo;
 import org.jboss.errai.ui.nav.client.local.api.NavigationControl;
 import org.jboss.errai.ui.nav.client.local.Navigation;
-
-import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Represents a page (a distinct place that can be navigated to and bookmarked to return to later).

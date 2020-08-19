@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import org.jboss.errai.bus.client.api.BusErrorCallback;
 import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.demo.todo.shared.ShareService;
 import org.jboss.errai.demo.todo.shared.UnknownUserException;
 import org.jboss.errai.security.shared.api.annotation.RestrictedAccess;

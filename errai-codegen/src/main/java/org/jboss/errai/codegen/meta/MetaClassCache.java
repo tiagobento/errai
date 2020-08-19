@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.jboss.errai.common.rebind.CacheStore;
+import org.jboss.errai.codegen.meta.cache.CacheStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -24,7 +24,6 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
-import org.jboss.errai.common.client.api.Assert;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -44,22 +43,26 @@ public class JavaReflectionMethod extends MetaMethod {
   private MetaClass returnType;
 
   public JavaReflectionMethod(final Method method) {
-    this.declaringClass = MetaClassFactory.get(Assert.notNull(method.getDeclaringClass()));
-    this.method = Assert.notNull(method);
-  }
-  
-  public JavaReflectionMethod(final MetaClass referenceClass, final Method method) {
-    this.declaringClass = Assert.notNull(referenceClass);
-    this.method = Assert.notNull(method);
+    if (method == null || method.getDeclaringClass() == null) {
+      throw new NullPointerException();
+    }
+    this.declaringClass = MetaClassFactory.get(method.getDeclaringClass());
+    this.method = method;
   }
 
-  @Override
-  public String getName() {
+  public JavaReflectionMethod(final MetaClass referenceClass, final Method method) {
+    if (referenceClass == null || method == null) {
+      throw new NullPointerException();
+    }
+    this.declaringClass = referenceClass;
+    this.method = method;
+  }
+
+  @Override public String getName() {
     return method.getName();
   }
 
-  @Override
-  public MetaParameter[] getParameters() {
+  @Override public MetaParameter[] getParameters() {
     if (parameters == null) {
       final List<MetaParameter> parmList = new ArrayList<MetaParameter>();
 
@@ -79,107 +82,87 @@ public class JavaReflectionMethod extends MetaMethod {
     return parameters;
   }
 
-  @Override
-  public MetaClass getReturnType() {
+  @Override public MetaClass getReturnType() {
     if (returnType == null) {
       returnType = MetaClassFactory.get(method.getReturnType(), method.getGenericReturnType());
     }
     return returnType;
   }
 
-  @Override
-  public MetaType getGenericReturnType() {
+  @Override public MetaType getGenericReturnType() {
     return JavaReflectionUtil.fromType(method.getGenericReturnType());
   }
 
-  @Override
-  public MetaType[] getGenericParameterTypes() {
+  @Override public MetaType[] getGenericParameterTypes() {
     return JavaReflectionUtil.fromTypeArray(method.getGenericParameterTypes());
   }
 
-  @Override
-  public MetaTypeVariable[] getTypeParameters() {
+  @Override public MetaTypeVariable[] getTypeParameters() {
     return JavaReflectionUtil.fromTypeVariable(method.getTypeParameters());
   }
 
-  @Override
-  public Collection<MetaAnnotation> getAnnotations() {
+  @Override public Collection<MetaAnnotation> getAnnotations() {
     return Arrays.stream(method.getAnnotations()).map(JavaReflectionAnnotation::new).collect(toList());
   }
 
-  @Override
-  public MetaClass[] getCheckedExceptions() {
+  @Override public MetaClass[] getCheckedExceptions() {
     return MetaClassFactory.fromClassArray(method.getExceptionTypes());
   }
 
-  @Override
-  public MetaClass getDeclaringClass() {
+  @Override public MetaClass getDeclaringClass() {
     return declaringClass;
   }
-  
-  @Override
-  public String getDeclaringClassName() {
+
+  @Override public String getDeclaringClassName() {
     return declaringClass.getName();
   }
 
-  @Override
-  public boolean isAbstract() {
+  @Override public boolean isAbstract() {
     return (method.getModifiers() & Modifier.ABSTRACT) != 0;
   }
 
-  @Override
-  public boolean isPublic() {
+  @Override public boolean isPublic() {
     return (method.getModifiers() & Modifier.PUBLIC) != 0;
   }
 
-  @Override
-  public boolean isPrivate() {
+  @Override public boolean isPrivate() {
     return (method.getModifiers() & Modifier.PRIVATE) != 0;
   }
 
-  @Override
-  public boolean isProtected() {
+  @Override public boolean isProtected() {
     return (method.getModifiers() & Modifier.PROTECTED) != 0;
   }
 
-  @Override
-  public boolean isFinal() {
+  @Override public boolean isFinal() {
     return (method.getModifiers() & Modifier.FINAL) != 0;
   }
 
-  @Override
-  public boolean isStatic() {
+  @Override public boolean isStatic() {
     return (method.getModifiers() & Modifier.STATIC) != 0;
   }
 
-  @Override
-  public boolean isTransient() {
+  @Override public boolean isTransient() {
     return (method.getModifiers() & Modifier.TRANSIENT) != 0;
   }
 
-  @Override
-  public boolean isVolatile() {
+  @Override public boolean isVolatile() {
     return false;
   }
 
-  @Override
-  public boolean isSynthetic() {
+  @Override public boolean isSynthetic() {
     return method.isSynthetic();
   }
 
-  @Override
-  public boolean isSynchronized() {
+  @Override public boolean isSynchronized() {
     return (method.getModifiers() & Modifier.SYNCHRONIZED) != 0;
   }
 
-  @Override
-  public boolean isVarArgs() {
+  @Override public boolean isVarArgs() {
     return method.isVarArgs();
   }
 
-  @Override
-  public Method asMethod() {
+  @Override public Method asMethod() {
     return method;
   }
-  
+
 }

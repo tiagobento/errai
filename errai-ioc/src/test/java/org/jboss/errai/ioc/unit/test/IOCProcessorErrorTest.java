@@ -11,7 +11,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +30,8 @@ import javax.inject.Singleton;
 import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
+import org.jboss.errai.config.rebind.MetaClassBridgeUtil;
 import org.jboss.errai.codegen.meta.MetaClassCache;
-import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
 import org.jboss.errai.common.client.api.annotations.IOCProducer;
 import org.jboss.errai.ioc.client.Bootstrapper;
@@ -47,7 +46,6 @@ import org.jboss.errai.ioc.rebind.ioc.graph.api.DependencyGraph;
 import org.jboss.errai.ioc.rebind.ioc.graph.api.QualifierFactory;
 import org.jboss.errai.ioc.rebind.ioc.graph.impl.DefaultQualifierFactory;
 import org.jboss.errai.ioc.rebind.ioc.injector.api.InjectionContext;
-import org.jboss.errai.ioc.rebind.ioc.injector.api.WiringElementType;
 import org.jboss.errai.ioc.tests.wiring.client.res.TypedBaseType;
 import org.jboss.errai.ioc.tests.wiring.client.res.TypedProducer;
 import org.jboss.errai.ioc.tests.wiring.client.res.TypedSuperInterface;
@@ -107,7 +105,7 @@ public class IOCProcessorErrorTest {
   @Before
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void setup() {
-    MetaClassFactory.getMetaClassCache().clear();
+    MetaClassBridgeUtil.getMetaClassCache().clear();
     FactoryGenerator.setDependencyGraph(null);
 
     final QualifierFactory qualFactory = new DefaultQualifierFactory();
@@ -544,7 +542,7 @@ public class IOCProcessorErrorTest {
   private void addToMetaClassCache(final Class<?>... metaClasses) {
     Arrays.stream(metaClasses)
           .map(type -> JavaReflectionClass.newInstance(type))
-          .forEach(mc -> MetaClassFactory.getMetaClassCache().pushCache(mc));
+          .forEach(mc -> MetaClassBridgeUtil.getMetaClassCache().pushCache(mc));
   }
 
 }

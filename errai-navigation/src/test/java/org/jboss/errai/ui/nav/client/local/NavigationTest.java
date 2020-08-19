@@ -18,7 +18,7 @@ package org.jboss.errai.ui.nav.client.local;
 
 import java.util.Collection;
 
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.jboss.errai.ioc.client.container.Factory;
 import org.jboss.errai.ioc.client.container.IOC;

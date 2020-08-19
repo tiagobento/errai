@@ -21,9 +21,9 @@ import com.google.common.collect.Multimap;
 import org.jboss.errai.codegen.meta.MetaAnnotation;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaMethod;
-import org.jboss.errai.common.client.api.interceptor.FeatureInterceptor;
-import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
-import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
+import org.jboss.errai.codegen.api.FeatureInterceptor;
+import org.jboss.errai.codegen.api.InterceptedCall;
+import org.jboss.errai.codegen.api.InterceptsRemoteCall;
 
 import java.util.ArrayList;
 import java.util.Arrays;

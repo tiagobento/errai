@@ -16,13 +16,10 @@
 
 package org.jboss.errai.codegen.test.model;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
-
 
 /**
  * An Integer parameter
  */
-@Portable
 public class PortableIntegerParameterDefinition
         extends PortableParameterDefinition
         implements HasValue<java.lang.Integer>,

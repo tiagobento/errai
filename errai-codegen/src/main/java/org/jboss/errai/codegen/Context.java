@@ -35,7 +35,6 @@ import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaField;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.util.GenUtil;
-import org.jboss.errai.common.client.api.Assert;
 
 /**
  * This class represents a context in which {@link Statement}s are generated.
@@ -125,7 +124,10 @@ public class Context {
    */
   public Context addVariable(final String name, final Class<?> type) {
     checkThread();
-    return addVariable(Variable.create(Assert.notNull(name), Assert.notNull(type)));
+    if (name == null | type == null) {
+      throw new NullPointerException();
+    }
+    return addVariable(Variable.create(name, type));
   }
 
   /**
@@ -142,7 +144,11 @@ public class Context {
    */
   public Context addVariable(final String name, final Class<?> type, final Object initialization) {
     checkThread();
-    final Variable v = Variable.create(Assert.notNull(name), Assert.notNull(type), initialization);
+
+    if (name == null | type == null) {
+      throw new NullPointerException();
+    }
+    final Variable v = Variable.create(name, type, initialization);
     return addVariable(v);
   }
 

@@ -116,6 +116,8 @@
     <module>errai-cdi-export-apt</module>
     <module>errai-ioc-extension-tests</module>
     <module>errai-config-apt</module>
+    <module>errai-ioc-2020</module>
+    <module>errai-codegen-api</module>
   </modules>
 
   <repositories>

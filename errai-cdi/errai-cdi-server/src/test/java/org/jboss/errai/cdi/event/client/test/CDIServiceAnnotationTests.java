@@ -25,11 +25,10 @@ import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.bus.client.api.messaging.MessageBus;
 import org.jboss.errai.bus.client.api.messaging.MessageCallback;
 import org.jboss.errai.bus.common.AbstractErraiTest;
-import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
 import org.jboss.errai.common.client.protocols.MessageParts;
 
 import com.google.gwt.user.client.Timer;
-import org.junit.Assert;
 
 /**
  * Test that annotated services (types or methods) are properly scanned and subscribed by

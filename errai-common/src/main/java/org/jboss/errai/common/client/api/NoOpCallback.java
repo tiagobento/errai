@@ -16,6 +16,8 @@
 
 package org.jboss.errai.common.client.api;
 
+import org.jboss.errai.codegen.api.RemoteCallback;
+
 /**
  * @author Mike Brock
  */

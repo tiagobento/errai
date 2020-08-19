@@ -16,14 +16,14 @@
 
 package org.jboss.errai.enterprise.client.jaxrs.api;
 
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestException;
 
 /**
- * A {@link org.jboss.errai.common.client.api.RemoteCallback} that can be used
+ * A {@link RemoteCallback} that can be used
  * to retrieve the underlying HTTP request.
  */
 public interface RequestCallback extends RemoteCallback<Request> {

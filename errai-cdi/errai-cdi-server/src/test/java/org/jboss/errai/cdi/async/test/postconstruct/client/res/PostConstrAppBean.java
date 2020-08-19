@@ -16,7 +16,7 @@
 
 package org.jboss.errai.cdi.async.test.postconstruct.client.res;
 
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanDef;
 

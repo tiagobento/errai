@@ -19,8 +19,8 @@ package org.jboss.errai.ioc.support.bus.tests.client.res;
 import java.lang.annotation.Annotation;
 
 import org.jboss.errai.bus.client.api.builder.RemoteCallSendable;
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.common.client.framework.RpcBatch;
 import org.jboss.errai.common.client.framework.RpcStub;
 

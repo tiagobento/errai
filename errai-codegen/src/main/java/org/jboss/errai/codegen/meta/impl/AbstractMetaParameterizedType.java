@@ -25,7 +25,6 @@ import org.jboss.errai.codegen.meta.MetaParameterizedType;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
 import org.jboss.errai.codegen.meta.MetaWildcardType;
-import org.jboss.errai.common.client.api.Assert;
 
 /**
  * @author Mike Brock <cbrock@redhat.com>
@@ -33,7 +32,10 @@ import org.jboss.errai.common.client.api.Assert;
 public abstract class AbstractMetaParameterizedType implements MetaParameterizedType {
   @Override
   public boolean isAssignableFrom(final MetaParameterizedType fromType) {
-    final MetaType[] compareFrom = Assert.notNull(fromType).getTypeParameters();
+    if (fromType == null) {
+      throw new NullPointerException();
+    }
+    final MetaType[] compareFrom = fromType.getTypeParameters();
     final MetaType[] compareTo = getTypeParameters();
 
     if (compareTo.length != compareFrom.length) return false;

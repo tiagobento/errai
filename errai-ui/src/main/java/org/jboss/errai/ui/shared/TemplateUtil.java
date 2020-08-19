@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 import org.jboss.errai.common.client.dom.DOMUtil;
 import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCResolutionException;
 import org.jboss.errai.ui.client.local.spi.TemplateProvider;

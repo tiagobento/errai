@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.client.util;
+package org.jboss.errai.codegen.api;
 
-/**
- * @author Mike Brock
- */
-@FunctionalInterface
-public interface CreationalCallback<T> {
-  void callback(T beanInstance);
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface FeatureInterceptor {
+  
+  Class<? extends Annotation>[] value();
+
 }

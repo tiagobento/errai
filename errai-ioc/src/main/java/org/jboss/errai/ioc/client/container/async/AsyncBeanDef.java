@@ -16,7 +16,7 @@
 
 package org.jboss.errai.ioc.client.container.async;
 
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
 
 /**

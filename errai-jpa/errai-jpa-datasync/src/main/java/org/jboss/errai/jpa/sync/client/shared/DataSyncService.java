@@ -19,6 +19,8 @@ package org.jboss.errai.jpa.sync.client.shared;
 import java.util.List;
 
 import org.jboss.errai.bus.server.annotations.Remote;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.jpa.sync.client.local.ClientSyncManager;
 import org.jboss.errai.jpa.sync.server.DataSyncServiceImpl;
@@ -37,7 +39,7 @@ public interface DataSyncService {
    * Performs a cold synchronization, usually by delegating to
    * {@link DataSyncServiceImpl#coldSync(SyncableDataSet, List)}. This method is
    * not normally invoked directly by application code; rather, application code calls
-   * {@link ClientSyncManager#coldSync(String, Class, java.util.Map, org.jboss.errai.common.client.api.RemoteCallback, org.jboss.errai.common.client.api.ErrorCallback)}
+   * {@link ClientSyncManager#coldSync(String, Class, java.util.Map, RemoteCallback, ErrorCallback)}
    * and that method calls this one via an Errai RPC {@link Caller}.
    *
    * @param dataSet

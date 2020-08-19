@@ -40,6 +40,7 @@ import org.jboss.errai.codegen.Parameter;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.ThrowsDeclaration;
 import org.jboss.errai.codegen.builder.callstack.LoadClassReference;
+import org.jboss.errai.codegen.meta.cache.CacheUtil;
 import org.jboss.errai.codegen.meta.impl.apt.APTClass;
 import org.jboss.errai.codegen.meta.impl.apt.APTClassUtil;
 import org.jboss.errai.codegen.meta.impl.build.BuildMetaClass;
@@ -52,7 +53,6 @@ import org.jboss.errai.codegen.meta.impl.build.ShadowBuildMetaMethod;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
 import org.jboss.errai.codegen.util.EmptyStatement;
 import org.jboss.errai.codegen.util.GenUtil;
-import org.jboss.errai.common.rebind.CacheUtil;
 import org.mvel2.ConversionHandler;
 import org.mvel2.DataConversion;
 

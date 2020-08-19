@@ -23,6 +23,8 @@ import org.jboss.errai.codegen.Parameter;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.StringStatement;
 import org.jboss.errai.codegen.Variable;
+import org.jboss.errai.codegen.api.CallContext;
+import org.jboss.errai.codegen.api.RemoteCallContext;
 import org.jboss.errai.codegen.builder.AnonymousClassStructureBuilder;
 import org.jboss.errai.codegen.builder.ElseBlockBuilder;
 import org.jboss.errai.codegen.builder.impl.BooleanExpressionBuilder;
@@ -31,11 +33,9 @@ import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.meta.MetaParameter;
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallContext;
-import org.jboss.errai.common.client.util.AsyncBeanFactory;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
@@ -57,18 +57,18 @@ public abstract class ProxyUtil {
   }
 
   /**
-   * Generates the {@link org.jboss.errai.common.client.api.interceptor.CallContext} for method
+   * Generates the {@link CallContext} for method
    * interception. Ignores annotations in non-translatable packages.
    *
-   * @param callContextType the type of {@link org.jboss.errai.common.client.api.interceptor.RemoteCallContext} to
+   * @param callContextType the type of {@link RemoteCallContext} to
    *                        use.
    * @param proxyClass      the declaring proxy class
    * @param method          the method that is being proxied.
    * @param proceed         the logic that should be invoked if
-   *                        {@link org.jboss.errai.common.client.api.interceptor.CallContext#proceed()} is called.
+   *                        {@link CallContext#proceed()} is called.
    * @param interceptors    a list of interceptors to use
    * @return statement representing an anonymous implementation of the provided
-   * {@link org.jboss.errai.common.client.api.interceptor.CallContext}
+   * {@link CallContext}
    */
   public static AnonymousClassStructureBuilder generateProxyMethodCallContext(final Class<? extends RemoteCallContext> callContextType,
           final MetaClass proxyClass,

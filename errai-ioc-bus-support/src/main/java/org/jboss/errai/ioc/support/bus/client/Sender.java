@@ -17,7 +17,7 @@
 package org.jboss.errai.ioc.support.bus.client;
 
 import org.jboss.errai.bus.client.api.messaging.MessageCallback;
-import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
 import org.jboss.errai.common.client.protocols.MessageParts;
 
 /**

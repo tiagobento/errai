@@ -27,7 +27,7 @@ import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.bus.client.tests.support.ErrorThrowingRPCService;
 import org.jboss.errai.bus.client.tests.support.SimpleRPCService;
 import org.jboss.errai.bus.common.AbstractErraiTest;
-import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
 import org.jboss.errai.common.client.protocols.MessageParts;
 
 import com.google.gwt.core.client.GWT;

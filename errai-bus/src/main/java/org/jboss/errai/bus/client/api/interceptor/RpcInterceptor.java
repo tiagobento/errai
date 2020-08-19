@@ -16,8 +16,8 @@
 
 package org.jboss.errai.bus.client.api.interceptor;
 
-import org.jboss.errai.common.client.api.interceptor.RemoteCallContext;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallInterceptor;
+import org.jboss.errai.codegen.api.RemoteCallContext;
+import org.jboss.errai.codegen.api.RemoteCallInterceptor;
 
 /**
  * Represents a client-side interceptor for remote procedure calls.

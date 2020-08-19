@@ -23,7 +23,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
 import org.jboss.errai.security.client.local.callback.DefaultBusSecurityErrorCallback;
 import org.jboss.errai.security.client.local.callback.DefaultRestSecurityErrorCallback;

@@ -23,8 +23,8 @@ import java.util.List;
 import org.jboss.errai.bus.client.api.BusErrorCallback;
 import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.BatchCaller;
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.ioc.support.bus.client.BatchCallerProvider;
 import org.jboss.errai.ioc.support.bus.tests.client.res.RpcBatchService;
 

@@ -28,8 +28,8 @@ import java.lang.reflect.Method;
 import javax.enterprise.event.Event;
 
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.security.client.local.api.SecurityContext;
 import org.jboss.errai.security.client.local.context.BasicUserCacheImpl;
 import org.jboss.errai.security.client.local.context.SecurityContextImpl;

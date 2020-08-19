@@ -28,14 +28,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.codegen.meta.MetaType;
 import org.jboss.errai.codegen.meta.MetaTypeVariable;
-import org.jboss.errai.common.rebind.CacheStore;
-import org.jboss.errai.common.rebind.CacheUtil;
+import org.jboss.errai.codegen.meta.cache.CacheStore;
+import org.jboss.errai.codegen.meta.cache.CacheUtil;
 
 /**
  * @author Mike Brock <cbrock@redhat.com>
  * @author Jonathan Fuerth <jfuerth@redhat.com>
  */
 public class JavaReflectionUtil {
+
   public static class CacheHolder implements CacheStore {
     final Map<Type, MetaType> FROM_TYPE_CLASS = new ConcurrentHashMap<Type, MetaType>();
 

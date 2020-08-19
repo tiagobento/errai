@@ -25,7 +25,7 @@ import org.jboss.errai.cdi.async.test.cyclic.client.res.CycleNodeA;
 import org.jboss.errai.cdi.async.test.cyclic.client.res.EquHashCheckCycleA;
 import org.jboss.errai.cdi.async.test.cyclic.client.res.EquHashCheckCycleB;
 import org.jboss.errai.cdi.async.test.cyclic.client.res.Petrol;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.jboss.errai.ioc.client.container.Factory;
 import org.jboss.errai.ioc.client.container.IOC;

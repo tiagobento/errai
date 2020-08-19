@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.client.api;
+package org.jboss.errai.codegen.api;
 
 /**
  * Callback interface for failed delivery of specific messages for which an error handler has been provided using the

@@ -16,6 +16,9 @@
 
 package org.jboss.errai.common.client.api;
 
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
+
 /**
  * An interface that can be used as an injection point for batched invocations of remote methods using generated
  * proxies. In contrast to {@link Caller}, no remote request will be sent until {@link #sendBatch()} is called.

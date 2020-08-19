@@ -370,6 +370,20 @@
         <version>${project.version}</version>
       </dependency>
 
+
+      <dependency>
+        <groupId>org.jboss.errai</groupId>
+        <artifactId>errai-ioc-2020</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+
+      <dependency>
+        <groupId>org.jboss.errai</groupId>
+        <artifactId>errai-codegen-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

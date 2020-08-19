@@ -16,7 +16,7 @@
 
 package org.jboss.errai.enterprise.client.jaxrs.api;
 
-import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
 
 import com.google.gwt.http.client.Request;
 

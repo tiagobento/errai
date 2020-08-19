@@ -57,7 +57,7 @@ import org.jboss.errai.cdi.async.test.bm.client.res.QualV;
 import org.jboss.errai.cdi.async.test.bm.client.res.TestBeanActivator;
 import org.jboss.errai.cdi.async.test.bm.client.res.ViaInstanceModule;
 import org.jboss.errai.cdi.async.test.bm.client.res.Visa;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.jboss.errai.ioc.client.QualifierUtil;
 import org.jboss.errai.ioc.client.container.DestructionCallback;

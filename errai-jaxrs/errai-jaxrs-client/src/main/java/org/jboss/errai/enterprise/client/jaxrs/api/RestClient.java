@@ -17,7 +17,7 @@
 package org.jboss.errai.enterprise.client.jaxrs.api;
 
 import org.jboss.errai.common.client.api.Assert;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.common.client.framework.ProxyFactory;
 import org.jboss.errai.common.client.framework.RemoteServiceProxyFactory;
 import org.jboss.errai.enterprise.client.jaxrs.AbstractJaxrsProxy;

@@ -228,6 +228,12 @@
         <version>${version.javax.enterprise}</version>
       </dependency>
       <dependency>
+        <groupId>javax.enterprise</groupId>
+        <artifactId>cdi-api</artifactId>
+        <version>${version.javax.enterprise}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>${version.javax.inject}</version>
@@ -445,6 +451,13 @@
         <groupId>org.mvel</groupId>
         <artifactId>mvel2</artifactId>
         <version>${version.org.mvel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mvel</groupId>
+        <artifactId>mvel2</artifactId>
+        <version>${version.org.mvel}</version>
+        <classifier>sources</classifier>
       </dependency>
      <!-- Keep in sync with groupId ch.qos.logback -->
       <dependency>
@@ -828,6 +841,12 @@
         <groupId>org.jboss.spec.javax.annotation</groupId>
         <artifactId>jboss-annotations-api_1.3_spec</artifactId>
         <version>${version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.3_spec}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.spec.javax.annotation</groupId>
+        <artifactId>jboss-annotations-api_1.3_spec</artifactId>
+        <version>${version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.3_spec}</version>
+        <classifier>sources</classifier>
       </dependency>
       <dependency>
         <groupId>org.jboss.spec.javax.ejb</groupId>

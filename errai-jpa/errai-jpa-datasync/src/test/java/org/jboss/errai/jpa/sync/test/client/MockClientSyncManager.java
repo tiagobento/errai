@@ -19,8 +19,8 @@ package org.jboss.errai.jpa.sync.test.client;
 import java.util.Collections;
 import java.util.Map;
 
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.jpa.sync.client.local.ClientSyncManager;
 
 /**

@@ -17,7 +17,6 @@
 package org.jboss.errai.cdi.rpc.client;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -31,7 +30,7 @@ import org.jboss.errai.cdi.common.client.remote.MyRemote;
 import org.jboss.errai.cdi.common.client.remote.MySessionAttributeSettingRemote;
 import org.jboss.errai.cdi.common.client.remote.SubService;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.EntryPoint;
 
 /**

@@ -16,7 +16,6 @@
 
 package org.jboss.errai.bus.rebind;
 
-import com.google.gwt.core.ext.GeneratorContext;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.bus.client.api.builder.RemoteCallSendable;
 import org.jboss.errai.bus.client.framework.AbstractRpcProxy;
@@ -38,11 +37,9 @@ import org.jboss.errai.codegen.meta.MetaMethod;
 import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.Bool;
 import org.jboss.errai.codegen.util.If;
-import org.jboss.errai.codegen.util.Bool;
-import org.jboss.errai.codegen.util.If;
 import org.jboss.errai.codegen.util.ProxyUtil;
 import org.jboss.errai.codegen.util.Stmt;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallContext;
+import org.jboss.errai.codegen.api.RemoteCallContext;
 import org.jboss.errai.common.client.framework.CallContextStatus;
 
 import java.util.ArrayList;

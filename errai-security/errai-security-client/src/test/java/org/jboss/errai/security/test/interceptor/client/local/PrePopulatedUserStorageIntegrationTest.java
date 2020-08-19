@@ -18,7 +18,7 @@ package org.jboss.errai.security.test.interceptor.client.local;
 
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.common.client.api.extension.InitVotes;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.marshalling.client.Marshalling;

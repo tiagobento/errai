@@ -23,7 +23,7 @@ import java.lang.annotation.Annotation;
 import javax.enterprise.inject.Default;
 
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.security.test.interceptor.client.local.res.Counter;
 import org.jboss.errai.security.test.interceptor.client.local.res.CountingRemoteCallback;

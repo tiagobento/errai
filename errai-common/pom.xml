@@ -44,6 +44,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-codegen-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.errai.reflections</groupId>
       <artifactId>reflections</artifactId>
       <exclusions>
@@ -79,10 +84,12 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>de.benediktmeurer.gwt-slf4j</groupId>
-      <artifactId>gwt-slf4j</artifactId>
-    </dependency>
+    <!--TODO: tiago2020 -->
+    <!-- static GWT not found -->
+    <!--<dependency>-->
+      <!--<groupId>de.benediktmeurer.gwt-slf4j</groupId>-->
+      <!--<artifactId>gwt-slf4j</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.apache.commons</groupId>

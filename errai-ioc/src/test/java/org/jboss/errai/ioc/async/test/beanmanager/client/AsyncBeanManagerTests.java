@@ -18,7 +18,7 @@ package org.jboss.errai.ioc.async.test.beanmanager.client;
 
 import java.util.Collection;
 
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.ioc.async.test.beanmanager.client.res.ADependent;
 import org.jboss.errai.ioc.async.test.beanmanager.client.res.AirDependentBean;
 import org.jboss.errai.ioc.async.test.beanmanager.client.res.Bar;

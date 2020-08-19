@@ -18,7 +18,7 @@ package org.jboss.errai.enterprise.client.jaxrs.test;
 
 import java.util.function.Function;
 
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.JaxrsModule;
 import org.jboss.errai.enterprise.client.jaxrs.api.RequestCallback;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;

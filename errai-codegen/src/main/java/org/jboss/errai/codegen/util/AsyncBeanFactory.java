@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.client.util;
+package org.jboss.errai.codegen.util;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
+import elemental2.dom.DomGlobal;
+import org.jboss.errai.codegen.api.CreationalCallback;
 
 /**
  * Dispatches a created bean via a callback.
@@ -25,22 +25,18 @@ import com.google.gwt.core.client.RunAsyncCallback;
  * @author eric.wittmann@redhat.com
  */
 public class AsyncBeanFactory {
-  
+
   /**
    * Deliver/dispatch the new bean instance asynchronously.
+   *
    * @param bean
    * @param callback
    */
-  public static final void createBean(final Object bean, @SuppressWarnings("rawtypes") final CreationalCallback callback) {
-    GWT.runAsync(new RunAsyncCallback() {
-      @SuppressWarnings("unchecked")
-      public void onSuccess() {
-        callback.callback(bean);
-      }
-      public void onFailure(Throwable caught) {
-        // can't really fail
-      }
-    });
+  public static final void createBean(final Object bean,
+          @SuppressWarnings("rawtypes") final CreationalCallback callback) {
+    DomGlobal.setInterval((a) -> {
+      callback.callback(bean);
+    }, 0);
   }
 
 }

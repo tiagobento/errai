@@ -20,7 +20,6 @@ import org.jboss.errai.codegen.BitwiseOperator;
 import org.jboss.errai.codegen.Expression;
 import org.jboss.errai.codegen.Statement;
 import org.jboss.errai.codegen.builder.impl.BitwiseExpressionBuilder;
-import org.jboss.errai.common.client.api.Assert;
 
 /**
  * @author Mike Brock
@@ -62,13 +61,14 @@ public class Bitwise {
     return append(lhs, BitwiseOperator.ShiftLeft, rhs);
   }
 
-  private static Expression<BitwiseOperator> append(final Object lhs,
-                                                    final BitwiseOperator operator,
-                                                    final Object... rhs) {
-    Assert.notNull("must specify a right hand side value", rhs);
+  private static Expression<BitwiseOperator> append(final Object lhs, final BitwiseOperator operator,
+          final Object... rhs) {
+    if (rhs == null) {
+      throw new NullPointerException("must specify a right hand side value");
+    }
 
     if (rhs.length == 0) {
-      throw new AssertionError("must specifiy at least one right hand side element");
+      throw new AssertionError("must specify at least one right hand side element");
     }
 
     Expression<BitwiseOperator> expr = BitwiseExpressionBuilder.create(lhs, operator, rhs[0]);

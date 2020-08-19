@@ -16,7 +16,8 @@
 
 package org.jboss.errai.common.client.api;
 
-
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 
 /**
  * An interface that can be used as the injection point for a (probably

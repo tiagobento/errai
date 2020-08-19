@@ -18,7 +18,7 @@ package org.jboss.errai.bus.client.api.messaging;
 
 import org.jboss.errai.bus.client.api.RoutingFlag;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
-import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
 import org.jboss.errai.common.client.api.ResourceProvider;
 
 import java.util.Map;

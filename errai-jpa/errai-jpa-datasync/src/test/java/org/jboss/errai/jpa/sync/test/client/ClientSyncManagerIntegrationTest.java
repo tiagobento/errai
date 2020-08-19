@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.common.client.api.extension.InitVotes;
 import org.jboss.errai.enterprise.client.cdi.CDIClientBootstrap;
 import org.jboss.errai.enterprise.client.cdi.api.CDI;

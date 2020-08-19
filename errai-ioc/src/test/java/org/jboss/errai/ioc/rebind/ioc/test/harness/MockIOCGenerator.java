@@ -30,10 +30,7 @@ import org.jboss.errai.ioc.rebind.ioc.bootstrapper.IocRelevantClassesUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 /**

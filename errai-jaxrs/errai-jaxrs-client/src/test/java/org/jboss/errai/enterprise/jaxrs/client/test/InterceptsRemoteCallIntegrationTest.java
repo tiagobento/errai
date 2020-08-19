@@ -16,7 +16,7 @@
 
 package org.jboss.errai.enterprise.jaxrs.client.test;
 
-import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
+import org.jboss.errai.codegen.api.InterceptsRemoteCall;
 import org.jboss.errai.enterprise.client.jaxrs.test.AbstractErraiJaxrsTest;
 import org.jboss.errai.enterprise.jaxrs.client.shared.InterceptsRemoteCallTestService;
 import org.junit.Test;

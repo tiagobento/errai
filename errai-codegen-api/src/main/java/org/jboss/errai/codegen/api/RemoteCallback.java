@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.client.api;
+package org.jboss.errai.codegen.api;
 
 /**
  * Callback interface for receiving the response of an RPC call, regardless of the RPC mechanism.

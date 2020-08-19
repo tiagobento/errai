@@ -18,7 +18,7 @@
 
     <dependency>
       <groupId>org.jboss.errai</groupId>
-      <artifactId>errai-common</artifactId>
+      <artifactId>errai-codegen-api</artifactId>
     </dependency>
 
     <dependency>
@@ -28,14 +28,53 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.elemental2</groupId>
+      <artifactId>elemental2-dom</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.spec.javax.annotation</groupId>
       <artifactId>jboss-annotations-api_1.3_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>org.jboss.spec.javax.annotation</groupId>-->
+      <!--<artifactId>jboss-annotations-api_1.3_spec</artifactId>-->
+      <!--<scope>provided</scope>-->
+      <!--<classifier>sources</classifier>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>javax.enterprise</groupId>-->
+      <!--<artifactId>cdi-api</artifactId>-->
+      <!--<classifier>sources</classifier>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>org.mvel</groupId>
       <artifactId>mvel2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mvel</groupId>
+      <artifactId>mvel2</artifactId>
+      <classifier>sources</classifier>
     </dependency>
 
     <dependency>
@@ -196,7 +235,7 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
-      
+
       <plugin>
        <groupId>org.apache.maven.plugins</groupId>
        <artifactId>maven-jar-plugin</artifactId>

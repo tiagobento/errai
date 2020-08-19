@@ -19,10 +19,10 @@ package org.jboss.errai.security.client.local.interceptors;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.common.client.api.interceptor.InterceptsRemoteCall;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallContext;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallInterceptor;
+import org.jboss.errai.codegen.api.RemoteCallback;
+import org.jboss.errai.codegen.api.InterceptsRemoteCall;
+import org.jboss.errai.codegen.api.RemoteCallContext;
+import org.jboss.errai.codegen.api.RemoteCallInterceptor;
 import org.jboss.errai.security.client.local.api.SecurityContext;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.service.AuthenticationService;

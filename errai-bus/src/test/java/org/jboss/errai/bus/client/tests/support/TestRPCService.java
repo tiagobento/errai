@@ -19,7 +19,7 @@ package org.jboss.errai.bus.client.tests.support;
 import java.util.List;
 
 import org.jboss.errai.bus.server.annotations.Remote;
-import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
+import org.jboss.errai.codegen.api.InterceptedCall;
 
 /**
  * @author Mike Brock <cbrock@redhat.com>

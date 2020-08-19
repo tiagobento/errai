@@ -21,7 +21,7 @@ import java.util.Set;
 
 import javax.enterprise.context.Dependent;
 
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.RefHolder;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanDef;

@@ -30,8 +30,8 @@ import org.jboss.errai.codegen.util.EmptyStatement;
 import org.jboss.errai.codegen.util.InterceptorProvider;
 import org.jboss.errai.codegen.util.ProxyUtil;
 import org.jboss.errai.codegen.util.Stmt;
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.AbstractJaxrsProxy;
 
 import javax.ws.rs.Path;

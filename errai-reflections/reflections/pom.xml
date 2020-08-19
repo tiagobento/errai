@@ -40,12 +40,14 @@
       <optional>true</optional>
     </dependency>
 
+    <!--TODO: tiago2020-->
+    <!-- apache 9 error (log4j related)-->
     <!-- effectively needed when using JBoss6UrlType -->
-    <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>jboss-vfs</artifactId>
-      <optional>true</optional>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.jboss</groupId>-->
+      <!--<artifactId>jboss-vfs</artifactId>-->
+      <!--<optional>true</optional>-->
+    <!--</dependency>-->
 
     <!-- effectively might be needed for war environments -->
     <dependency>

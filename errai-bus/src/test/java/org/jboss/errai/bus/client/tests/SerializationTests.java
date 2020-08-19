@@ -100,7 +100,7 @@ import org.jboss.errai.bus.client.tests.support.pkg.PortableType1;
 import org.jboss.errai.bus.client.tests.support.pkg.serializablesubpkg.PortableType2;
 import org.jboss.errai.bus.client.tests.support.pkg.subpkg.NonSerializable;
 import org.jboss.errai.bus.common.AbstractErraiTest;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 import org.jboss.errai.marshalling.client.Marshalling;
 
 /**

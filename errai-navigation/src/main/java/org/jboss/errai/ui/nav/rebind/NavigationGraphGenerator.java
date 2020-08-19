@@ -51,7 +51,7 @@ import org.jboss.errai.codegen.util.Refs;
 import org.jboss.errai.codegen.util.Stmt;
 import org.jboss.errai.common.client.PageRequest;
 import org.jboss.errai.common.client.api.IsElement;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.common.metadata.RebindUtils;
 import org.jboss.errai.config.apt.MetaClassFinder;
 import org.jboss.errai.config.rebind.AbstractAsyncGenerator;

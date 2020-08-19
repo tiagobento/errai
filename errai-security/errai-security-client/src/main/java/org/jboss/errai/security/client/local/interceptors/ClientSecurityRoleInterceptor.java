@@ -16,11 +16,11 @@
 
 package org.jboss.errai.security.client.local.interceptors;
 
-import org.jboss.errai.common.client.api.ErrorCallback;
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.common.client.api.interceptor.FeatureInterceptor;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallContext;
-import org.jboss.errai.common.client.api.interceptor.RemoteCallInterceptor;
+import org.jboss.errai.codegen.api.ErrorCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
+import org.jboss.errai.codegen.api.FeatureInterceptor;
+import org.jboss.errai.codegen.api.RemoteCallContext;
+import org.jboss.errai.codegen.api.RemoteCallInterceptor;
 import org.jboss.errai.security.client.local.api.SecurityContext;
 import org.jboss.errai.security.shared.api.Role;
 import org.jboss.errai.security.shared.api.annotation.RestrictedAccess;

@@ -27,7 +27,7 @@ import org.jboss.errai.cdi.async.test.producers.client.res.Fooblie;
 import org.jboss.errai.cdi.async.test.producers.client.res.FooblieDependentBean;
 import org.jboss.errai.cdi.async.test.producers.client.res.FooblieMaker;
 import org.jboss.errai.cdi.async.test.producers.client.res.PseudoBeanProducerConsumer;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.async.AsyncBeanFuture;

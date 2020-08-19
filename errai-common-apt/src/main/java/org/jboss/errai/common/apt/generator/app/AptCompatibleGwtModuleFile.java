@@ -16,7 +16,6 @@
 
 package org.jboss.errai.common.apt.generator.app;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.common.apt.exportfile.ExportedTypesFromExportFiles;
 import org.jboss.errai.config.apt.api.ErraiModule;
@@ -64,7 +63,7 @@ class AptCompatibleGwtModuleFile {
       return Files.readAllLines(gwtModuleFile.toPath())
               .stream()
               .map(String::trim)
-              .filter(s -> !StringUtils.isBlank(s))
+              .filter(s -> !s.trim().isEmpty())
               .collect(toList());
     } catch (final IOException e) {
       throw new RuntimeException("Unable to read file " + gwtModuleFile.toURI());

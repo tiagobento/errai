@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package org.jboss.errai.common.client.api.interceptor;
+package org.jboss.errai.codegen.api;
 
-import java.lang.annotation.*;
+import org.jboss.errai.codegen.api.CallContext;
 
 /**
- * Indicates that calls to the annotated method will be intercepted by the specified interceptor(s). When used on
- * a class or interface, all methods of the corresponding type will be intercepted.
+ * Represents an interceptor for either synchronous or asynchronous (remote) method calls.
  * 
  * @author Christian Sadilek <csadilek@redhat.com>
+ * 
+ * @param <T>
+ *          type of {@link CallContext}
  */
-@Documented
-@Target({ ElementType.TYPE, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface InterceptedCall {
+public interface CallInterceptor<T extends CallContext> {
 
-  /**
-   * The interceptor type(s) to use. Interceptor execution is guaranteed to be in declaration order.
-   */
-  Class<? extends CallInterceptor<? extends CallContext>>[] value();
 }

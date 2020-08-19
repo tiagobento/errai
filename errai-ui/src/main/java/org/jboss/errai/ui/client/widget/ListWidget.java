@@ -26,7 +26,7 @@ import javax.enterprise.context.Dependent;
 
 import org.jboss.errai.common.client.api.Assert;
 import org.jboss.errai.common.client.ui.ValueChangeManager;
-import org.jboss.errai.common.client.util.CreationalCallback;
+import org.jboss.errai.codegen.api.CreationalCallback;
 import org.jboss.errai.databinding.client.BindableListWrapper;
 import org.jboss.errai.databinding.client.api.handler.list.BindableListChangeHandler;
 import org.jboss.errai.databinding.client.components.ListComponent;

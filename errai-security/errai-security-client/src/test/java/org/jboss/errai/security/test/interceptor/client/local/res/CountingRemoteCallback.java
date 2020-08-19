@@ -16,7 +16,7 @@
 
 package org.jboss.errai.security.test.interceptor.client.local.res;
 
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.codegen.api.RemoteCallback;
 
 public class CountingRemoteCallback implements RemoteCallback<Void> {
 

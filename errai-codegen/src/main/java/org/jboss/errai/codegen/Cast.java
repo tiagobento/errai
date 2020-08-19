@@ -20,7 +20,6 @@ import org.jboss.errai.codegen.builder.callstack.LoadClassReference;
 import org.jboss.errai.codegen.exception.InvalidTypeException;
 import org.jboss.errai.codegen.meta.MetaClass;
 import org.jboss.errai.codegen.meta.MetaClassFactory;
-import org.jboss.errai.common.client.api.Assert;
 import org.mvel2.util.NullType;
 
 /**
@@ -37,7 +36,10 @@ public class Cast implements Statement {
   private Cast(final MetaClass toType,
                final Statement statement) {
 
-    this.toType = Assert.notNull(toType);
+    if (toType == null) {
+      throw new NullPointerException();
+    }
+    this.toType = toType;
     this.statement = statement;
   }
 

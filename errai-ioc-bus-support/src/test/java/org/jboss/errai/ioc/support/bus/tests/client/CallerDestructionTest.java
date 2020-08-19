@@ -16,7 +16,7 @@
 
 package org.jboss.errai.ioc.support.bus.tests.client;
 
-import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.codegen.api.ErrorCallback;
 import org.jboss.errai.common.client.framework.RemoteServiceProxyFactory;
 import org.jboss.errai.ioc.client.IOCUtil;
 import org.jboss.errai.ioc.client.test.AbstractErraiIOCTest;
