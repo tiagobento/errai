@@ -15,12 +15,6 @@
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-codegen</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.errai</groupId>
-                    <artifactId>errai-common</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

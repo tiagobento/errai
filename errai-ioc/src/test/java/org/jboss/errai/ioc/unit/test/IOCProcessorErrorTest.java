@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import org.jboss.errai.codegen.builder.BlockBuilder;
 import org.jboss.errai.codegen.builder.ClassStructureBuilder;
 import org.jboss.errai.codegen.builder.impl.ClassBuilder;
+import org.jboss.errai.codegen.meta.MetaClassFactory;
 import org.jboss.errai.config.rebind.MetaClassBridgeUtil;
 import org.jboss.errai.codegen.meta.MetaClassCache;
 import org.jboss.errai.codegen.meta.impl.java.JavaReflectionClass;
@@ -105,7 +106,7 @@ public class IOCProcessorErrorTest {
   @Before
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void setup() {
-    MetaClassBridgeUtil.getMetaClassCache().clear();
+    MetaClassFactory.getMetaClassCache().clear();
     FactoryGenerator.setDependencyGraph(null);
 
     final QualifierFactory qualFactory = new DefaultQualifierFactory();
@@ -542,7 +543,7 @@ public class IOCProcessorErrorTest {
   private void addToMetaClassCache(final Class<?>... metaClasses) {
     Arrays.stream(metaClasses)
           .map(type -> JavaReflectionClass.newInstance(type))
-          .forEach(mc -> MetaClassBridgeUtil.getMetaClassCache().pushCache(mc));
+          .forEach(mc -> MetaClassFactory.getMetaClassCache().pushCache(mc));
   }
 
 }
